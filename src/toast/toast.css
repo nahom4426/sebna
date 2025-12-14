@@ -1,0 +1,37 @@
+.leave {
+  animation: leave 0.2s linear;
+}
+
+.enter {
+  animation: enter 0.2s linear normal;
+}
+
+@keyframes enter {
+  0% {
+    opacity: 0;
+    height: 0;
+    transform: translateX(-15rem);
+    overflow: hidden;
+  }
+
+  100% {
+    opacity: 1;
+    height: var(--height);
+    transform: translateX(0rem);
+  }
+}
+
+@keyframes leave {
+  0% {
+    opacity: 1;
+    height: var(--height);
+    transform: translateX(0rem);
+  }
+
+  100% {
+    opacity: 0;
+    height: 0;
+    transform: translateX(-13rem);
+    overflow: hidden;
+  }
+}
