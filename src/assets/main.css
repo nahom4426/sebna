@@ -1,0 +1,138 @@
+@import url("https://fonts.googleapis.com/css2?family=Nunito+Sans:ital,opsz,wght@0,6..12,200..1000;1,6..12,200..1000&display=swap");
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary: 60 60 158;
+  --secondary: 31 56 76;
+  --accent: 224 229 242;
+  --dark: 32 34 36;
+  --text-clr: var(--secondary);
+  --base-clr: 248 250 255;
+  --base-clr2: 247 248 251;
+  --base-clr3: 30 30 30;
+  --base-clr4: 6 86 162;
+  --base-clr5: 43 54 116;
+
+  --drawer-width: 18rem;
+  --navbar-height: 3.5rem;
+}
+
+body {
+  font-family: "Nunito Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+  @apply text-text-clr text-sm;
+  font-variation-settings: "wdth" 100, "YTLC" 500;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+* {
+  scrollbar-width: thin;
+}
+
+.show-scrollbar {
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 0 0.15rem;
+}
+
+.show-scrollbar::-webkit-scrollbar-thumb {
+  border-radius: 5px;
+  background-color: theme("colors.text-clr");
+  visibility: hidden;
+}
+
+.show-scrollbar:hover::-webkit-scrollbar-thumb {
+  visibility: visible;
+}
+
+.show-scrollbar::-webkit-scrollbar {
+  width: 4px !important;
+}
+
+*:focus {
+  outline: none;
+  box-shadow: none;
+}
+
+button:focus,
+input:focus {
+  box-shadow: 0px 0px 0px 2px theme("colors.primary");
+}
+
+[data-required="true"]::after {
+  content: " * ";
+  color: red;
+}
+/* Ripple */
+
+.__ripple {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate;
+}
+.__ripple .__ripple_child {
+  z-index: -1;
+  position: absolute;
+  width: 0px;
+  height: 0px;
+  background-color: #ddd;
+  border-radius: 99999px;
+  transform: translate3d(-50%, -50%, 0);
+  pointer-events: none;
+}
+
+.__ripple_animation {
+  top: var(--y);
+  left: var(--x);
+  animation: ripple 0.4s ease-out;
+}
+
+@keyframes ripple {
+  100% {
+    width: var(--btnWidth);
+    height: var(--btnWidth);
+    opacity: 0;
+  }
+}
+
+/* Add these styles to maintain consistency */
+select {
+  background-color: var(--base-clr) !important;
+}
+
+select option {
+  background-color: white;
+  color: var(--text-clr);
+}
+
+/* Remove default select arrow in modern browsers */
+select {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.5rem center;
+  background-size: 1em;
+  padding-right: 2.5rem;
+}
+
+/* Remove default select arrow in IE */
+select::-ms-expand {
+  display: none;
+}
+
+/* Ensure consistent hover state */
+select option:hover {
+  background-color: var(--accent);
+}
+
