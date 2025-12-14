@@ -76,7 +76,7 @@ export function SignUp() {
               <span>Sign in With Google</span>
             </Button>
             <Button size="lg" color="white" className="flex items-center gap-2 justify-center shadow-md" fullWidth>
-              <img src="/img/twitter-logo.svg" height={24} width={24} alt="" />
+              {/* <img src="/img/twitter-logo.svg" height={24} width={24} alt="" /> */}
               <span>Sign in With Twitter</span>
             </Button>
           </div>
