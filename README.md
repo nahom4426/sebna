@@ -1,187 +1,172 @@
-# [SEBNA](http://demos.creative-tim.com/material-tailwind-dashboard-react/#/?ref=readme-mtdr) [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social&logo=twitter)](https://twitter.com/intent/tweet?url=https://www.creative-tim.com/product/material-tailwind-dashboard-react&text=Check%20Material%20Tailwind%20Dashboard%20React%20made%20by%20@CreativeTim%20#webdesign%20#kit%20#materialdesign%20#react%20#materialtailwind%20#tailwindcss%20https://www.creative-tim.com/product/material-tailwind-dashboard-react)
+# **SEBNA**
 
-![version](https://img.shields.io/badge/version-2.1.0-blue.svg) [![GitHub issues open](https://img.shields.io/github/issues/creativetimofficial/material-tailwind-dashboard-react.svg)](https://github.com/creativetimofficial/material-tailwind-dashboard-react/issues?q=is%3Aopen+is%3Aissue) [![GitHub issues closed](https://img.shields.io/github/issues-closed-raw/creativetimofficial/material-tailwind-dashboard-react.svg)](https://github.com/creativetimofficial/material-tailwind-dashboard-react/issues?q=is%3Aissue+is%3Aclosed)
+![version](https://img.shields.io/badge/version-1.0.0-blue.svg)
 
-![Image](https://s3.amazonaws.com/creativetim_bucket/products/488/original/material-tailwind-dashboard-react.jpg)
+![Image](https://via.placeholder.com/1200x630?text=SEBNA+Dashboard)
 
-SEBNA is our newest free Material Tailwind Admin Template based on Tailwind CSS and React. If you’re a developer looking to create an admin dashboard that is developer-friendly, rich with features, and highly customisable, here is your match. Our innovative Material Tailwind, Tailwind CSS & React dashboard comes with a beautiful design inspired by Google's Material Design and it will help you create stunning websites & web apps to delight your clients.
+**SEBNA** is a modern, scalable, and developer‑friendly **Material Tailwind Admin Dashboard** built with **React** and **Tailwind CSS**. It is designed as the **parent platform for Share Companies**, providing structured administration, role‑based access control, and rich content management.
 
-**Fully Coded Elements**
+SEBNA focuses on clarity, performance, and extensibility, enabling administrators and institutional users to manage data, users, roles, and published content efficiently.
 
-SEBNA is built with over 40 frontend individual elements coming from @material-tailwind/react, like buttons, inputs, navbars, nav tabs, cards, or alerts, giving you the freedom of choosing and combining. All components can take variations in color, which you can easily modify using props and tailwind css classnames. You will save a lot of time going from prototyping to full-functional code because all elements are implemented.
+---
 
-This free Material Tailwind, Tailwind CSS & React Dashboard is coming with prebuilt design blocks, so the development process is seamless, switching from our pages to the real website is very easy to be done.
+## 🚀 Key Features
 
-View [all components here](https://www.material-tailwind.com/docs/react/button).
+* Built with **React + Tailwind CSS + Material Tailwind**
+* Clean and professional **Material Design UI**
+* **Role‑based access control (RBAC)**
+* Scalable structure for multi‑institution platforms
+* Fully responsive (desktop, tablet, mobile)
+* Easy customization and extension
 
-**Documentation built by Developers**
+---
 
-Each element is well presented in very complex documentation.
+## 👥 User Roles
 
-You can read more about the [documentation here](https://www.material-tailwind.com/docs/react/installation).
+SEBNA supports **three main roles**:
 
-**Example Pages**
+### 1️⃣ Super Admin (Platform Admin)
 
-If you want to get inspiration or just show something directly to your clients, you can jump-start your development with our pre-built example pages. You will be able to quickly set up the basic structure for your web project.
+* Creates and manages share company institutions
+* Manages institution admins
+* Controls system‑wide roles and privileges
+* Publishes global announcements and information
+* Manages platform content including images
 
-View [example pages here](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/dashboard/home).
+### 2️⃣ Institution Admin
 
-**HELPFUL LINKS**
+* Manages institution users
+* Publishes news and updates with images
+* Provides institution‑specific information
+* Controls internal content and users
 
-- View [Github Repository](https://github.com/creativetimofficial/material-tailwind-dashboard-react)
-- Check [FAQ Page](https://www.creative-tim.com/faq)
+### 3️⃣ Users
 
-#### Special thanks
+* View published news and information
+* Access institution content
+* Interact with publicly available data
 
-During the development of this dashboard, we have used many existing resources from awesome developers. We want to thank them for providing their tools open source:
+---
 
-- [Material Tailwind](https://material-tailwind.com/) - Material Tailwind is an easy to use components library for Tailwind CSS and Material Design.
-- [Hero Icons](https://heroicons.com/) - Beautiful hand-crafted SVG icons.
-- [Apex Charts](https://apexcharts.com/) - Modern & Interactive open-source Charts.
-- [Nepcha Analytics](https://nepcha.com?ref=readme) for the analytics tool. Nepcha is already integrated with SEBNA. You can use it to gain insights into your sources of traffic.
+## 🧩 Fully Coded Components
 
-Let us know your thoughts below. And good luck with development!
+SEBNA includes **40+ reusable UI components** powered by **@material-tailwind/react**, such as:
 
-## Table of Contents
+* Buttons & Inputs
+* Cards & Alerts
+* Navbars & Sidebars
+* Tabs & Tables
+* Modals & Forms
 
-- [Versions](#versions)
-- [Demo](#demo)
-- [Quick Start](#quick-start)
-- [Deploy](#deploy)
-- [Documentation](#documentation)
-- [File Structure](#file-structure)
-- [Browser Support](#browser-support)
-- [Resources](#resources)
-- [Reporting Issues](#reporting-issues)
-- [Technical Support or Questions](#technical-support-or-questions)
-- [Licensing](#licensing)
-- [Useful Links](#useful-links)
+All components are configurable using **props** and **Tailwind utility classes**, allowing rapid development and easy customization.
 
-## Versions
+---
 
-[<img src="https://raw.githubusercontent.com/creativetimofficial/public-assets/master/logos/react-logo.jpg?raw=true" width="60" height="60" />](https://www.creative-tim.com/product/material-tailwind-dashboard-react?ref=readme-mtdr)
+## 📄 Documentation
 
-| React |
-| ----- |
+Each component and layout follows clean, developer‑friendly patterns. The project structure is organized to support long‑term scalability and team collaboration.
 
-| [![SEBNA](https://s3.amazonaws.com/creativetim_bucket/products/488/thumb/material-tailwind-dashboard-react.jpg)](http://demos.creative-tim.com/material-tailwind-dashboard-react/#/?ref=readme-mtdr)
+---
 
-## Demo
-
-- [Dashboard page](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/dashboard/home?ref=readme-mtdr)
-- [Profile page](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/dashboard/profile?ref=readme-mtdr)
-- [Tables page](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/dashboard/tables?ref=readme-mtdr)
-- [Notifications page](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/dashboard/notifications?ref=readme-mtdr)
-- [Sign in page](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/auth/sign-in?ref=readme-mtdr)
-- [Sign up page](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/auth/sign-up?ref=readme-mtdr)
-
-[View More](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/?ref=readme-mtdr).
-
-## Quick start
-
-Quick start options:
-
-- Download from [Creative Tim](https://www.creative-tim.com/product/material-tailwind-dashboard-react?ref=readme-mtdr).
-
-## Deploy
-
-:rocket: You can deploy your own version of the template to Genezio with one click:
-
-[![Deploy to Genezio](https://raw.githubusercontent.com/Genez-io/graphics/main/svg/deploy-button.svg)](https://app.genez.io/start/deploy?repository=https://github.com/creativetimofficial/material-tailwind-dashboard-react&utm_source=github&utm_medium=referral&utm_campaign=github-creativetim&utm_term=deploy-project&utm_content=button-head)
-
-## Terminal Commands
-
-1. Download and Install NodeJs LTS version from [NodeJs Official Page](https://nodejs.org/en/download/).
-2. Navigate to the root ./ directory of the product and run `npm install` or `yarn install` or `pnpm install` to install our local dependencies.
-
-## Documentation
-
-The documentation for the SEBNA is hosted at our [website](https://material-tailwind.com/?ref=readme-mtdr).
-
-### What's included
-
-Within the download you'll find the following directories and files:
+## 📦 Project Structure
 
 ```
-material-tailwind-dashboard-react
-    ├── public
-    │   ├── css
-    │   └── img
-    ├── src
-    │   ├── configs
-    │   ├── context
-    │   ├── data
-    │   ├── layouts
-    │   ├── pages
-    │   ├── widgets
-    │   ├── App.jsx
-    │   ├── main.jsx
-    │   └── routes.jsx
-    ├── .gitignore
-    ├── CHANGELOG.md
-    ├── index.html
-    ├── ISSUE_TEMPLATE.md
-    ├── jsconfig.json
-    ├── LICENSE
-    ├── package.json
-    ├── postcsss.config.cjs
-    ├── prettier.config.cjs
-    ├── README.md
-    ├── tailwind.config.cjs
-    └── vite.config.js
+sebnA-dashboard
+├── public
+│   ├── css
+│   └── img
+├── src
+│   ├── configs
+│   ├── context
+│   ├── data
+│   ├── layouts
+│   ├── pages
+│   ├── widgets
+│   ├── App.jsx
+│   ├── main.jsx
+│   └── routes.jsx
+├── .gitignore
+├── index.html
+├── package.json
+├── tailwind.config.cjs
+├── vite.config.js
+└── README.md
 ```
 
-## Browser Support
+---
 
-At present, we officially aim to support the last two versions of the following browsers:
+## ⚡ Quick Start
 
-<img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/chrome.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/firefox.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/edge.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/safari.png" width="64" height="64"> <img src="https://s3.amazonaws.com/creativetim_bucket/github/browser/opera.png" width="64" height="64">
+### Requirements
 
-## Resources
+* Node.js (LTS recommended)
+* npm / yarn / pnpm
 
-- [Live Preview](https://demos.creative-tim.com/material-tailwind-dashboard-react/#/dashboard/home?ref=readme-mtdr)
-- [Download Page](https://www.creative-tim.com/product/material-tailwind-dashboard-react?ref=readme-mtdr)
-- Documentation is [here](https://material-tailwind.com/?ref=readme-mtdr)
-- [License Agreement](https://www.creative-tim.com/license?ref=readme-mtdr)
-- [Support](https://www.creative-tim.com/contact-us?ref=readme-mtdr)
-- Issues: [Github Issues Page](https://github.com/creativetimofficial/material-tailwind-dashboard-react/issues)
-- [Nepcha Analytics](https://nepcha.com?ref=readme) - Analytics tool for your website
+### Installation
 
-## Reporting Issues
+```bash
+npm install
+# or
+yarn install
+# or
+pnpm install
+```
 
-We use GitHub Issues as the official bug tracker for the SEBNA. Here are some advices for our users that want to report an issue:
+### Run Development Server
 
-1. Make sure that you are using the latest version of the SEBNA. Check the CHANGELOG from your dashboard on our [website](https://www.creative-tim.com/product/material-tailwind-dashboard-react?ref=readme-mtdr).
-2. Providing us reproducible steps for the issue will shorten the time it takes for it to be fixed.
-3. Some issues may be browser specific, so specifying in what browser you encountered the issue might help.
+```bash
+npm run dev
+```
 
-## Technical Support or Questions
+---
 
-If you have questions or need help integrating the product please [contact us](https://www.creative-tim.com/contact-us?ref=readme-mtdr) instead of opening an issue.
+## 🌍 Browser Support
 
-## Licensing
+SEBNA supports the latest versions of:
 
-- Copyright 2023 [Creative Tim](https://www.creative-tim.com?ref=readme-mtdr)
-- Creative Tim [license](https://www.creative-tim.com/license?ref=readme-mtdr)
+* Chrome
+* Firefox
+* Edge
+* Safari
+* Opera
 
-## Useful Links
+---
 
-- [More products](https://www.creative-tim.com/templates?ref=readme-mtdr) from Creative Tim
+## 🛠️ Technologies Used
 
-- [Tutorials](https://www.youtube.com/channel/UCVyTG4sCw-rOvB9oHkzZD1w)
+* **React**
+* **Tailwind CSS**
+* **Material Tailwind**
+* **Vite**
+* **Hero Icons**
+* **ApexCharts**
 
-- [Freebies](https://www.creative-tim.com/bootstrap-themes/free?ref=readme-mtdr) from Creative Tim
+---
 
-- [Affiliate Program](https://www.creative-tim.com/affiliates/new?ref=readme-mtdr) (earn money)
+## 🐞 Reporting Issues
 
-##### Social Media
+If you encounter issues:
 
-Twitter: <https://twitter.com/CreativeTim>
+1. Ensure you are using the latest version
+2. Provide clear reproduction steps
+3. Mention browser and environment details
 
-Facebook: <https://www.facebook.com/CreativeTim>
+---
 
-Dribbble: <https://dribbble.com/creativetim>
+## 📜 License
 
-Google+: <https://plus.google.com/+CreativetimPage>
+SEBNA is released under a **custom internal license** for platform use.
 
-Instagram: <https://instagram.com/creativetimofficial>
+---
+
+## 🤝 Credits
+
+* Material Tailwind
+* Tailwind CSS
+* React Community
+* Hero Icons
+* ApexCharts
+
+---
+
+**SEBNA** – A unified platform for managing share company institutions with clarity, control, and confidence.

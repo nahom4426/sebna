@@ -528,21 +528,22 @@ const UserForm = ({ user = null, onSuccess }) => {
                     </Typography>
                   )}
                 </div>
-                <Select
-                  value={formData.roleUuid}
-                  onChange={(value) => handleSelectChange('roleUuid', value)}
-                  disabled={rolesLoading || loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  label={selectedRole ? selectedRole.name : 'Select a role'}
-                  menuProps={{ className: "max-h-48 z-[9999]" }}
-                >
-                  {renderRoleOptions()}
-                </Select>
-                {formData.roleUuid && selectedRole && (
-                  <div className="mt-2 text-sm text-gray-700">
-                    <strong>Selected:</strong> {selectedRole.name}
-                  </div>
-                )}
+                <div className="relative">
+                  <Select
+                    value={formData.roleUuid}
+                    onChange={(value) => handleSelectChange('roleUuid', value)}
+                    disabled={rolesLoading || loading}
+                    className="!border-gray-300 focus:!border-blue-500 !text-sm"
+                    menuProps={{ className: "max-h-48 z-[9999]" }}
+                  >
+                    {renderRoleOptions()}
+                  </Select>
+                  {formData.roleUuid && selectedRole && (
+                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-700 font-medium text-sm">
+                      {selectedRole.name}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Institution Selection (conditional) */}
@@ -554,56 +555,56 @@ const UserForm = ({ user = null, onSuccess }) => {
                       Institution *
                     </Typography>
                   </div>
-                  {(() => {
-                    const selectedInstitution = institutions.find(i => i.id === formData.institutionId);
-                    return (
-                      <Select
-                        value={formData.institutionId}
-                        onChange={(value) => handleSelectChange('institutionId', value)}
-                        disabled={institutionsLoading || loading}
-                        className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                        label={selectedInstitution ? selectedInstitution.name : (institutionsLoading ? 'Loading...' : 'Select institution')}
-                        menuProps={{ className: "max-h-48 z-[9999]" }}
-                      >
-                        <Option value="" className="text-gray-400 text-sm">
-                          {institutionsLoading ? 'Loading institutions...' : 'Select institution'}
-                        </Option>
-                        {institutions.map((inst) => (
-                          <Option 
-                            key={inst.id}
-                            value={inst.id}
-                            className="text-gray-700 text-sm"
+                  <div className="relative">
+                    {(() => {
+                      const selectedInstitution = institutions.find(i => i.id === formData.institutionId);
+                      return (
+                        <>
+                          <Select
+                            value={formData.institutionId}
+                            onChange={(value) => handleSelectChange('institutionId', value)}
+                            disabled={institutionsLoading || loading}
+                            className="!border-gray-300 focus:!border-blue-500 !text-sm"
+                            menuProps={{ className: "max-h-48 z-[9999]" }}
                           >
-                            <div className="flex items-center gap-2 py-1">
-                              {inst.logo && (
+                            <Option value="" className="text-gray-400 text-sm">
+                              {institutionsLoading ? 'Loading institutions...' : 'Select institution'}
+                            </Option>
+                            {institutions.map((inst) => (
+                              <Option 
+                                key={inst.id}
+                                value={inst.id}
+                                className="text-gray-700 text-sm"
+                              >
+                                <div className="flex items-center gap-2 py-1">
+                                  {inst.logo && (
+                                    <img
+                                      src={inst.logo}
+                                      alt={inst.name}
+                                      className="h-5 w-5 object-contain rounded"
+                                    />
+                                  )}
+                                  <span>{inst.name}</span>
+                                </div>
+                              </Option>
+                            ))}
+                          </Select>
+                          {formData.institutionId && selectedInstitution && (
+                            <div className="absolute inset-y-0 left-0 flex items-center gap-2 pl-3 pointer-events-none text-gray-700 font-medium text-sm">
+                              {selectedInstitution.logo && (
                                 <img
-                                  src={inst.logo}
-                                  alt={inst.name}
-                                  className="h-5 w-5 object-contain rounded"
+                                  src={selectedInstitution.logo}
+                                  alt={selectedInstitution.name}
+                                  className="h-4 w-4 object-contain rounded"
                                 />
                               )}
-                              <span>{inst.name}</span>
+                              <span>{selectedInstitution.name}</span>
                             </div>
-                          </Option>
-                        ))}
-                      </Select>
-                    );
-                  })()}
-                  {formData.institutionId && institutions.find(i => i.id === formData.institutionId) && (
-                    <div className="mt-2 text-sm text-gray-700">
-                      <div className="flex items-center gap-2">
-                        <strong>Selected:</strong>
-                        {institutions.find(i => i.id === formData.institutionId)?.logo && (
-                          <img
-                            src={institutions.find(i => i.id === formData.institutionId).logo}
-                            alt="institution"
-                            className="h-4 w-4 object-contain rounded"
-                          />
-                        )}
-                        <span>{institutions.find(i => i.id === formData.institutionId)?.name}</span>
-                      </div>
-                    </div>
-                  )}
+                          )}
+                        </>
+                      );
+                    })()}
+                  </div>
                   <Typography variant="small" color="gray" className="mt-1 text-xs">
                     Required for company roles
                   </Typography>
