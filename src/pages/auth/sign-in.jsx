@@ -3,6 +3,7 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { login, forgotPassword, resetPassword, verifyResetCode } from '@/pages/admin/api/LoginApi';
 import { toasted } from '@/utils/toast';
+import { useAuthStore } from '@/stores/authStore';
 import logo from '@/assets/logo.svg';
 import { FiMail, FiLock, FiSmartphone, FiArrowRight, FiArrowLeft, FiX, FiEye, FiEyeOff } from 'react-icons/fi';
 
@@ -84,6 +85,8 @@ const GlassCard = ({ children, className = '' }) => (
 const SignIn = () => {
   const navigate = useNavigate();
   const location = useLocation();
+  const auth = useAuthStore((state) => state.auth);
+  const setAuth = useAuthStore((state) => state.setAuth);
   
   // Login state
   const [email, setEmail] = useState('');
@@ -112,14 +115,13 @@ const SignIn = () => {
   const [isFocused, setIsFocused] = useState({ email: false, password: false });
   const [showPassword, setShowPassword] = useState(false);
   
-  // Check if user is already logged in
+  // Check if user is already logged in (use auth store, not localStorage)
   useEffect(() => {
-    const userDetail = localStorage.getItem('userDetail');
-    if (userDetail) {
+    if (auth?.accessToken) {
       const redirectPath = location.state?.from?.pathname || '/dashboard/home';
-      navigate(redirectPath);
+      navigate(redirectPath, { replace: true });
     }
-  }, [navigate, location]);
+  }, [auth?.accessToken, navigate, location]);
 
   // Login handler
   const handleLogin = async (e) => {
@@ -132,9 +134,14 @@ const SignIn = () => {
       const response = await login({ email, password });
       
       if (response.success) {
+        // Set auth in store (this will also save to localStorage)
+        setAuth({
+          user: response.data,
+          accessToken: response.data?.token || response.data?.accessToken,
+        });
         localStorage.setItem('userDetail', JSON.stringify(response.data));
         const redirectPath = location.state?.from?.pathname || '/dashboard/home';
-        navigate(redirectPath);
+        navigate(redirectPath, { replace: true });
       } else {
         const errorMsg = response?.error?.toLowerCase?.() || '';
         if (response.status === 404 && errorMsg.includes('not active')) {
