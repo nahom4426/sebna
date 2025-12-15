@@ -4,7 +4,7 @@ import MainLayout from '@/layouts/MainLayout';
 import SignIn from '@/pages/auth/sign-in';
 import SignUp from '@/pages/auth/sign-up';
 import { Home, Profile, Tables, Notifications } from '@/features/dashboard';
-import { Users, Roles, Privileges, Institutions, Posts, Messages, Comments } from '@/pages/admin';
+import { Users, Roles, Privileges, Institutions, Posts, Messages, Comments, Logs } from '@/pages/admin';
 import SebnaLanding from '@/pages/SebnaLanding';
 import ProtectedRoute from './ProtectedRoute';
 import { ROLES } from '@/constants/roles';
