@@ -3,32 +3,34 @@ import ApiService from '@/services/ApiService';
 const api = new ApiService(import.meta.env.VITE_API_URI);
 
 // Posts API endpoints
-export function getAllPosts(query = {}) {
-  const params = new URLSearchParams(query).toString();
-  const queryString = params ? `?${params}` : '';
-  return api.addAuthenticationHeader().get(`/posts${queryString}`);
+export function getAllPosts(page = 0, limit = 10) {
+  return api.addAuthenticationHeader().get(`/api/v1/posts?page=${page}&limit=${limit}`);
+}
+
+export function getInstitutionPosts(institutionId, page = 0, limit = 10) {
+  return api.addAuthenticationHeader().get(`/api/v1/posts/institution/${institutionId}?page=${page}&limit=${limit}`);
+}
+
+export function getUserPosts(userId, page = 0, limit = 10) {
+  return api.addAuthenticationHeader().get(`/api/v1/posts/user/${userId}?page=${page}&limit=${limit}`);
 }
 
 export function getPostById(id) {
-  return api.addAuthenticationHeader().get(`/posts/${id}`);
+  return api.addAuthenticationHeader().get(`/api/v1/posts/${id}`);
 }
 
 export function createPost(data) {
-  // Use multipart/form-data for image upload
   const formData = new FormData();
-  formData.append('title', data.title || '');
   formData.append('content', data.content || '');
+  
   if (data.institutionId) {
     formData.append('institutionId', data.institutionId);
-  }
-  if (data.status) {
-    formData.append('status', data.status);
   }
   if (data.imageFile instanceof File) {
     formData.append('image', data.imageFile);
   }
 
-  return api.addAuthenticationHeader().post('/posts', formData, {
+  return api.addAuthenticationHeader().post('/api/v1/posts', formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -37,19 +39,16 @@ export function createPost(data) {
 
 export function updatePostById(id, data) {
   const formData = new FormData();
-  formData.append('title', data.title || '');
   formData.append('content', data.content || '');
+  
   if (data.institutionId) {
     formData.append('institutionId', data.institutionId);
-  }
-  if (data.status) {
-    formData.append('status', data.status);
   }
   if (data.imageFile instanceof File) {
     formData.append('image', data.imageFile);
   }
 
-  return api.addAuthenticationHeader().put(`/posts/${id}`, formData, {
+  return api.addAuthenticationHeader().put(`/api/v1/posts/${id}`, formData, {
     headers: {
       'Content-Type': 'multipart/form-data',
     },
@@ -57,5 +56,5 @@ export function updatePostById(id, data) {
 }
 
 export function removePostById(id) {
-  return api.addAuthenticationHeader().delete(`/posts/${id}`);
+  return api.addAuthenticationHeader().delete(`/api/v1/posts/${id}`);
 }

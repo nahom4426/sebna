@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { ROLES } from '@/constants/roles';
 
 const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
   const location = useLocation();
@@ -8,54 +9,103 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
   const [expandedMenus, setExpandedMenus] = useState([]);
   const auth = useAuthStore((state) => state.auth);
 
-  // Navigation configuration
   const navs = [
     {
       name: 'Dashboard',
       icon: '🏠',
       path: '/dashboard/home',
-      privilege: null,
+      requiredRoles: [],
     },
     {
-      name: 'Admin',
+      name: 'Admin Panel',
       icon: '⚙️',
-      privilege: null,
+      requiredRoles: [],
       navs: [
         {
           name: 'Users',
           icon: '👥',
           path: '/admin/users',
-          privilege: ['create_user'],
+          requiredRoles: [
+            ROLES.READ_USERS,
+            ROLES.CREATE_USER,
+            ROLES.UPDATE_USER,
+            ROLES.DELETE_USER,
+          ],
         },
         {
           name: 'Roles',
           icon: '🔐',
           path: '/admin/roles',
-          privilege: ['ROLE_MANAGEMENT','create_user'],
+          requiredRoles: [
+            ROLES.READ_ROLES,
+            ROLES.CREATE_ROLE,
+            ROLES.UPDATE_ROLE,
+            ROLES.DELETE_ROLE,
+            ROLES.READ_ROLE,
+          ],
         },
         {
           name: 'Privileges',
           icon: '🛡️',
           path: '/admin/privileges',
-          privilege: ['PRIVILEGE_MANAGEMENT','create_user'],
+          requiredRoles: [
+            ROLES.READ_PRIVILEGES,
+            ROLES.CREATE_PRIVILEGE,
+            ROLES.UPDATE_PRIVILEGE,
+            ROLES.DELETE_PRIVILEGE,
+            ROLES.READ_PRIVILEGE,
+          ],
         },
         {
           name: 'Institutions',
           icon: '🏢',
           path: '/admin/institutions',
-          privilege: ['PRIVILEGE_MANAGEMENT','create_user'],
+          requiredRoles: [
+            ROLES.READ_INSTITUTIONS,
+            ROLES.CREATE_INSTITUTION,
+            ROLES.UPDATE_INSTITUTION,
+            ROLES.DELETE_INSTITUTION,
+            ROLES.READ_INSTITUTION,
+          ],
         },
         {
           name: 'Posts',
           icon: '📰',
           path: '/admin/posts',
-          privilege: ['CREATE_POST'],
+          requiredRoles: [
+            ROLES.READ_POSTS,
+            ROLES.CREATE_POST,
+            ROLES.UPDATE_POST,
+            ROLES.DELETE_POST,
+            ROLES.READ_POST,
+            ROLES.LIKE_POST,
+            ROLES.UNLIKE_POST,
+          ],
         },
         {
           name: 'Messages',
           icon: '✉️',
           path: '/admin/messages',
-          privilege: ['SEND_MESSAGE'],
+          requiredRoles: [
+            ROLES.READ_MESSAGES,
+            ROLES.SEND_MESSAGE,
+          ],
+        },
+        {
+          name: 'Comments',
+          icon: '💬',
+          path: '/admin/comments',
+          requiredRoles: [
+            ROLES.READ_COMMENTS,
+            ROLES.CREATE_COMMENT,
+            ROLES.DELETE_COMMENT,
+          ],
+        },
+        {
+          name: 'Logs',
+          icon: '📋',
+          path: '/admin/logs',
+          requiredRoles: [ROLES.READ_LOGS],
         },
       ],
     },
@@ -63,55 +113,49 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
       name: 'Profile',
       icon: '👤',
       path: '/dashboard/profile',
-      privilege: null,
+      requiredRoles: [],
     },
     {
       name: 'Tables',
       icon: '📊',
       path: '/dashboard/tables',
-      privilege: null,
+      requiredRoles: [],
     },
     {
       name: 'Notifications',
       icon: '🔔',
       path: '/dashboard/notifications',
-      privilege: null,
+      requiredRoles: [],
     },
   ];
 
-  // Privilege checking
-  const hasPrivilege = (requiredPrivileges) => {
-    if (!requiredPrivileges || requiredPrivileges.length === 0) return true;
+  const hasPrivilege = (requiredRoles) => {
+    if (!requiredRoles || requiredRoles.length === 0) return true;
     const userPrivileges = auth?.user?.privileges || [];
     const userRole = auth?.user?.roleName;
 
-    // Super Admin or All Privileges can access everything
     if (userRole === 'Super Admin' || userPrivileges.includes('All Privileges')) {
       return true;
     }
 
-    // Check if user has any of the required privileges
-    return requiredPrivileges.some((priv) => 
-      priv && priv.length > 0 && userPrivileges.includes(`ROLE_${priv}`)
-    );
+    return requiredRoles.some((role) => userPrivileges.includes(role));
   };
 
-  // Filter navigation items based on privileges
   const filteredNavs = useMemo(() => {
     return navs
       .map((item) => {
         if (item.navs) {
           const filteredChildren = item.navs.filter((child) =>
-            hasPrivilege(child.privilege)
+            hasPrivilege(child.requiredRoles)
           );
-          return hasPrivilege(item.privilege) || filteredChildren.length > 0
+          return hasPrivilege(item.requiredRoles) || filteredChildren.length > 0
             ? { ...item, navs: filteredChildren }
             : null;
         }
-        return hasPrivilege(item.privilege) ? item : null;
+        return hasPrivilege(item.requiredRoles) ? item : null;
       })
       .filter(Boolean);
-  }, []);
+  }, [auth?.user?.privileges, auth?.user?.roleName]);
 
   // Toggle menu expansion
   const toggleMenu = (name) => {

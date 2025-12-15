@@ -1,6 +1,4 @@
-// import { toasted } from "@/utils/utils";
-
-import { toasted } from "@/utils/utils";
+import { toasted } from "@/utils/toast";
 
 export async function responseHandler(request) {
   try {
@@ -30,7 +28,10 @@ export async function responseHandler(request) {
         errMsg = error.message || "Request failed";
       }
 
-      toasted(false, "", errMsg);
+      // Use setTimeout to avoid calling hooks outside component context
+      setTimeout(() => {
+        toasted(false, "", errMsg);
+      }, 0);
 
       return {
         success: false,
@@ -41,7 +42,10 @@ export async function responseHandler(request) {
 
     // Request never reached the server
     if (error.request) {
-      toasted(false, "", error.message);
+      setTimeout(() => {
+        toasted(false, "", error.message);
+      }, 0);
+      
       return {
         success: false,
         status: error.code,
