@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getAllPosts, getPostById, createPost, updatePostById, removePostById } from '@/pages/admin/posts/api/PostsApi';
 
 export const usePosts = (page = 0, limit = 10) => {
@@ -7,27 +7,39 @@ export const usePosts = (page = 0, limit = 10) => {
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const fetchPosts = useCallback(async () => {
+    if (!isMountedRef.current) return;
     setLoading(true);
     setError(null);
     try {
       const response = await getAllPosts(page, limit);
+      if (!isMountedRef.current) return;
       const data = response.data || response;
       setPosts(data.content || data.posts || []);
       setTotalPages(data.totalPages || 0);
       setTotalElements(data.totalElements || 0);
     } catch (err) {
+      if (!isMountedRef.current) return;
       setError(err.message || 'Failed to fetch posts');
       console.error('Error fetching posts:', err);
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [page, limit]);
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]);
+  }, [page, limit]);
 
   const createNewPost = useCallback(async (postData) => {
     try {

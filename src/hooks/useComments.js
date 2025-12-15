@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getPostComments, createComment, updateCommentById, deleteCommentById } from '@/pages/admin/comments/api/CommentsApi';
 
 export const useComments = (postId, page = 0, limit = 10) => {
@@ -7,28 +7,39 @@ export const useComments = (postId, page = 0, limit = 10) => {
   const [error, setError] = useState(null);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const fetchComments = useCallback(async () => {
-    if (!postId) return;
+    if (!postId || !isMountedRef.current) return;
     setLoading(true);
     setError(null);
     try {
       const response = await getPostComments(postId, page, limit);
+      if (!isMountedRef.current) return;
       const data = response.data || response;
       setComments(data.content || data.comments || []);
       setTotalPages(data.totalPages || 0);
       setTotalElements(data.totalElements || 0);
     } catch (err) {
+      if (!isMountedRef.current) return;
       setError(err.message || 'Failed to fetch comments');
       console.error('Error fetching comments:', err);
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [postId, page, limit]);
 
   useEffect(() => {
     fetchComments();
-  }, [fetchComments]);
+  }, [postId, page, limit]);
 
   const addComment = useCallback(async (content) => {
     try {

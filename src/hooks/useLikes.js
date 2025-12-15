@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { getPostLikes, getPostLikeCount, checkIfUserLiked, toggleLike } from '@/pages/admin/posts/api/LikesApi';
 
 export const useLikes = (postId) => {
@@ -7,9 +7,16 @@ export const useLikes = (postId) => {
   const [isLiked, setIsLiked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const fetchLikeData = useCallback(async () => {
-    if (!postId) return;
+    if (!postId || !isMountedRef.current) return;
     setLoading(true);
     setError(null);
     try {
@@ -19,6 +26,8 @@ export const useLikes = (postId) => {
         checkIfUserLiked(postId),
       ]);
 
+      if (!isMountedRef.current) return;
+
       const likesData = likesResponse.data || likesResponse;
       const countData = countResponse.data || countResponse;
       const likedData = likedResponse.data || likedResponse;
@@ -27,16 +36,19 @@ export const useLikes = (postId) => {
       setLikeCount(countData.count || countData || 0);
       setIsLiked(likedData.liked || likedData || false);
     } catch (err) {
+      if (!isMountedRef.current) return;
       setError(err.message || 'Failed to fetch likes');
       console.error('Error fetching likes:', err);
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   }, [postId]);
 
   useEffect(() => {
     fetchLikeData();
-  }, [fetchLikeData]);
+  }, [postId]);
 
   const togglePostLike = useCallback(async () => {
     try {

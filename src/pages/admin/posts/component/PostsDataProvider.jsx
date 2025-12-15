@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { getAllPosts } from '../api/PostsApi';
 
 const PostsDataProvider = ({ search = '', children }) => {
@@ -9,8 +9,16 @@ const PostsDataProvider = ({ search = '', children }) => {
   const [perPage, setPerPage] = React.useState(25);
   const [totalElements, setTotalElements] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(1);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const fetchPosts = useCallback(async (pageNum = 1, pageSize = 25, searchTerm = '') => {
+    if (!isMountedRef.current) return;
     setPending(true);
     setError(null);
     try {
@@ -19,6 +27,8 @@ const PostsDataProvider = ({ search = '', children }) => {
         page: pageNum,
         size: pageSize,
       });
+
+      if (!isMountedRef.current) return;
 
       if (response.success) {
         const data = response.data;
@@ -32,10 +42,13 @@ const PostsDataProvider = ({ search = '', children }) => {
         setError(response.error || 'Failed to fetch posts');
       }
     } catch (err) {
+      if (!isMountedRef.current) return;
       setError(err.message || 'Failed to fetch posts');
       console.error('Error fetching posts:', err);
     } finally {
-      setPending(false);
+      if (isMountedRef.current) {
+        setPending(false);
+      }
     }
   }, []);
 
@@ -45,7 +58,7 @@ const PostsDataProvider = ({ search = '', children }) => {
 
   useEffect(() => {
     fetchPosts(1, perPage, search);
-  }, [search, perPage, fetchPosts]);
+  }, [search, perPage]);
 
   const handlePageChange = useCallback((newPage) => {
     fetchPosts(newPage, perPage, search);
