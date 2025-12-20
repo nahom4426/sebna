@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { getAllPrivilege, deletePrivilege, changePrivilegeStatus } from '@/pages/admin/api/AdminApi';
 
 const Privileges = () => {
@@ -6,27 +6,43 @@ const Privileges = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const isMountedRef = useRef(true);
+  const lastFetchKeyRef = useRef('');
 
   useEffect(() => {
-    fetchPrivileges();
+    return () => {
+      isMountedRef.current = false;
+    };
   }, []);
 
-  const fetchPrivileges = async () => {
+  const fetchPrivileges = useCallback(async (search = '') => {
+    if (!isMountedRef.current) return;
     setLoading(true);
     setError('');
     try {
-      const response = await getAllPrivilege({ search: searchTerm });
+      const response = await getAllPrivilege({ search });
+      if (!isMountedRef.current) return;
       if (response.success) {
         setPrivileges(response.data || []);
       } else {
         setError(response.error || 'Failed to fetch privileges');
       }
     } catch (err) {
+      if (!isMountedRef.current) return;
       setError('Failed to fetch privileges');
     } finally {
-      setLoading(false);
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    const fetchKey = `${searchTerm}`;
+    if (lastFetchKeyRef.current === fetchKey) return;
+    lastFetchKeyRef.current = fetchKey;
+    fetchPrivileges(searchTerm);
+  }, [searchTerm, fetchPrivileges]);
 
   const handleDeletePrivilege = async (id) => {
     if (window.confirm('Are you sure you want to delete this privilege?')) {

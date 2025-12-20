@@ -10,6 +10,7 @@ export const useLikes = (postId) => {
   const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
@@ -33,12 +34,15 @@ export const useLikes = (postId) => {
       const likedData = likedResponse.data || likedResponse;
 
       setLikes(likesData.content || likesData.likes || []);
-      setLikeCount(countData.count || countData || 0);
-      setIsLiked(likedData.liked || likedData || false);
+      setLikeCount(
+        typeof countData === 'number'
+          ? countData
+          : (countData?.likeCount ?? countData?.count ?? 0)
+      );
+      setIsLiked(typeof likedData.liked === 'boolean' ? likedData.liked : (typeof likedData === 'boolean' ? likedData : false));
     } catch (err) {
       if (!isMountedRef.current) return;
       setError(err.message || 'Failed to fetch likes');
-      console.error('Error fetching likes:', err);
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
@@ -48,7 +52,7 @@ export const useLikes = (postId) => {
 
   useEffect(() => {
     fetchLikeData();
-  }, [postId]);
+  }, [fetchLikeData, postId]);
 
   const togglePostLike = useCallback(async () => {
     try {

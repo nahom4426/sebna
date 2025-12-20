@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { getAllMessages } from '../api/MessagesApi';
 
 const MessagesDataProvider = ({ search = '', children }) => {
@@ -9,8 +9,16 @@ const MessagesDataProvider = ({ search = '', children }) => {
   const [perPage, setPerPage] = React.useState(25);
   const [totalElements, setTotalElements] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(1);
+  const isMountedRef = useRef(true);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const fetchMessages = useCallback(async (pageNum = 1, pageSize = 25, searchTerm = '') => {
+    if (!isMountedRef.current) return;
     setPending(true);
     setError(null);
     try {
@@ -19,6 +27,8 @@ const MessagesDataProvider = ({ search = '', children }) => {
         page: pageNum,
         size: pageSize,
       });
+
+      if (!isMountedRef.current) return;
 
       if (response.success) {
         const data = response.data;
@@ -32,16 +42,19 @@ const MessagesDataProvider = ({ search = '', children }) => {
         setError(response.error || 'Failed to fetch messages');
       }
     } catch (err) {
+      if (!isMountedRef.current) return;
       setError(err.message || 'Failed to fetch messages');
       console.error('Error fetching messages:', err);
     } finally {
-      setPending(false);
+      if (isMountedRef.current) {
+        setPending(false);
+      }
     }
   }, []);
 
   useEffect(() => {
     fetchMessages(1, perPage, search);
-  }, [search, perPage, fetchMessages]);
+  }, [search, perPage]);
 
   const handlePageChange = useCallback((newPage) => {
     fetchMessages(newPage, perPage, search);

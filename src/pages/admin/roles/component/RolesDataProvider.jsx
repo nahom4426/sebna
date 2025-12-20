@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback } from 'react';
+import React, { useEffect, useCallback, useRef } from 'react';
 import { getAllRole } from '@/pages/admin/api/AdminApi';
 
 const RolesDataProvider = ({ search = '', children }) => {
@@ -9,8 +9,18 @@ const RolesDataProvider = ({ search = '', children }) => {
   const [perPage, setPerPage] = React.useState(25);
   const [totalElements, setTotalElements] = React.useState(0);
   const [totalPages, setTotalPages] = React.useState(1);
+  const isMountedRef = useRef(true);
+  const lastFetchKeyRef = useRef('');
+
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
   const fetchRoles = useCallback(async (pageNum = 1, pageSize = 25, searchTerm = '') => {
+    if (!isMountedRef.current) return;
     setPending(true);
     setError(null);
     try {
@@ -19,6 +29,8 @@ const RolesDataProvider = ({ search = '', children }) => {
         page: pageNum,
         size: pageSize,
       });
+
+      if (!isMountedRef.current) return;
 
       if (response.success) {
         const data = response.data;
@@ -34,10 +46,13 @@ const RolesDataProvider = ({ search = '', children }) => {
         setError(response.error || 'Failed to fetch roles');
       }
     } catch (err) {
+      if (!isMountedRef.current) return;
       setError(err.message || 'Failed to fetch roles');
       console.error('Error fetching roles:', err);
     } finally {
-      setPending(false);
+      if (isMountedRef.current) {
+        setPending(false);
+      }
     }
   }, []);
 
@@ -50,6 +65,9 @@ const RolesDataProvider = ({ search = '', children }) => {
   }, [fetchRoles, perPage, search]);
 
   useEffect(() => {
+    const fetchKey = `${search}::${perPage}`;
+    if (lastFetchKeyRef.current === fetchKey) return;
+    lastFetchKeyRef.current = fetchKey;
     fetchRoles(1, perPage, search);
   }, [search, perPage, fetchRoles]);
 

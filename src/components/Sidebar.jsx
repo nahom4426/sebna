@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { ROLES } from '@/constants/roles';
+import { isSuperAdmin, hasAllPrivileges } from '@/utils/rbacUtils';
 
 const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
   const location = useLocation();
@@ -14,9 +15,26 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
       name: 'Dashboard',
       icon: '🏠',
       path: '/dashboard/home',
-      requiredRoles: [],
+      requiredRoles: [ROLES.READ_REPORTS],
+    },
+  
+    {
+      name: 'Institutions',
+      icon: '🏢',
+      path: '/admin/institutions',
+      requiredRoles: [
+        ROLES.READ_INSTITUTIONS,
+      ],
     },
     {
+      name: 'Posts',
+      icon: '📰',
+      path: '/admin/posts',
+      requiredRoles: [
+        ROLES.READ_POSTS,
+      ],
+    },
+      {
       name: 'Admin Panel',
       icon: '⚙️',
       requiredRoles: [],
@@ -27,9 +45,6 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
           path: '/admin/users',
           requiredRoles: [
             ROLES.READ_USERS,
-            ROLES.CREATE_USER,
-            ROLES.UPDATE_USER,
-            ROLES.DELETE_USER,
           ],
         },
         {
@@ -37,10 +52,6 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
           icon: '🔐',
           path: '/admin/roles',
           requiredRoles: [
-            ROLES.READ_ROLES,
-            ROLES.CREATE_ROLE,
-            ROLES.UPDATE_ROLE,
-            ROLES.DELETE_ROLE,
             ROLES.READ_ROLE,
           ],
         },
@@ -50,83 +61,51 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
           path: '/admin/privileges',
           requiredRoles: [
             ROLES.READ_PRIVILEGES,
-            ROLES.CREATE_PRIVILEGE,
-            ROLES.UPDATE_PRIVILEGE,
-            ROLES.DELETE_PRIVILEGE,
-            ROLES.READ_PRIVILEGE,
           ],
         },
-        {
-          name: 'Institutions',
-          icon: '🏢',
-          path: '/admin/institutions',
-          requiredRoles: [
-            ROLES.READ_INSTITUTIONS,
-            ROLES.CREATE_INSTITUTION,
-            ROLES.UPDATE_INSTITUTION,
-            ROLES.DELETE_INSTITUTION,
-            ROLES.READ_INSTITUTION,
-          ],
-        },
-        {
-          name: 'Posts',
-          icon: '📰',
-          path: '/admin/posts',
-          requiredRoles: [
-            ROLES.READ_POSTS,
-            ROLES.CREATE_POST,
-            ROLES.UPDATE_POST,
-            ROLES.DELETE_POST,
-            ROLES.READ_POST,
-            ROLES.LIKE_POST,
-            ROLES.UNLIKE_POST,
-          ],
-        },
-        {
-          name: 'Messages',
-          icon: '✉️',
-          path: '/admin/messages',
-          requiredRoles: [
-            ROLES.READ_MESSAGES,
-            ROLES.SEND_MESSAGE,
-          ],
-        },
-        {
-          name: 'Comments',
-          icon: '💬',
-          path: '/admin/comments',
-          requiredRoles: [
-            ROLES.READ_COMMENTS,
-            ROLES.CREATE_COMMENT,
-            ROLES.DELETE_COMMENT,
-          ],
-        },
-        {
-          name: 'Logs',
-          icon: '📋',
-          path: '/admin/logs',
-          requiredRoles: [ROLES.READ_LOGS],
-        },
+         {
+      name: 'Logs',
+      icon: '📋',
+      path: '/admin/logs',
+      requiredRoles: [ROLES.READ_LOGS],
+    },
       ],
     },
-    {
-      name: 'Profile',
-      icon: '👤',
-      path: '/dashboard/profile',
-      requiredRoles: [],
-    },
-    {
-      name: 'Tables',
-      icon: '📊',
-      path: '/dashboard/tables',
-      requiredRoles: [],
-    },
-    {
-      name: 'Notifications',
-      icon: '🔔',
-      path: '/dashboard/notifications',
-      requiredRoles: [],
-    },
+    // {
+    //   name: 'Messages',
+    //   icon: '✉️',
+    //   path: '/admin/messages',
+    //   requiredRoles: [
+    //     ROLES.READ_MESSAGES,
+    //   ],
+    // },
+    // {
+    //   name: 'Comments',
+    //   icon: '💬',
+    //   path: '/admin/comments',
+    //   requiredRoles: [
+    //     ROLES.READ_COMMENTS,
+    //   ],
+    // },
+   
+    // {
+    //   name: 'Profile',
+    //   icon: '👤',
+    //   path: '/dashboard/profile',
+    //   requiredRoles: [],
+    // },
+    // {
+    //   name: 'Tables',
+    //   icon: '📊',
+    //   path: '/dashboard/tables',
+    //   requiredRoles: [],
+    // },
+    // {
+    //   name: 'Notifications',
+    //   icon: '🔔',
+    //   path: '/dashboard/notifications',
+    //   requiredRoles: [],
+    // },
   ];
 
   const hasPrivilege = (requiredRoles) => {
@@ -134,7 +113,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
     const userPrivileges = auth?.user?.privileges || [];
     const userRole = auth?.user?.roleName;
 
-    if (userRole === 'Super Admin' || userPrivileges.includes('All Privileges')) {
+    if (isSuperAdmin(userRole) || hasAllPrivileges(userPrivileges)) {
       return true;
     }
 
@@ -148,9 +127,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
           const filteredChildren = item.navs.filter((child) =>
             hasPrivilege(child.requiredRoles)
           );
-          return hasPrivilege(item.requiredRoles) || filteredChildren.length > 0
-            ? { ...item, navs: filteredChildren }
-            : null;
+          return filteredChildren.length > 0 ? { ...item, navs: filteredChildren } : null;
         }
         return hasPrivilege(item.requiredRoles) ? item : null;
       })

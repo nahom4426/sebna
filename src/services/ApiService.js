@@ -120,6 +120,7 @@ export default class ApiService {
         this.api.defaults.headers.common.Authorization = `Bearer ${token}`;
         console.log('[ApiService] Authorization header set:', this.api.defaults.headers.common.Authorization);
       } else {
+        delete this.api.defaults.headers.common.Authorization;
         console.warn('[ApiService] No token available, header not set');
       }
     } catch (error) {

@@ -14,6 +14,8 @@ import { useModal } from '@/context/ModalContext';
 import { createUser, updateUserById, getAllRole } from '../api/UsersApi';
 import { getAllInstitution } from '../../institutions/api/InstitutionsApi';
 import pako from 'pako';
+import { toast } from '@/utils/utils';
+import { useAuthStore } from '@/stores/authStore';
 import { 
   EnvelopeIcon, 
   KeyIcon, 
@@ -23,21 +25,36 @@ import {
   BuildingOfficeIcon,
   ExclamationTriangleIcon,
   ShieldCheckIcon,
-  IdentificationIcon
+  IdentificationIcon,
+  AtSymbolIcon,
+  LockClosedIcon,
+  UserGroupIcon,
+  BriefcaseIcon,
+  CalendarIcon,
+  CheckCircleIcon,
+  XCircleIcon,
+  ArrowPathIcon,
+  InformationCircleIcon
 } from '@heroicons/react/24/outline';
+import { 
+  EnvelopeIcon as EnvelopeSolid,
+  UserCircleIcon as UserCircleSolid,
+  ShieldCheckIcon as ShieldCheckSolid 
+} from '@heroicons/react/24/solid';
 
 const UserForm = ({ user = null, onSuccess }) => {
   const { closeModal } = useModal();
+  const auth = useAuthStore((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [roles, setRoles] = useState([]);
   const [rolesLoading, setRolesLoading] = useState(true);
   const [institutions, setInstitutions] = useState([]);
   const [institutionsLoading, setInstitutionsLoading] = useState(true);
   const [error, setError] = useState('');
+  const [queuedEmailBanner, setQueuedEmailBanner] = useState('');
+  const [activeSection, setActiveSection] = useState('personal'); // personal, auth, role
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    title: '',
     firstName: '',
     fatherName: '',
     grandFatherName: '',
@@ -48,6 +65,14 @@ const UserForm = ({ user = null, onSuccess }) => {
   });
 
   const isEditMode = !!user;
+
+  const roleNameRaw = auth?.user?.roleName;
+  const roleNameNormalized = String(roleNameRaw || '').trim().toLowerCase().replace(/\s+/g, '_');
+  const isCompanyAdmin = roleNameNormalized === 'company_admin';
+  const adminInstitutionId = auth?.user?.institutionId || auth?.user?.institutionUuid;
+  const institutionMissing = isCompanyAdmin && !adminInstitutionId;
+
+  const normalizeRoleName = (name) => String(name || '').trim().toLowerCase().replace(/\s+/g, '_');
 
   // Helper function to decompress logo
   const decompressLogo = (compressedBase64) => {
@@ -131,9 +156,9 @@ const UserForm = ({ user = null, onSuccess }) => {
         
         // Process institutions with logos
         const validInstitutions = institutionsList
-          .filter(inst => inst && (inst.id || inst.institutionId))
+          .filter(inst => inst && (inst.id || inst.institutionId || inst.institutionUuid || inst.uuid))
           .map(inst => ({
-            id: inst.id || inst.institutionId || '',
+            id: String(inst.id || inst.institutionId || inst.institutionUuid || inst.uuid || ''),
             name: inst.name || 'Unnamed Institution',
             logo: inst.logo ? decompressLogo(inst.logo) : null,
           }));
@@ -152,20 +177,41 @@ const UserForm = ({ user = null, onSuccess }) => {
     fetchInstitutions();
   }, []);
 
+  useEffect(() => {
+    if (!isCompanyAdmin || isEditMode) return;
+    if (rolesLoading) return;
+    const companyUserRole = roles.find((r) => normalizeRoleName(r?.name) === 'company_user');
+    if (!companyUserRole?.roleUuid) {
+      setError('Company user role not found');
+      return;
+    }
+    setFormData((prev) => ({
+      ...prev,
+      roleUuid: companyUserRole.roleUuid,
+      institutionId: '',
+    }));
+  }, [isCompanyAdmin, isEditMode, rolesLoading, roles]);
+
   // Initialize form with user data in edit mode
   useEffect(() => {
     if (isEditMode && user) {
       setFormData({
         email: user.email || '',
-        password: '',
-        title: user.title || '',
         firstName: user.firstName || '',
         fatherName: user.fatherName || '',
         grandFatherName: user.grandFatherName || '',
         gender: user.gender || '',
         mobilePhone: user.mobilePhone || '',
         roleUuid: user.roleUuid || user.role?.roleUuid || '',
-        institutionId: user.institutionId || user.institution?.id || '',
+        institutionId: String(
+          user.institutionId ||
+            user.institutionUuid ||
+            user.institution?.id ||
+            user.institution?.institutionId ||
+            user.institution?.institutionUuid ||
+            user.institution?.uuid ||
+            ''
+        ),
       });
     }
   }, [user, isEditMode, roles]);
@@ -177,6 +223,7 @@ const UserForm = ({ user = null, onSuccess }) => {
       [name]: value,
     }));
     setError('');
+    setQueuedEmailBanner('');
   };
 
   const handleSelectChange = (name, value) => {
@@ -185,6 +232,7 @@ const UserForm = ({ user = null, onSuccess }) => {
       [name]: value,
     }));
     setError('');
+    setQueuedEmailBanner('');
   };
 
   const validateForm = () => {
@@ -192,22 +240,48 @@ const UserForm = ({ user = null, onSuccess }) => {
       setError('Email is required');
       return false;
     }
-    if (!isEditMode && !formData.password) {
-      setError('Password is required for new users');
-      return false;
-    }
+  
     if (!formData.firstName) {
       setError('First name is required');
       return false;
     }
+
+    if (!formData.fatherName || formData.fatherName.trim().length === 0) {
+      setError('Father name is required');
+      return false;
+    }
+
+    if (!formData.gender) {
+      setError('Gender is required');
+      return false;
+    }
+
+    if (!formData.mobilePhone || formData.mobilePhone.trim().length === 0) {
+      setError('Mobile phone is required');
+      return false;
+    }
+
     if (!formData.roleUuid) {
       setError('Role is required');
       return false;
     }
+
+    if (institutionMissing) {
+      setError('Admin is not assigned to institution, contact super admin');
+      return false;
+    }
+
     const selectedRole = roles.find((r) => r.roleUuid === formData.roleUuid);
-    if (selectedRole?.name === 'company_admin' || selectedRole?.name === 'company_user') {
-      if (!formData.institutionId) {
-        setError('Institution is required for this role');
+    const selectedRoleNormalized = normalizeRoleName(selectedRole?.name);
+    const roleRequiresInstitution = !isCompanyAdmin && (selectedRoleNormalized === 'company_admin' || selectedRoleNormalized === 'company_user');
+    if (roleRequiresInstitution && !formData.institutionId) {
+      setError('Institution is required for this role');
+      return false;
+    }
+
+    if (isCompanyAdmin && !isEditMode) {
+      if (selectedRoleNormalized !== 'company_user') {
+        setError('Company admin can only create company users');
         return false;
       }
     }
@@ -225,42 +299,73 @@ const UserForm = ({ user = null, onSuccess }) => {
     try {
       const payload = { ...formData };
 
-      if (isEditMode && !payload.password) {
-        delete payload.password;
+      if (isCompanyAdmin && !isEditMode) {
+        const companyUserRole = roles.find((r) => normalizeRoleName(r?.name) === 'company_user');
+        if (!companyUserRole?.roleUuid) {
+          setError('Company user role not found');
+          return;
+        }
+        payload.roleUuid = companyUserRole.roleUuid;
+        delete payload.institutionId;
       }
 
-      if (isEditMode) {
-        await updateUserById(user.userUuid, payload);
+      const res = isEditMode
+        ? await updateUserById(user.userUuid, payload)
+        : await createUser(payload);
+
+      const msg =
+        typeof res?.data === 'string'
+          ? res.data
+          : (res?.data?.message ? String(res.data.message) : (res?.error ? String(res.error) : ''));
+
+      const lowerMsg = (msg || '').toLowerCase();
+      const emailQueued = !isEditMode && lowerMsg.includes('unable to send password email right now');
+      const createdOk = !isEditMode && (lowerMsg.includes('user registered successfully') || lowerMsg.includes('user created successfully'));
+      const treatAsSuccess = Boolean(res?.success) || (createdOk && emailQueued);
+
+      if (!treatAsSuccess) {
+        setError(msg || 'Failed to save user');
+        return;
+      }
+
+      if (emailQueued) {
+        setQueuedEmailBanner('User created successfully, but email delivery is delayed. Admin can resend later.');
+        toast.warning('User created successfully, but email delivery is delayed. Admin can resend later.');
+      }
+
+      if (msg) {
+        toast.success(msg);
       } else {
-        await createUser(payload);
+        toast.success(isEditMode ? 'User updated successfully' : 'User created successfully');
       }
 
       closeModal();
       if (onSuccess) {
-        onSuccess();
+        onSuccess({
+          emailQueued,
+          message: msg,
+        });
       }
     } catch (err) {
       console.error('Error saving user:', err);
-      setError(err?.response?.data?.message || 'Failed to save user');
+      setError(err?.response?.data?.message || err?.message || 'Failed to save user');
     } finally {
       setLoading(false);
     }
   };
 
   const selectedRole = roles.find((r) => r.roleUuid === formData.roleUuid);
-  const requiresInstitution = selectedRole?.name === 'company_admin' || selectedRole?.name === 'company_user';
+  const selectedRoleNormalized = normalizeRoleName(selectedRole?.name);
+  const requiresInstitution = !isCompanyAdmin && (selectedRoleNormalized === 'company_admin' || selectedRoleNormalized === 'company_user');
 
   // Render role options
   const renderRoleOptions = () => {
     if (rolesLoading) {
       return (
         <Option value="" disabled className="text-gray-400">
-          <div className="flex items-center gap-2 py-1">
-            <svg className="animate-spin h-3 w-3 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
-            Loading roles...
+          <div className="flex items-center gap-2 py-2 px-3">
+            <ArrowPathIcon className="h-3 w-3 animate-spin text-blue-500" />
+            <span className="text-xs">Loading roles...</span>
           </div>
         </Option>
       );
@@ -268,27 +373,30 @@ const UserForm = ({ user = null, onSuccess }) => {
 
     if (roles.length === 0) {
       return (
-        <Option value="" disabled className="text-red-400 text-sm">
-          No roles available
+        <Option value="" disabled className="text-gray-400 text-xs">
+          <div className="flex items-center gap-2 py-2 px-3">
+            <ExclamationTriangleIcon className="h-3 w-3 text-amber-500" />
+            <span>No roles available</span>
+          </div>
         </Option>
       );
     }
 
     return (
       <>
-        <Option value="" className="text-gray-400 text-sm">
+        <Option value="" className="text-gray-400 text-xs py-2 px-3">
           Select a role
         </Option>
         {roles.map((role) => (
           <Option 
             key={role.roleUuid}
             value={role.roleUuid}
-            className="text-gray-700 hover:bg-blue-50 text-sm"
+            className="text-gray-700 hover:bg-blue-50 transition-colors text-xs"
           >
-            <div className="py-1">
+            <div className="py-2 px-3">
               <div className="font-medium">{role.name}</div>
               {role.description && (
-                <div className="text-xs text-gray-500 mt-0.5">{role.description}</div>
+                <div className="text-xs text-gray-500 mt-0.5 truncate">{role.description}</div>
               )}
             </div>
           </Option>
@@ -297,275 +405,393 @@ const UserForm = ({ user = null, onSuccess }) => {
     );
   };
 
+  // Form navigation tabs
+  const formSections = [
+    { id: 'personal', label: 'Personal Info', icon: UserCircleIcon },
+    { id: 'auth', label: 'Authentication', icon: ShieldCheckIcon },
+    ...(!(isCompanyAdmin && !isEditMode) ? [{ id: 'role', label: 'Role & Access', icon: BriefcaseIcon }] : [])
+  ];
+
   return (
-    <Card className="w-full max-w-2xl shadow-xl">
-          <CardHeader 
-            shadow={false} 
-            className="rounded-t-xl bg-gradient-to-r from-blue-500 to-blue-600 py-4 px-6"
-          >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <UserCircleIcon className="h-6 w-6 text-white" />
-            <Typography variant="h5" className="text-white font-semibold">
-              {isEditMode ? 'Edit User' : 'New User'}
-            </Typography>
-          </div>
-          <Button
-            variant="text"
-            className="text-white hover:bg-white/10 p-1 h-8 w-8 min-w-0"
-            onClick={closeModal}
-          >
-            ✕
-          </Button>
-        </div>
-      </CardHeader>
-
-      <CardBody className="p-6">
-        {error && (
-          <Alert 
-            color="red" 
-            variant="filled" 
-            className="mb-4 py-2 text-sm"
-          >
-            {error}
-          </Alert>
-        )}
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Authentication Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b">
-              <KeyIcon className="h-5 w-5 text-blue-500" />
-              <Typography variant="h6" color="blue-gray" className="font-semibold">
-                Authentication
-              </Typography>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Email */}
-              <div className="space-y-1">
-                <Typography variant="small" color="blue-gray" className="font-medium">
-                  Email *
-                </Typography>
-                <Input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  disabled={isEditMode || loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  labelProps={{ className: "hidden" }}
-                  placeholder="user@example.com"
-                  required
-                />
-              </div>
-
-              {/* Password */}
-              <div className="space-y-1">
-                <Typography variant="small" color="blue-gray" className="font-medium">
-                  {isEditMode ? 'New Password' : 'Password *'}
-                </Typography>
-                <Input
-                  type="password"
-                  name="password"
-                  value={formData.password}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  labelProps={{ className: "hidden" }}
-                  placeholder={isEditMode ? 'Leave empty to keep current' : 'Enter password'}
-                  required={!isEditMode}
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Personal Information Section */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b">
-              <IdentificationIcon className="h-5 w-5 text-blue-500" />
-              <Typography variant="h6" color="blue-gray" className="font-semibold">
-                Personal Information
-              </Typography>
-            </div>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Title */}
-              <div className="space-y-1">
-                <Typography variant="small" color="blue-gray" className="font-medium">
-                  Title
-                </Typography>
-                <Input
-                  type="text"
-                  name="title"
-                  value={formData.title}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  labelProps={{ className: "hidden" }}
-                  placeholder="e.g., Mr., Ms."
-                />
-              </div>
-
-              {/* First Name */}
-              <div className="space-y-1">
-                <Typography variant="small" color="blue-gray" className="font-medium">
-                  First Name *
-                </Typography>
-                <Input
-                  type="text"
-                  name="firstName"
-                  value={formData.firstName}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  labelProps={{ className: "hidden" }}
-                  placeholder="Enter first name"
-                  required
-                />
-              </div>
-
-              {/* Father Name */}
-              <div className="space-y-1">
-                <Typography variant="small" color="blue-gray" className="font-medium">
-                  Father Name
-                </Typography>
-                <Input
-                  type="text"
-                  name="fatherName"
-                  value={formData.fatherName}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  labelProps={{ className: "hidden" }}
-                  placeholder="Father's name"
-                />
-              </div>
-
-              {/* Grand Father Name */}
-              <div className="space-y-1">
-                <Typography variant="small" color="blue-gray" className="font-medium">
-                  Grand Father Name
-                </Typography>
-                <Input
-                  type="text"
-                  name="grandFatherName"
-                  value={formData.grandFatherName}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  labelProps={{ className: "hidden" }}
-                  placeholder="Grandfather's name"
-                />
-              </div>
-
-              {/* Gender */}
-              <div className="space-y-1">
-                <Typography variant="small" color="blue-gray" className="font-medium">
-                  Gender
-                </Typography>
-                <Select
-                  value={formData.gender}
-                  onChange={(value) => handleSelectChange('gender', value)}
-                  disabled={loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  labelProps={{ className: "hidden" }}
-                  menuProps={{ className: "max-h-48" }}
-                >
-                  <Option value="" className="text-gray-400 text-sm">
-                    Select Gender
-                  </Option>
-                  <Option value="male" className="text-gray-700 text-sm">
-                    Male
-                  </Option>
-                  <Option value="female" className="text-gray-700 text-sm">
-                    Female
-                  </Option>
-                  <Option value="other" className="text-gray-700 text-sm">
-                    Other
-                  </Option>
-                </Select>
-              </div>
-
-              {/* Mobile Phone */}
-              <div className="space-y-1">
-                <Typography variant="small" color="blue-gray" className="font-medium">
-                  Mobile Phone
-                </Typography>
-                <Input
-                  type="tel"
-                  name="mobilePhone"
-                  value={formData.mobilePhone}
-                  onChange={handleInputChange}
-                  disabled={loading}
-                  className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                  labelProps={{ className: "hidden" }}
-                  placeholder="+1 (555) 123-4567"
-                />
-              </div>
-            </div>
-          </div>
-
-          {/* Role & Permissions Section - MOVED TO END */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2 pb-2 border-b">
-              <ShieldCheckIcon className="h-5 w-5 text-blue-500" />
-              <Typography variant="h6" color="blue-gray" className="font-semibold">
-                Role & Permissions
-              </Typography>
-            </div>
-            
-            <div className="space-y-4">
-              {/* Role Selection */}
-              <div className="space-y-1">
-                <div className="flex items-center justify-between">
-                  <Typography variant="small" color="blue-gray" className="font-medium">
-                    User Role *
-                  </Typography>
-                  {!rolesLoading && (
-                    <Typography variant="small" color="gray" className="text-xs">
-                      {roles.length} available
-                    </Typography>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+      <Card className="w-full max-w-3xl mx-auto shadow-2xl border-0 bg-gradient-to-br from-white to-gray-50/50">
+        {/* Header */}
+        <CardHeader 
+          shadow={false} 
+          className="rounded-t-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-purple-600 py-4 px-6 relative overflow-hidden"
+        >
+          {/* Background pattern */}
+          <div className="absolute inset-0 bg-grid-white/10" />
+          <div className="relative z-10">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white/20 rounded-xl backdrop-blur-sm">
+                  {isEditMode ? (
+                    <UserCircleSolid className="h-6 w-6 text-white" />
+                  ) : (
+                    <UserGroupIcon className="h-6 w-6 text-white" />
                   )}
                 </div>
-                <div className="relative">
-                  <Select
-                    value={formData.roleUuid}
-                    onChange={(value) => handleSelectChange('roleUuid', value)}
-                    disabled={rolesLoading || loading}
-                    className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                    menuProps={{ className: "max-h-48 z-[9999]" }}
-                  >
-                    {renderRoleOptions()}
-                  </Select>
-                  {formData.roleUuid && selectedRole && (
-                    <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-700 font-medium text-sm">
-                      {selectedRole.name}
+                <div>
+                  <Typography variant="h4" className="text-white font-bold">
+                    {isEditMode ? 'Edit User Profile' : 'Create New User'}
+                  </Typography>
+                  <Typography variant="small" className="text-blue-100 font-medium mt-1">
+                    {isEditMode ? 'Update user details and permissions' : 'Add a new user to the system'}
+                  </Typography>
+                </div>
+              </div>
+              <Button
+                variant="text"
+                className="text-white/80 hover:text-white hover:bg-white/10 p-2 h-10 w-10 min-w-0 rounded-full transition-all"
+                onClick={closeModal}
+              >
+                <XCircleIcon className="h-5 w-5" />
+              </Button>
+            </div>
+          </div>
+        </CardHeader>
+
+        {/* Form Navigation Tabs */}
+        <div className="px-6 pt-4 border-b border-gray-200">
+          <div className="flex gap-2">
+            {formSections.map((section) => {
+              const Icon = section.icon;
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => setActiveSection(section.id)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all duration-200 text-sm font-medium ${
+                    activeSection === section.id
+                      ? 'bg-blue-100 text-blue-700 shadow-sm'
+                      : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  <Icon className={`h-4 w-4 ${activeSection === section.id ? 'text-blue-600' : ''}`} />
+                  {section.label}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <CardBody className="p-6 max-h-[70vh] overflow-y-auto">
+          {/* Notifications */}
+          {queuedEmailBanner && (
+            <Alert
+              color="amber"
+              className="mb-6 border-l-4 border-amber-500 bg-amber-50/80 rounded-lg"
+              icon={<InformationCircleIcon className="h-5 w-5" />}
+            >
+              <Typography variant="small" className="font-medium text-amber-900">
+                {queuedEmailBanner}
+              </Typography>
+            </Alert>
+          )}
+          {error && (
+            <Alert
+              color="red"
+              className="mb-6 border-l-4 border-red-500 bg-red-50/80 rounded-lg"
+              icon={<ExclamationTriangleIcon className="h-5 w-5" />}
+            >
+              <Typography variant="small" className="font-medium text-red-900">
+                {error}
+              </Typography>
+            </Alert>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-6">
+            {/* Personal Information Section */}
+            <div className={`space-y-4 ${activeSection !== 'personal' ? 'hidden' : ''}`}>
+              <div className="bg-gradient-to-r from-blue-50 to-purple-50 p-4 rounded-xl border border-blue-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-white rounded-lg shadow-sm">
+                    <IdentificationIcon className="h-5 w-5 text-blue-600" />
+                  </div>
+                  <div>
+                    <Typography variant="h6" color="blue-gray" className="font-bold">
+                      Personal Information
+                    </Typography>
+                    <Typography variant="small" className="text-gray-600">
+                      Basic details about the user
+                    </Typography>
+                  </div>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {/* First Name */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <span>First Name</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        disabled={loading}
+                        className="!border-gray-300 focus:!border-blue-500 !text-sm pl-10 bg-white"
+                        labelProps={{ className: "hidden" }}
+                        placeholder="John"
+                        required
+                      />
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        <UserIcon className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Father Name */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <span>Father Name</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        name="fatherName"
+                        value={formData.fatherName}
+                        onChange={handleInputChange}
+                        disabled={loading}
+                        className="!border-gray-300 focus:!border-blue-500 !text-sm pl-10 bg-white"
+                        labelProps={{ className: "hidden" }}
+                        placeholder="Doe"
+                        required
+                      />
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        <UserGroupIcon className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Grand Father Name */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <span>Grand Father Name</span>
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="text"
+                        name="grandFatherName"
+                        value={formData.grandFatherName}
+                        onChange={handleInputChange}
+                        disabled={loading}
+                        className="!border-gray-300 focus:!border-blue-500 !text-sm pl-10 bg-white"
+                        labelProps={{ className: "hidden" }}
+                        placeholder="Smith"
+                      />
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        <CalendarIcon className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Gender */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <span>Gender</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <Select
+                      value={formData.gender}
+                      onChange={(value) => handleSelectChange('gender', value)}
+                      disabled={loading}
+                      className="!border-gray-300 focus:!border-blue-500 !text-sm bg-white"
+                      labelProps={{ className: "hidden" }}
+                    >
+                      <Option value="" className="text-gray-400 text-sm">
+                        <div className="flex items-center gap-2">
+                          <UserIcon className="h-4 w-4" />
+                          Select Gender
+                        </div>
+                      </Option>
+                      <Option value="male" className="text-gray-700 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span>👨</span>
+                          Male
+                        </div>
+                      </Option>
+                      <Option value="female" className="text-gray-700 text-sm">
+                        <div className="flex items-center gap-2">
+                          <span>👩</span>
+                          Female
+                        </div>
+                      </Option>
+                    </Select>
+                  </div>
+
+                  {/* Mobile Phone */}
+                  <div className="space-y-2 md:col-span-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <span>Mobile Phone</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="tel"
+                        name="mobilePhone"
+                        value={formData.mobilePhone}
+                        onChange={handleInputChange}
+                        disabled={loading}
+                        className="!border-gray-300 focus:!border-blue-500 !text-sm pl-10 bg-white"
+                        labelProps={{ className: "hidden" }}
+                        placeholder="+1 (555) 123-4567"
+                        required
+                      />
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        <PhoneIcon className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Authentication Section */}
+            <div className={`space-y-4 ${activeSection !== 'auth' ? 'hidden' : ''}`}>
+              <div className="bg-gradient-to-r from-amber-50 to-orange-50 p-4 rounded-xl border border-amber-100">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="p-2 bg-white rounded-lg shadow-sm">
+                    <ShieldCheckIcon className="h-5 w-5 text-amber-600" />
+                  </div>
+                  <div>
+                    <Typography variant="h6" color="blue-gray" className="font-bold">
+                      Authentication Details
+                    </Typography>
+                    <Typography variant="small" className="text-gray-600">
+                      Login credentials and security
+                    </Typography>
+                  </div>
+                </div>
+                
+                <div className="space-y-4">
+                  {/* Email */}
+                  <div className="space-y-2">
+                    <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                      <span>Email Address</span>
+                      <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        disabled={loading}
+                        className="!border-gray-300 focus:!border-blue-500 !text-sm pl-10 bg-white"
+                        labelProps={{ className: "hidden" }}
+                        placeholder="john.doe@company.com"
+                        required
+                      />
+                      <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+                        <EnvelopeIcon className="h-4 w-4 text-gray-400" />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Password Info */}
+                  {!isEditMode && (
+                    <div className="bg-blue-50/50 border border-blue-200 rounded-lg p-3">
+                      <div className="flex items-start gap-2">
+                        <InformationCircleIcon className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                        <div>
+                          <Typography variant="small" className="font-medium text-blue-900">
+                            Password Information
+                          </Typography>
+                          <Typography variant="small" className="text-blue-700">
+                            A secure password will be automatically generated and sent to the user's email.
+                          </Typography>
+                        </div>
+                      </div>
                     </div>
                   )}
                 </div>
               </div>
+            </div>
 
-              {/* Institution Selection (conditional) */}
-              {requiresInstitution && (
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <BuildingOfficeIcon className="h-4 w-4 text-blue-500" />
-                    <Typography variant="small" color="blue-gray" className="font-medium">
-                      Institution *
-                    </Typography>
+            {/* Role & Access Section */}
+            {!(isCompanyAdmin && !isEditMode) && (
+              <div className={`space-y-4 ${activeSection !== 'role' ? 'hidden' : ''}`}>
+                <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-100">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="p-2 bg-white rounded-lg shadow-sm">
+                      <BriefcaseIcon className="h-5 w-5 text-purple-600" />
+                    </div>
+                    <div>
+                      <Typography variant="h6" color="blue-gray" className="font-bold">
+                        Role & Permissions
+                      </Typography>
+                      <Typography variant="small" className="text-gray-600">
+                        Set user permissions and access levels
+                      </Typography>
+                    </div>
                   </div>
-                  <div className="relative">
-                    {(() => {
-                      const selectedInstitution = institutions.find(i => i.id === formData.institutionId);
-                      return (
-                        <>
+                  
+                  <div className="space-y-4">
+                    {/* Role Selection */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                          <span>User Role</span>
+                          <span className="text-red-500">*</span>
+                        </label>
+                        {!rolesLoading && (
+                          <Typography variant="small" color="gray" className="text-xs">
+                            {roles.length} roles available
+                          </Typography>
+                        )}
+                      </div>
+                      <div className="relative">
+                        <Select
+                          value={formData.roleUuid}
+                          onChange={(value) => handleSelectChange('roleUuid', value)}
+                          disabled={rolesLoading || loading}
+                          className="!border-gray-300 focus:!border-blue-500 !text-sm bg-white"
+                          menuProps={{ className: "max-h-64" }}
+                        >
+                          {renderRoleOptions()}
+                        </Select>
+                        {formData.roleUuid && selectedRole && (
+                          <div className="absolute inset-y-0 right-3 flex items-center pointer-events-none">
+                            <CheckCircleIcon className="h-4 w-4 text-green-500" />
+                          </div>
+                        )}
+                      </div>
+                      {selectedRole && (
+                        <div className="bg-white/50 border border-gray-200 rounded-lg p-3 mt-2">
+                          <div className="flex items-center gap-2">
+                            <ShieldCheckIcon className="h-4 w-4 text-blue-500" />
+                            <Typography variant="small" className="font-medium text-gray-900">
+                              Selected Role: {selectedRole.name}
+                            </Typography>
+                          </div>
+                          {selectedRole.description && (
+                            <Typography variant="small" className="text-gray-600 mt-1">
+                              {selectedRole.description}
+                            </Typography>
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Institution Selection */}
+                    {requiresInstitution && (
+                      <div className="space-y-2">
+                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                          <BuildingOfficeIcon className="h-4 w-4" />
+                          <span>Institution</span>
+                          <span className="text-red-500">*</span>
+                        </label>
+                        <div className="relative">
                           <Select
                             value={formData.institutionId}
                             onChange={(value) => handleSelectChange('institutionId', value)}
                             disabled={institutionsLoading || loading}
-                            className="!border-gray-300 focus:!border-blue-500 !text-sm"
-                            menuProps={{ className: "max-h-48 z-[9999]" }}
+                            className="!border-gray-300 focus:!border-blue-500 !text-sm bg-white"
+                            menuProps={{ className: "max-h-64" }}
                           >
                             <Option value="" className="text-gray-400 text-sm">
                               {institutionsLoading ? 'Loading institutions...' : 'Select institution'}
@@ -576,78 +802,134 @@ const UserForm = ({ user = null, onSuccess }) => {
                                 value={inst.id}
                                 className="text-gray-700 text-sm"
                               >
-                                <div className="flex items-center gap-2 py-1">
-                                  {inst.logo && (
+                                <div className="flex items-center gap-3 py-2">
+                                  {inst.logo ? (
                                     <img
                                       src={inst.logo}
                                       alt={inst.name}
-                                      className="h-5 w-5 object-contain rounded"
+                                      className="h-6 w-6 object-contain rounded"
                                     />
+                                  ) : (
+                                    <div className="h-6 w-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded flex items-center justify-center">
+                                      <BuildingOfficeIcon className="h-3 w-3 text-gray-600" />
+                                    </div>
                                   )}
                                   <span>{inst.name}</span>
                                 </div>
                               </Option>
                             ))}
                           </Select>
-                          {formData.institutionId && selectedInstitution && (
-                            <div className="absolute inset-y-0 left-0 flex items-center gap-2 pl-3 pointer-events-none text-gray-700 font-medium text-sm">
-                              {selectedInstitution.logo && (
-                                <img
-                                  src={selectedInstitution.logo}
-                                  alt={selectedInstitution.name}
-                                  className="h-4 w-4 object-contain rounded"
-                                />
-                              )}
-                              <span>{selectedInstitution.name}</span>
-                            </div>
-                          )}
-                        </>
-                      );
-                    })()}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Company Admin Note */}
+                    {isCompanyAdmin && (
+                      <div className="bg-blue-50/50 border border-blue-200 rounded-lg p-3">
+                        <div className="flex items-start gap-2">
+                          <InformationCircleIcon className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
+                          <div>
+                            <Typography variant="small" className="font-medium text-blue-900">
+                              Company Admin Restriction
+                            </Typography>
+                            <Typography variant="small" className="text-blue-700">
+                              You can only create users with 'Company User' role.
+                            </Typography>
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
-                  <Typography variant="small" color="gray" className="mt-1 text-xs">
-                    Required for company roles
+                </div>
+              </div>
+            )}
+
+            {/* Form Progress & Actions */}
+            <div className="pt-4 border-t border-gray-200">
+              <div className="flex items-center justify-between">
+                {/* Form Progress Indicator */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    {formSections.map((section, index) => (
+                      <React.Fragment key={section.id}>
+                        <div className={`h-2 w-8 rounded-full transition-all duration-300 ${
+                          activeSection === section.id 
+                            ? 'bg-blue-600' 
+                            : formSections.findIndex(s => s.id === activeSection) > index
+                            ? 'bg-green-500'
+                            : 'bg-gray-300'
+                        }`} />
+                        {index < formSections.length - 1 && (
+                          <div className="h-0.5 w-4 bg-gray-300" />
+                        )}
+                      </React.Fragment>
+                    ))}
+                  </div>
+                  <Typography variant="small" className="text-gray-600 ml-2">
+                    Step {formSections.findIndex(s => s.id === activeSection) + 1} of {formSections.length}
                   </Typography>
                 </div>
-              )}
-            </div>
-          </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-end gap-3 pt-4 border-t">
-            <Button
-              variant="text"
-              color="blue-gray"
-              onClick={closeModal}
-              disabled={loading}
-              className="px-4 py-2 text-sm"
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={loading}
-              className="px-4 py-2 text-sm bg-blue-500 hover:bg-blue-600"
-            >
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-3 w-3 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  Saving...
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <UserIcon className="h-3 w-3" />
-                  {isEditMode ? 'Update' : 'Create'}
-                </span>
-              )}
-            </Button>
-          </div>
-        </form>
-      </CardBody>
-    </Card>
+                {/* Action Buttons */}
+                <div className="flex items-center gap-3">
+                  <Button
+                    variant="text"
+                    color="gray"
+                    onClick={closeModal}
+                    disabled={loading}
+                    className="px-4 py-2.5 text-sm font-medium hover:bg-gray-100 transition-all"
+                  >
+                    Cancel
+                  </Button>
+                  
+                  {activeSection !== formSections[formSections.length - 1].id ? (
+                    <Button
+                      type="button"
+                      onClick={() => {
+                        const currentIndex = formSections.findIndex(s => s.id === activeSection);
+                        if (currentIndex < formSections.length - 1) {
+                          setActiveSection(formSections[currentIndex + 1].id);
+                        }
+                      }}
+                      className="px-4 py-2.5 text-sm font-medium bg-blue-500 hover:bg-blue-600 transition-all shadow-sm"
+                    >
+                      Continue
+                    </Button>
+                  ) : (
+                    <Button
+                      type="submit"
+                      disabled={loading || institutionMissing || (isCompanyAdmin && !isEditMode && (!formData.roleUuid || rolesLoading))}
+                      className="px-6 py-2.5 text-sm font-medium bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                    >
+                      {loading ? (
+                        <span className="flex items-center gap-2">
+                          <ArrowPathIcon className="h-3 w-3 animate-spin text-white" />
+                          Processing...
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          {isEditMode ? (
+                            <>
+                              <CheckCircleIcon className="h-4 w-4" />
+                              Update User
+                            </>
+                          ) : (
+                            <>
+                              <UserIcon className="h-4 w-4" />
+                              Create User
+                            </>
+                          )}
+                        </span>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          </form>
+        </CardBody>
+      </Card>
+    </div>
   );
 };
 

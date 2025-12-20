@@ -1,121 +1,194 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { ROLES } from '@/constants/roles';
+import Table from '@/components/Table';
+import Pagination from '@/composables/Pagination';
+import { getLoginLogs } from '../api/LogsApi';
 
 const Logs = () => {
   const auth = useAuthStore((state) => state.auth);
   const [logs, setLogs] = useState([]);
-  const [filteredLogs, setFilteredLogs] = useState([]);
   const [filterType, setFilterType] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+  const [totalElements, setTotalElements] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  const [expandedKey, setExpandedKey] = useState(null);
 
   const userPrivileges = auth?.user?.privileges || [];
   const canRead = userPrivileges.includes(ROLES.READ_LOGS);
 
   useEffect(() => {
-    const fetchLogs = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        
-        // In a real app, this would be an API call
-        // const response = await fetch('/api/logs');
-        // const data = await response.json();
-        
-        // Mock data
-        const mockLogs = [
-          {
-            id: 1,
-            action: 'User Login',
-            user: 'admin@example.com',
-            timestamp: new Date(Date.now() - 3600000).toISOString(),
-            type: 'login',
-            status: 'success',
-          },
-          {
-            id: 2,
-            action: 'Post Created',
-            user: 'user@example.com',
-            timestamp: new Date(Date.now() - 7200000).toISOString(),
-            type: 'create',
-            status: 'success',
-          },
-          {
-            id: 3,
-            action: 'User Deleted',
-            user: 'admin@example.com',
-            timestamp: new Date(Date.now() - 10800000).toISOString(),
-            type: 'delete',
-            status: 'success',
-          },
-          {
-            id: 4,
-            action: 'Role Updated',
-            user: 'admin@example.com',
-            timestamp: new Date(Date.now() - 14400000).toISOString(),
-            type: 'update',
-            status: 'success',
-          },
-          {
-            id: 5,
-            action: 'Failed Login Attempt',
-            user: 'unknown@example.com',
-            timestamp: new Date(Date.now() - 18000000).toISOString(),
-            type: 'login',
-            status: 'failed',
-          },
-        ];
-        
-        setLogs(mockLogs);
-        setFilteredLogs(mockLogs);
-      } catch (err) {
-        setError('Failed to load logs');
-        console.error('Error fetching logs:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (!canRead) return;
+    setPage(1);
+  }, [canRead]);
 
-    if (canRead) {
-      fetchLogs();
+  const formatTimestamp = (timestamp) => {
+    if (!timestamp) return '-';
+    const d = new Date(timestamp);
+    return Number.isFinite(d.getTime()) ? d.toLocaleString() : '-';
+  };
+
+  const normalizeSuccess = (raw) => {
+    if (typeof raw === 'boolean') return raw;
+    if (typeof raw === 'number') return raw === 1;
+    if (typeof raw === 'string') {
+      const v = raw.trim().toLowerCase();
+      if (v === 'success' || v === 'true' || v === '1' || v === 'ok') return true;
+      if (v === 'failed' || v === 'false' || v === '0') return false;
+    }
+    return null;
+  };
+
+  const fetchLogs = useCallback(async (pageNum = 1, pageSize = 25) => {
+    if (!canRead) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getLoginLogs({
+        page: pageNum,
+        limit: pageSize,
+      });
+
+      if (!response?.success) {
+        setError(response?.error || 'Failed to load logs');
+        setLogs([]);
+        setTotalElements(0);
+        setTotalPages(1);
+        setPage(pageNum);
+        setPerPage(pageSize);
+        return;
+      }
+
+      const data = response.data;
+      const rawLogs = Array.isArray(data?.response)
+        ? data.response
+        : (Array.isArray(data?.content) ? data.content : (Array.isArray(data?.logs) ? data.logs : []));
+
+      const mapped = rawLogs.map((l, idx) => {
+        const key = l?.logUuid || l?.uuid || l?.id || `${pageNum}-${idx}`;
+        const success = normalizeSuccess(l?.success ?? l?.isSuccess ?? l?.status);
+        return {
+          key,
+          email: l?.email || l?.userEmail || l?.username || '-',
+          success,
+          ip: l?.ip || l?.ipAddress || '-',
+          createdAt: l?.createdAt || l?.timestamp || l?.createdDate || l?.created_on,
+          failureReason: l?.failureReason || l?.reason || l?.message || '-',
+          userAgent: l?.userAgent || l?.user_agent || l?.agent || '',
+        };
+      });
+
+      setLogs(mapped);
+      setTotalElements(data?.totalElements || data?.total || mapped.length);
+      setTotalPages(data?.totalPages || 1);
+      setPage(pageNum);
+      setPerPage(pageSize);
+    } catch (err) {
+      console.error('Error fetching logs:', err);
+      setError(err?.message || 'Failed to load logs');
+    } finally {
+      setLoading(false);
     }
   }, [canRead]);
 
   useEffect(() => {
-    if (filterType === 'all') {
-      setFilteredLogs(logs);
-    } else {
-      setFilteredLogs(logs.filter((log) => log.type === filterType));
-    }
-  }, [filterType, logs]);
+    if (!canRead) return;
+    fetchLogs(page, perPage);
+  }, [canRead, fetchLogs, page, perPage]);
 
-  const getTypeColor = (type) => {
-    const colors = {
-      login: 'bg-blue-100 text-blue-800',
-      create: 'bg-green-100 text-green-800',
-      update: 'bg-yellow-100 text-yellow-800',
-      delete: 'bg-red-100 text-red-800',
-    };
-    return colors[type] || 'bg-gray-100 text-gray-800';
+  const filteredLogs = filterType === 'all'
+    ? logs
+    : filterType === 'success'
+      ? logs.filter((l) => l.success === true)
+      : logs.filter((l) => l.success === false);
+
+  const headers = {
+    head: ['Email', 'Success', 'IP', 'Created At', 'Failure Reason'],
+    row: ['email', 'success', 'ip', 'createdAt', 'failureReason'],
   };
 
-  const getStatusColor = (status) => {
-    return status === 'success'
+  const handlePageChange = (newPage) => {
+    setPage(newPage);
+  };
+
+  const handlePerPageChange = (newPerPage) => {
+    setPerPage(newPerPage);
+    setPage(1);
+  };
+
+  const handleNext = () => {
+    if (page < totalPages) setPage(page + 1);
+  };
+
+  const handlePrevious = () => {
+    if (page > 1) setPage(page - 1);
+  };
+
+  const renderRow = (row, index, currentPage, currentPerPage) => {
+    const expanded = expandedKey === row.key;
+    const colSpan = (headers?.head?.length || 0) + 2;
+    const label = row.success === true ? 'Success' : row.success === false ? 'Failed' : '-';
+    const badgeClass = row.success === true
       ? 'bg-green-100 text-green-800'
-      : 'bg-red-100 text-red-800';
-  };
+      : row.success === false
+        ? 'bg-red-100 text-red-800'
+        : 'bg-gray-100 text-gray-800';
 
-  const formatTimestamp = (timestamp) => {
-    return new Date(timestamp).toLocaleString();
+    return (
+      <React.Fragment key={row.key}>
+        <tr className="border-b border-gray-200 hover:bg-gray-50">
+          <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-600 border-r border-gray-100">
+            {(currentPage - 1) * currentPerPage + index + 1}
+          </td>
+          <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
+            {row.email || '-'}
+          </td>
+          <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
+            <span className={`px-2 py-1 text-[10px] sm:text-xs font-medium rounded-full ${badgeClass}`}>
+              {label}
+            </span>
+          </td>
+          <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
+            {row.ip || '-'}
+          </td>
+          <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
+            {formatTimestamp(row.createdAt)}
+          </td>
+          <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
+            {row.failureReason || '-'}
+          </td>
+          <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs">
+            {row.userAgent ? (
+              <button
+                type="button"
+                onClick={() => setExpandedKey(expanded ? null : row.key)}
+                className="px-2 py-1 rounded bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+              >
+                {expanded ? 'Hide' : 'UserAgent'}
+              </button>
+            ) : (
+              <span className="text-gray-400">-</span>
+            )}
+          </td>
+        </tr>
+        {expanded && (
+          <tr className="border-b border-gray-200 bg-gray-50">
+            <td colSpan={colSpan} className="px-3 py-3 text-[10px] sm:text-xs text-gray-700">
+              <div className="whitespace-pre-wrap break-words">{row.userAgent}</div>
+            </td>
+          </tr>
+        )}
+      </React.Fragment>
+    );
   };
 
   const filterTypes = [
     { key: 'all', label: 'All' },
-    { key: 'login', label: 'Login' },
-    { key: 'create', label: 'Create' },
-    { key: 'update', label: 'Update' },
-    { key: 'delete', label: 'Delete' },
+    { key: 'success', label: 'Success' },
+    { key: 'failed', label: 'Failed' },
   ];
 
   return (
@@ -127,7 +200,6 @@ const Logs = () => {
           <p className="text-gray-600">Monitor system activities and user actions</p>
         </div>
 
-        {/* Filter Section */}
         {canRead && !loading && !error && (
           <div className="bg-white rounded-2xl shadow-lg p-6 mb-8 border border-gray-200">
             <h2 className="text-lg font-semibold text-gray-900 mb-4">Filter Logs</h2>
@@ -171,61 +243,31 @@ const Logs = () => {
           </div>
         )}
 
-        {/* Logs Table */}
         {!loading && !error && canRead ? (
           <div className="bg-white rounded-2xl shadow-lg overflow-hidden border border-gray-200">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead className="bg-gradient-to-r from-gray-50 to-gray-100 border-b border-gray-200">
-                  <tr>
-                    <th scope="col" className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      Action
-                    </th>
-                    <th scope="col" className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      User
-                    </th>
-                    <th scope="col" className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      Type
-                    </th>
-                    <th scope="col" className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      Status
-                    </th>
-                    <th scope="col" className="px-6 py-4 text-left text-sm font-semibold text-gray-900">
-                      Timestamp
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-200">
-                  {filteredLogs.length === 0 ? (
-                    <tr>
-                      <td colSpan={5} className="px-6 py-8 text-center text-gray-500">
-                        No logs found for the selected filter
-                      </td>
-                    </tr>
-                  ) : (
-                    filteredLogs.map((log) => (
-                      <tr key={log.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="px-6 py-4 text-sm text-gray-900 font-medium">{log.action}</td>
-                        <td className="px-6 py-4 text-sm text-gray-600">{log.user}</td>
-                        <td className="px-6 py-4 text-sm">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getTypeColor(log.type)}`}>
-                            {log.type.charAt(0).toUpperCase() + log.type.slice(1)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm">
-                          <span className={`px-3 py-1 rounded-full text-xs font-semibold ${getStatusColor(log.status)}`}>
-                            {log.status.charAt(0).toUpperCase() + log.status.slice(1)}
-                          </span>
-                        </td>
-                        <td className="px-6 py-4 text-sm text-gray-600">
-                          {formatTimestamp(log.timestamp)}
-                        </td>
-                      </tr>
-                    ))
-                  )}
-                </tbody>
-              </table>
-            </div>
+            <Table
+              headers={headers}
+              rows={filteredLogs}
+              loading={loading}
+              renderRow={renderRow}
+              page={page}
+              perPage={perPage}
+              placeholder="No logs found"
+              lastCol
+            />
+
+            <Pagination
+              page={page}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              perPage={perPage}
+              rowsCount={filteredLogs.length}
+              onPageChange={handlePageChange}
+              onPerPageChange={handlePerPageChange}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+              loading={loading}
+            />
           </div>
         ) : !loading && !error && !canRead ? (
           <div className="bg-white rounded-2xl shadow-lg p-12 text-center border border-gray-200">

@@ -10,6 +10,7 @@ export const useComments = (postId, page = 0, limit = 10) => {
   const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
@@ -23,13 +24,14 @@ export const useComments = (postId, page = 0, limit = 10) => {
       const response = await getPostComments(postId, page, limit);
       if (!isMountedRef.current) return;
       const data = response.data || response;
-      setComments(data.content || data.comments || []);
-      setTotalPages(data.totalPages || 0);
-      setTotalElements(data.totalElements || 0);
+      // Backend may return a pageable object ({content: []}) or a plain array ([])
+      const list = Array.isArray(data) ? data : (data.content || data.comments || []);
+      setComments(list);
+      setTotalPages(Array.isArray(data) ? 1 : (data.totalPages || 0));
+      setTotalElements(Array.isArray(data) ? list.length : (data.totalElements || 0));
     } catch (err) {
       if (!isMountedRef.current) return;
       setError(err.message || 'Failed to fetch comments');
-      console.error('Error fetching comments:', err);
     } finally {
       if (isMountedRef.current) {
         setLoading(false);
@@ -41,11 +43,14 @@ export const useComments = (postId, page = 0, limit = 10) => {
     fetchComments();
   }, [postId, page, limit]);
 
-  const addComment = useCallback(async (content) => {
+  const addComment = useCallback(async (comment) => {
     try {
-      const response = await createComment({ postId, content });
-      const newComment = response.data || response;
-      setComments([...comments, newComment]);
+      const response = await createComment({ postId, comment });
+      const created = response.data || response;
+      const newComment = Array.isArray(created) ? created[0] : created;
+      if (newComment) {
+        setComments([...comments, newComment]);
+      }
       return newComment;
     } catch (err) {
       setError(err.message || 'Failed to create comment');
@@ -55,7 +60,7 @@ export const useComments = (postId, page = 0, limit = 10) => {
 
   const updateComment = useCallback(async (id, content) => {
     try {
-      const response = await updateCommentById(id, { content });
+      const response = await updateCommentById(id, { comment: content });
       const updatedComment = response.data || response;
       setComments(comments.map((comment) => (comment.id === id ? updatedComment : comment)));
       return updatedComment;

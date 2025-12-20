@@ -5,8 +5,28 @@ export async function responseHandler(request) {
     console.log('[ResponseHandler] Processing request...');
     const res = await request;
     console.log('[ResponseHandler] Response received:', res.status, res.data);
+
+    const data = res?.data;
+    if (data && typeof data === 'object') {
+      const statusCode = Number(data.statusCode);
+      if ((Number.isFinite(statusCode) && statusCode >= 400) || data.success === false) {
+        const errMsg = data?.message ? String(data.message) : (data?.error ? String(data.error) : 'Request failed');
+
+        setTimeout(() => {
+          toasted(false, '', errMsg);
+        }, 0);
+
+        return {
+          success: false,
+          status: Number.isFinite(statusCode) ? statusCode : res.status,
+          error: errMsg,
+          data,
+        };
+      }
+    }
+
     return {
-      status: 200,
+      status: res.status,
       data: res.data,
       success: true,
       error: "",

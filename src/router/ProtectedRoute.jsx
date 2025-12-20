@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useBreadcrumbStore } from '@/stores/breadcrumbStore';
-import { canAccess } from '@/utils/rbacUtils';
+import { canAccess, getDefaultRouteForRole, isSuperAdmin, hasAllPrivileges } from '@/utils/rbacUtils';
 
 const ProtectedRoute = ({ element, requiredRoles = [], requiredPrivileges = [] }) => {
   const auth = useAuthStore((state) => state.auth);
@@ -29,18 +29,14 @@ const ProtectedRoute = ({ element, requiredRoles = [], requiredPrivileges = [] }
   const userPrivileges = auth?.user?.privileges || [];
   const userRole = auth?.user?.roleName;
 
-  if (userRole === 'Super Admin' || userPrivileges.includes('All Privileges')) {
+  if (isSuperAdmin(userRole) || hasAllPrivileges(userPrivileges)) {
     return element;
   }
 
   const rolesToCheck = requiredRoles.length > 0 ? requiredRoles : requiredPrivileges;
 
-  if (rolesToCheck.length > 0) {
-    const hasAccess = rolesToCheck.some((role) => userPrivileges.includes(role));
-
-    if (!hasAccess) {
-      return <Navigate to="/dashboard/home" replace />;
-    }
+  if (rolesToCheck.length > 0 && !canAccess(auth, rolesToCheck)) {
+    return <Navigate to={getDefaultRouteForRole(userRole)} replace />;
   }
 
   return element;

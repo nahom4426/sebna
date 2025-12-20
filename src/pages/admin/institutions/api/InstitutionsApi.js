@@ -64,3 +64,7 @@ export function changeInstitutionStatus(institutionId, status) {
     params: { status },
   });
 }
+
+export function getMyInstitutionMembership() {
+  return api.addAuthenticationHeader().get('/institution-memberships/my');
+}

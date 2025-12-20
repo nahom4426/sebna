@@ -24,6 +24,19 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  setInstitutionId: (institutionId) => {
+    const { auth } = get();
+    if (!auth?.user) return;
+    const nextAuth = {
+      ...auth,
+      user: {
+        ...auth.user,
+        institutionId,
+      },
+    };
+    get().setAuth(nextAuth);
+  },
+
   setProfile: (imageData) => {
     set({ imageData });
     if (imageData) {

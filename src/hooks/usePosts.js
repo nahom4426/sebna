@@ -1,7 +1,14 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { getAllPosts, getPostById, createPost, updatePostById, removePostById } from '@/pages/admin/posts/api/PostsApi';
+import {
+  getAllPosts,
+  getInstitutionPosts,
+  getPostById,
+  createPost,
+  updatePostById,
+  removePostById,
+} from '@/pages/admin/posts/api/PostsApi';
 
-export const usePosts = (page = 0, limit = 10) => {
+export const usePosts = (page = 0, limit = 10, institutionId) => {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -10,6 +17,7 @@ export const usePosts = (page = 0, limit = 10) => {
   const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
     return () => {
       isMountedRef.current = false;
     };
@@ -20,7 +28,9 @@ export const usePosts = (page = 0, limit = 10) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getAllPosts(page, limit);
+      const response = institutionId
+        ? await getInstitutionPosts(institutionId, page, limit)
+        : await getAllPosts(page, limit);
       if (!isMountedRef.current) return;
       const data = response.data || response;
       setPosts(data.content || data.posts || []);
@@ -35,11 +45,11 @@ export const usePosts = (page = 0, limit = 10) => {
         setLoading(false);
       }
     }
-  }, [page, limit]);
+  }, [page, limit, institutionId]);
 
   useEffect(() => {
     fetchPosts();
-  }, [page, limit]);
+  }, [fetchPosts, page, limit]);
 
   const createNewPost = useCallback(async (postData) => {
     try {

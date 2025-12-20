@@ -37,7 +37,7 @@ export function updateUserById(id, data) {
 
   return api
     .addAuthenticationHeader()
-    .put(`${path}/${id}`, formattedData)
+    .put(`${path}/update/${id}`, formattedData)
     .catch((error) => {
       return {
         success: false,

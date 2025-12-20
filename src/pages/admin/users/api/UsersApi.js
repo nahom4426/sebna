@@ -14,15 +14,27 @@ export function getUserById(id) {
 }
 
 export function createUser(data) {
-  return api.addAuthenticationHeader().post('/users/signUp', data);
+  return api.addAuthenticationHeader().post('/users/signUp', data, {
+    validateStatus: (status) => status === 200 || status === 400,
+  });
 }
 
 export function updateUserById(id, data) {
-  return api.addAuthenticationHeader().put(`/users/${id}`, data);
+  return api.addAuthenticationHeader().put(`/users/update/${id}`, data);
 }
 
 export function removeUserById(id) {
-  return api.addAuthenticationHeader().delete(`/users/${id}`);
+  return api.addAuthenticationHeader().delete(`/users/delete/${id}`);
+}
+
+export function resendWelcomePasswordEmail(userUuid) {
+  return api.addAuthenticationHeader().post(`/users/admin/resend-welcome-password/${userUuid}`, null, {
+    validateStatus: (status) => status === 200 || status === 400,
+  });
+}
+
+export function adminResetPassword(userUuid) {
+  return api.addAuthenticationHeader().post(`/users/admin/reset-password/${userUuid}`);
 }
 
 export function changeUserStatus(userId, status) {

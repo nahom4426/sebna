@@ -25,7 +25,9 @@ export const checkUserRole = (userRole, requiredRoles) => {
 };
 
 export const isSuperAdmin = (userRole) => {
-  return userRole === 'Super Admin' || userRole === 'SUPER_ADMIN';
+  if (!userRole) return false;
+  const normalized = String(userRole).trim();
+  return normalized === 'Super Admin' || normalized === 'SUPER_ADMIN' || normalized === 'super_admin';
 };
 
 export const hasAllPrivileges = (userPrivileges) => {
@@ -44,6 +46,20 @@ export const canAccess = (auth, requiredRoles = []) => {
   }
 
   return checkUserPrivilege(privileges, requiredRoles);
+};
+
+export const getDefaultRouteForRole = (userRole) => {
+  const role = String(userRole || '').trim();
+  if (role === 'super_admin' || role === 'SUPER_ADMIN' || role === 'Super Admin') {
+    return '/admin/users';
+  }
+  if (role === 'company_admin' || role === 'COMPANY_ADMIN' || role === 'Company Admin') {
+    return '/admin/users';
+  }
+  if (role === 'company_user' || role === 'COMPANY_USER' || role === 'Company User') {
+    return '/admin/posts';
+  }
+  return '/dashboard/home';
 };
 
 export const formatRoleName = (role) => {

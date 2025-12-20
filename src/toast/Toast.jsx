@@ -52,7 +52,11 @@ const Toast = ({ toast, id }) => {
 
   const toastClasses = `
     relative rounded-md max-w-[50%] flex items-center p-4 gap-3 text-base shadow-md min-w-72 justify-between
-    ${toast?.type === 'success' ? 'bg-[#02676B] text-[#F6F7FA]' : 'bg-yellow-200 border-l-4 border-red-500'}
+    ${toast?.type === 'success'
+      ? 'bg-[#02676B] text-[#F6F7FA]'
+      : toast?.type === 'warning'
+        ? 'bg-yellow-200 border-l-4 border-yellow-600 text-black'
+        : 'bg-red-600 text-white'}
   `;
 
   return (

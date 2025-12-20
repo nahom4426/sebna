@@ -1,61 +1,114 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { login, forgotPassword, resetPassword, verifyResetCode } from '@/pages/admin/api/LoginApi';
+import { login, sendResetCode, checkResetCode, resetPassword } from '@/pages/admin/api/LoginApi';
 import { toasted } from '@/utils/toast';
 import { useAuthStore } from '@/stores/authStore';
+import { getDefaultRouteForRole } from '@/utils/rbacUtils';
 import logo from '@/assets/logo.svg';
-import { FiMail, FiLock, FiSmartphone, FiArrowRight, FiArrowLeft, FiX, FiEye, FiEyeOff } from 'react-icons/fi';
+import { 
+  FiMail, 
+  FiLock, 
+  FiSmartphone, 
+  FiArrowRight, 
+  FiArrowLeft, 
+  FiX, 
+  FiEye, 
+  FiEyeOff,
+  FiUser,
+  FiCheck,
+  FiShield,
+  FiKey,
+  FiRefreshCw
+} from 'react-icons/fi';
+import { 
+  FcGoogle,
+  FcFeedback,
+  FcAcceptDatabase,
+  FcApproval,
+  FcExpired
+} from 'react-icons/fc';
 
-// Custom Input Component
+// Custom Input Component with enhanced animations
 const InputField = ({ icon: Icon, type, placeholder, value, onChange, className = '', ...props }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
   
   const isPassword = type === 'password';
   
   return (
-    <div className={`relative mb-6 ${className}`}>
-      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-        <Icon className="h-5 w-5 text-gray-400 transition-colors duration-300" />
+    <motion.div 
+      className={`relative mb-6 ${className}`}
+      animate={{
+        y: isHovered ? -2 : 0,
+      }}
+      transition={{ type: "spring", stiffness: 300 }}
+    >
+      <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+        <Icon className={`h-5 w-5 transition-all duration-300 ${
+          isFocused ? 'text-blue-500 scale-110' : 
+          isHovered ? 'text-blue-400' : 'text-gray-400'
+        }`} />
       </div>
-      <input
+      <motion.input
         type={isPassword && showPassword ? 'text' : type}
-        className="w-full pl-12 pr-4 py-4 bg-white/90 backdrop-blur-sm border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 shadow-sm transition-all duration-300"
+        className="w-full pl-12 pr-12 py-4 bg-white/95 backdrop-blur-sm border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-400 shadow-sm transition-all duration-500"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        onFocus={() => setIsFocused(true)}
+        onBlur={() => setIsFocused(false)}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
         {...props}
+        animate={{
+          boxShadow: isFocused 
+            ? '0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04)'
+            : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+          borderColor: isFocused 
+            ? '#60a5fa' 
+            : isHovered 
+              ? '#93c5fd' 
+              : '#e5e7eb'
+        }}
       />
       {isPassword && (
-        <button
+        <motion.button
           type="button"
           onClick={() => setShowPassword(!showPassword)}
-          className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
+          className="absolute inset-y-0 right-0 pr-4 flex items-center"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
         >
-          {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
-        </button>
+          {showPassword ? (
+            <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+          ) : (
+            <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+          )}
+        </motion.button>
       )}
-    </div>
+    </motion.div>
   );
 };
 
-// OTP Input Component
-const OtpInput = ({ value, onChange, disabled = false }) => {
+// Enhanced OTP Input Component
+const OtpInput = ({ value, onChange, disabled = false, loading = false }) => {
   const handleChange = (e, index) => {
     const newValue = e.target.value.replace(/\D/g, '').slice(0, 1);
     const newOtp = [...value];
     newOtp[index] = newValue;
     onChange(newOtp);
     
-    if (newValue && index < 3) {
+    if (newValue && index < value.length - 1) {
       document.getElementById(`otp-${index + 1}`)?.focus();
     }
   };
 
   return (
     <div className="flex space-x-4 justify-center">
-      {[0, 1, 2, 3].map((index) => (
-        <input
+      {Array.from({ length: value.length }, (_, index) => index).map((index) => (
+        <motion.input
           key={index}
           id={`otp-${index}`}
           type="text"
@@ -67,19 +120,28 @@ const OtpInput = ({ value, onChange, disabled = false }) => {
               document.getElementById(`otp-${index - 1}`)?.focus();
             }
           }}
-          className="w-16 h-16 text-center text-2xl font-bold bg-white/90 border-2 border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all duration-300"
-          disabled={disabled}
+          className="w-16 h-16 text-center text-3xl font-bold bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-400 outline-none transition-all duration-300"
+          disabled={disabled || loading}
+          whileFocus={{ scale: 1.05 }}
+          whileHover={{ scale: 1.02 }}
         />
       ))}
     </div>
   );
 };
 
-// Glass Card Component
-const GlassCard = ({ children, className = '' }) => (
-  <div className={`bg-white/10 backdrop-blur-lg border border-white/20 rounded-3xl shadow-2xl ${className}`}>
-    {children}
-  </div>
+// Glass Card Component with gradient border
+const GlassCard = ({ children, className = '', hover = true }) => (
+  <motion.div 
+    className={`relative bg-gradient-to-br from-white/95 via-white/90 to-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden ${className}`}
+    whileHover={hover ? { scale: 1.01 } : {}}
+    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+  >
+    {/* Gradient border effect */}
+    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-10 rounded-3xl" />
+    <div className="absolute inset-[1px] bg-gradient-to-br from-white/95 via-white/90 to-white/95 backdrop-blur-xl rounded-3xl" />
+    <div className="relative z-10">{children}</div>
+  </motion.div>
 );
 
 const SignIn = () => {
@@ -87,6 +149,7 @@ const SignIn = () => {
   const location = useLocation();
   const auth = useAuthStore((state) => state.auth);
   const setAuth = useAuthStore((state) => state.setAuth);
+  const [showPassword, setShowPassword] = useState(false);
   
   // Login state
   const [email, setEmail] = useState('');
@@ -105,23 +168,83 @@ const SignIn = () => {
   // Forgot password modal state
   const [showForgotPasswordModal, setShowForgotPasswordModal] = useState(false);
   const [forgotStep, setForgotStep] = useState(1);
-  const [forgotPhone, setForgotPhone] = useState('');
-  const [forgotOtpInputs, setForgotOtpInputs] = useState(['', '', '', '']);
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [forgotOtpInputs, setForgotOtpInputs] = useState(['', '', '', '', '', '']);
   const [forgotOtp, setForgotOtp] = useState('');
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [forgotReqPending, setForgotReqPending] = useState(false);
   
-  const [isFocused, setIsFocused] = useState({ email: false, password: false });
-  const [showPassword, setShowPassword] = useState(false);
+  // Focus states for animations
+  const [isEmailFocused, setIsEmailFocused] = useState(false);
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   
-  // Check if user is already logged in (use auth store, not localStorage)
+  // Check if user is already logged in
   useEffect(() => {
     if (auth?.accessToken) {
-      const redirectPath = location.state?.from?.pathname || '/dashboard/home';
+      const roleDefault = getDefaultRouteForRole(auth?.user?.roleName);
+      const redirectPath = location.state?.from?.pathname || roleDefault;
       navigate(redirectPath, { replace: true });
     }
   }, [auth?.accessToken, navigate, location]);
+
+  // Particle background
+  const ParticleBackground = () => (
+    <div className="absolute inset-0 overflow-hidden">
+      {/* Animated gradient orbs */}
+      <motion.div 
+        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-3xl"
+        animate={{
+          x: [0, 50, 0],
+          y: [0, -50, 0],
+          scale: [1, 1.2, 1],
+        }}
+        transition={{
+          duration: 20,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      <motion.div 
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-pink-500/10 to-orange-500/10 blur-3xl"
+        animate={{
+          x: [0, -30, 0],
+          y: [0, 30, 0],
+          scale: [1, 1.1, 1],
+        }}
+        transition={{
+          duration: 25,
+          repeat: Infinity,
+          ease: "easeInOut",
+        }}
+      />
+      
+      {/* Floating particles */}
+      {[...Array(12)].map((_, i) => (
+        <motion.div
+          key={i}
+          className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-400/30"
+          style={{
+            left: `${Math.random() * 100}%`,
+            top: `${Math.random() * 100}%`,
+          }}
+          animate={{
+            y: [0, -100, 0],
+            x: [0, Math.random() * 50 - 25, 0],
+            opacity: [0, 0.7, 0],
+          }}
+          transition={{
+            duration: 3 + Math.random() * 4,
+            repeat: Infinity,
+            delay: Math.random() * 2,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+    </div>
+  );
 
   // Login handler
   const handleLogin = async (e) => {
@@ -134,14 +257,20 @@ const SignIn = () => {
       const response = await login({ email, password });
       
       if (response.success) {
-        // Set auth in store (this will also save to localStorage)
+        // Set auth in store
         setAuth({
           user: response.data,
           accessToken: response.data?.token || response.data?.accessToken,
         });
         localStorage.setItem('userDetail', JSON.stringify(response.data));
-        const redirectPath = location.state?.from?.pathname || '/dashboard/home';
-        navigate(redirectPath, { replace: true });
+        const roleDefault = getDefaultRouteForRole(response.data?.roleName);
+        const redirectPath = location.state?.from?.pathname || roleDefault;
+        
+        // Success animation before navigation
+        toasted(true, 'Welcome back!', 'Redirecting to dashboard...');
+        setTimeout(() => {
+          navigate(redirectPath, { replace: true });
+        }, 1000);
       } else {
         const errorMsg = response?.error?.toLowerCase?.() || '';
         if (response.status === 404 && errorMsg.includes('not active')) {
@@ -164,7 +293,7 @@ const SignIn = () => {
     setVerifyReqPending(true);
     
     try {
-      // TODO: Replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
       toasted(true, 'Verification code sent successfully');
     } catch (err) {
       toasted(false, 'Send Code Failed', 'Verification failed');
@@ -175,14 +304,14 @@ const SignIn = () => {
 
   const submitVerification = async () => {
     if (!verificationCode.trim() || !phoneNumber.trim()) {
-      toasted(false, '', 'Please enter both phone number and verification code');
+      toasted(false, '', 'Please enter both email and verification code');
       return;
     }
     
     setVerifyReqPending(true);
     
     try {
-      // TODO: Replace with actual API call
+      await new Promise(resolve => setTimeout(resolve, 1000)); // Simulated API call
       toasted(true, 'Account verified successfully');
       closeVerificationModal();
       if (pendingLoginData) {
@@ -211,9 +340,9 @@ const SignIn = () => {
 
   const closeForgotPasswordModal = () => {
     setShowForgotPasswordModal(false);
-    setForgotPhone('');
+    setForgotEmail('');
     setForgotOtp('');
-    setForgotOtpInputs(['', '', '', '']);
+    setForgotOtpInputs(['', '', '', '', '', '']);
     setNewPassword('');
     setConfirmPassword('');
     setForgotStep(1);
@@ -223,7 +352,7 @@ const SignIn = () => {
     setForgotReqPending(true);
     
     try {
-      const response = await forgotPassword(forgotPhone);
+      const response = await sendResetCode(forgotEmail);
       
       if (response.success) {
         toasted(true, 'OTP sent successfully');
@@ -249,9 +378,19 @@ const SignIn = () => {
     setForgotReqPending(true);
     
     try {
-      // TODO: Replace with actual API call
-      toasted(true, 'OTP verified');
-      setForgotStep(3);
+      const code = forgotOtpInputs.join('');
+      setForgotOtp(code);
+      const response = await checkResetCode({
+        email: forgotEmail,
+        verificationCode: code,
+      });
+
+      if (response.success) {
+        toasted(true, 'OTP verified');
+        setForgotStep(3);
+      } else {
+        toasted(false, '', response?.error || response?.message || 'Invalid OTP');
+      }
     } catch (err) {
       toasted(false, '', 'Invalid OTP');
     } finally {
@@ -268,14 +407,12 @@ const SignIn = () => {
     setForgotReqPending(true);
     
     try {
-      const data = {
-        passwordResetOtp: forgotOtp,
-        userName: forgotPhone,
-        confirmPassword: confirmPassword,
+      const response = await resetPassword({
+        email: forgotEmail,
+        verificationCode: forgotOtp,
         newPassword: newPassword,
-      };
-      
-      const response = await resetPassword(data);
+        confirmPassword: confirmPassword,
+      });
       
       if (response.success) {
         toasted(true, 'Password reset successfully');
@@ -290,26 +427,6 @@ const SignIn = () => {
     }
   };
 
-  const focusNext = (index) => {
-    const newOtpInputs = [...otpInputs];
-    if (newOtpInputs[index].length === 1 && index < 3) {
-      const inputs = document.querySelectorAll('input[type="text"]');
-      const next = inputs[index + 1];
-      next?.focus();
-    }
-    setVerificationCode(newOtpInputs.join(''));
-  };
-
-  const focusNextForgotOtp = (index) => {
-    const newOtpInputs = [...forgotOtpInputs];
-    if (newOtpInputs[index].length === 1 && index < 3) {
-      const inputs = document.querySelectorAll('input[type="text"]');
-      const next = inputs[index + 1];
-      next?.focus();
-    }
-    setForgotOtp(newOtpInputs.join(''));
-  };
-
   const goToSignup = () => {
     navigate('/signUp');
   };
@@ -318,85 +435,67 @@ const SignIn = () => {
     navigate('/');
   };
 
-  // Floating particles for background
-  const Particle = ({ delay, duration, left, size }) => (
-    <motion.div
-      className="absolute rounded-full bg-white/10"
-      style={{
-        left: `${left}%`,
-        width: size,
-        height: size,
-      }}
-      animate={{
-        y: ['0%', '100%'],
-        opacity: [0, 0.5, 0],
-      }}
-      transition={{
-        duration,
-        repeat: Infinity,
-        delay,
-        ease: 'linear',
-      }}
-    />
-  );
-
   return (
     <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-      {/* Animated Background Particles */}
-      <div className="absolute inset-0 overflow-hidden">
-        {Array.from({ length: 20 }).map((_, i) => (
-          <Particle
-            key={i}
-            delay={Math.random() * 5}
-            duration={15 + Math.random() * 10}
-            left={Math.random() * 100}
-            size={2 + Math.random() * 4}
-          />
-        ))}
-      </div>
+      <ParticleBackground />
       
-      {/* Background Pattern */}
+      {/* Background grid pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 1px 1px, #3b82f6 1px, transparent 0)`,
-          backgroundSize: '40px 40px',
+          backgroundImage: `linear-gradient(to right, #3b82f6 1px, transparent 1px),
+                           linear-gradient(to bottom, #3b82f6 1px, transparent 1px)`,
+          backgroundSize: '50px 50px',
         }} />
       </div>
       
       {/* Back Button */}
       <motion.button 
         onClick={handleBack}
-        className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 flex items-center text-gray-600 hover:text-blue-600 transition-colors group"
-        whileHover={{ x: -4 }}
+        className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-xl text-gray-600 hover:text-blue-600 hover:bg-white transition-all group border border-white/40 shadow-lg"
+        whileHover={{ x: -4, scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.2 }}
       >
-        <FiArrowLeft className="w-5 h-5 mr-2 group-hover:animate-pulse" />
+        <FiArrowLeft className="w-5 h-5 group-hover:animate-pulse" />
         <span className="font-medium text-sm sm:text-base">Back to Home</span>
       </motion.button>
 
       <motion.div 
         initial={{ opacity: 0, y: 30, scale: 0.95 }}
         animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        transition={{ 
+          duration: 0.6, 
+          ease: "easeOut",
+          type: "spring",
+          stiffness: 100,
+          damping: 15
+        }}
         className="w-full max-w-md mx-auto"
       >
         <GlassCard className="p-8 sm:p-10">
-          {/* Logo Section */}
+          {/* Logo Section with animation */}
           <motion.div 
             className="flex flex-col items-center mb-10"
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.2 }}
+            transition={{ delay: 0.2, type: "spring" }}
           >
-            <div className="mb-6 p-4 bg-gradient-to-r from-blue-500 to-purple-500 rounded-2xl shadow-lg">
+            <motion.div 
+              className="mb-6 p-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg relative overflow-hidden"
+              whileHover={{ scale: 1.05, rotate: 5 }}
+              transition={{ type: "spring", stiffness: 200 }}
+            >
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 animate-pulse" />
               <img 
                 src={logo} 
                 alt="Logo" 
-                className="h-12 sm:h-16 w-auto filter brightness-0 invert" 
+                className="h-12 sm:h-16 w-auto filter brightness-0 invert relative z-10" 
               />
-            </div>
+            </motion.div>
             <div className="text-center">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
                 Welcome Back
               </h1>
               <p className="text-gray-500 mt-2">Sign in to your account to continue</p>
@@ -411,193 +510,277 @@ const SignIn = () => {
             animate={{ opacity: 1 }}
             transition={{ delay: 0.3 }}
           >
-            <div>
+            {/* Email Input */}
+            <motion.div
+              whileHover={{ y: -2 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <label className="block text-sm font-semibold text-gray-700 mb-3">
                 Email or Phone Number
               </label>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FiMail className={`h-5 w-5 transition-colors duration-300 ${isFocused.email ? 'text-blue-500' : 'text-gray-400'}`} />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                  <FiMail className={`h-5 w-5 transition-all duration-300 ${
+                    isEmailFocused ? 'text-blue-500 scale-110' : 'text-gray-400'
+                  }`} />
                 </div>
-                <input
+                <motion.input
                   type="text"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  onFocus={() => setIsFocused(prev => ({ ...prev, email: true }))}
-                  onBlur={() => setIsFocused(prev => ({ ...prev, email: false }))}
+                  onFocus={() => setIsEmailFocused(true)}
+                  onBlur={() => setIsEmailFocused(false)}
                   placeholder="Enter your email or phone"
-                  className="w-full pl-12 pr-4 py-4 bg-white border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 shadow-sm transition-all duration-300 group-hover:border-blue-300"
+                  className="w-full pl-12 pr-4 py-4 bg-white/95 border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-400 shadow-sm transition-all duration-500"
                   required
+                  animate={{
+                    boxShadow: isEmailFocused 
+                      ? '0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04)'
+                      : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                    borderColor: isEmailFocused ? '#60a5fa' : '#e5e7eb'
+                  }}
                 />
               </div>
-            </div>
+            </motion.div>
 
-            <div>
+            {/* Password Input */}
+            <motion.div
+              whileHover={{ y: -2 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
               <div className="flex justify-between items-center mb-3">
                 <label className="block text-sm font-semibold text-gray-700">
                   Password
                 </label>
-                <button
+                <motion.button
                   type="button"
                   onClick={openForgotPasswordModal}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors hover:underline"
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
                 >
                   Forgot Password?
-                </button>
+                </motion.button>
               </div>
               <div className="relative group">
-                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                  <FiLock className={`h-5 w-5 transition-colors duration-300 ${isFocused.password ? 'text-blue-500' : 'text-gray-400'}`} />
+                <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
+                  <FiLock className={`h-5 w-5 transition-all duration-300 ${
+                    isPasswordFocused ? 'text-blue-500 scale-110' : 'text-gray-400'
+                  }`} />
                 </div>
-                <input
+                <motion.input
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  onFocus={() => setIsFocused(prev => ({ ...prev, password: true }))}
-                  onBlur={() => setIsFocused(prev => ({ ...prev, password: false }))}
+                  onFocus={() => setIsPasswordFocused(true)}
+                  onBlur={() => setIsPasswordFocused(false)}
                   placeholder="Enter your password"
-                  className="w-full pl-12 pr-12 py-4 bg-white border border-gray-200 rounded-xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 shadow-sm transition-all duration-300 group-hover:border-blue-300"
+                  className="w-full pl-12 pr-12 py-4 bg-white/95 border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-400 shadow-sm transition-all duration-500"
                   required
+                  animate={{
+                    boxShadow: isPasswordFocused 
+                      ? '0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04)'
+                      : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
+                    borderColor: isPasswordFocused ? '#60a5fa' : '#e5e7eb'
+                  }}
                 />
-                <button
+                <motion.button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-400 hover:text-gray-600 transition-colors"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
                 >
-                  {showPassword ? <FiEyeOff className="h-5 w-5" /> : <FiEye className="h-5 w-5" />}
-                </button>
+                  {showPassword ? (
+                    <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                  ) : (
+                    <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600 transition-colors" />
+                  )}
+                </motion.button>
               </div>
-            </div>
+            </motion.div>
 
-            <div className="flex items-center">
+            {/* Remember Me */}
+            <motion.div 
+              className="flex items-center"
+              whileHover={{ x: 4 }}
+            >
               <input
                 type="checkbox"
                 id="remember"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500/30"
               />
-              <label htmlFor="remember" className="ml-3 text-sm text-gray-600 cursor-pointer">
+              <label htmlFor="remember" className="ml-3 text-sm text-gray-600 cursor-pointer select-none">
                 Keep me logged in
               </label>
-            </div>
+            </motion.div>
 
+            {/* Submit Button */}
             <motion.button
               type="submit"
               disabled={loginReqPending}
-              whileHover={{ scale: 1.02 }}
+              whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="w-full py-4 px-6 rounded-xl bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed group"
+              className="relative w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden group"
             >
-              {loginReqPending ? (
-                <div className="flex items-center justify-center">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin mr-3"></div>
-                  Signing in...
-                </div>
-              ) : (
-                <div className="flex items-center justify-center">
-                  <span>Sign In</span>
-                  <FiArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" />
-                </div>
-              )}
+              {/* Animated gradient background */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              
+              {/* Shimmer effect */}
+              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
+              
+              <div className="relative flex items-center justify-center">
+                {loginReqPending ? (
+                  <>
+                    <motion.div 
+                      className="w-5 h-5 border-2 border-white border-t-transparent rounded-full mr-3"
+                      animate={{ rotate: 360 }}
+                      transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                    />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    <span>Sign In</span>
+                    <FiArrowRight className="ml-3 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </div>
             </motion.button>
           </motion.form>
 
           {/* Divider */}
-          <div className="my-8 flex items-center">
-            <div className="flex-1 border-t border-gray-200"></div>
-            <span className="mx-4 text-sm text-gray-400">or continue with</span>
-            <div className="flex-1 border-t border-gray-200"></div>
-          </div>
-
-          {/* Social Login (Optional) */}
-          <div className="grid grid-cols-2 gap-4 mb-8">
-            <button className="flex items-center justify-center py-3 px-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors group">
-              <svg className="w-5 h-5 mr-3 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
-              </svg>
-              <span className="text-sm font-medium text-gray-700">Google</span>
-            </button>
-            <button className="flex items-center justify-center py-3 px-4 bg-white border border-gray-200 rounded-xl hover:bg-gray-50 transition-colors group">
-              <svg className="w-5 h-5 mr-3 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 0c-6.627 0-12 5.373-12 12s5.373 12 12 12 12-5.373 12-12-5.373-12-12-12zm3 8h-1.35c-.538 0-.65.221-.65.778v1.222h2l-.209 2h-1.791v7h-3v-7h-2v-2h2v-2.308c0-1.769.931-2.692 3.029-2.692h1.971v3z"/>
-              </svg>
-              <span className="text-sm font-medium text-gray-700">Facebook</span>
-            </button>
-          </div>
-
-          {/* Signup Link */}
           <motion.div 
-            className="text-center pt-4 border-t border-gray-100"
+            className="my-8 flex items-center"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.4 }}
+          >
+            <div className="flex-1 border-t border-gray-200/50"></div>
+            <motion.span 
+              className="mx-4 text-sm text-gray-400"
+              whileHover={{ scale: 1.1 }}
+            >
+              or continue with
+            </motion.span>
+            <div className="flex-1 border-t border-gray-200/50"></div>
+          </motion.div>
+
+          {/* Social Login */}
+          <motion.div 
+            className="grid grid-cols-2 gap-4 mb-8"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.5 }}
           >
+            <motion.button 
+              className="flex items-center justify-center py-3 px-4 bg-white/90 backdrop-blur-sm border border-gray-200/80 rounded-2xl hover:bg-white transition-all duration-300 group hover:shadow-lg"
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <FcGoogle className="w-6 h-6 mr-3" />
+              <span className="text-sm font-medium text-gray-700">Google</span>
+            </motion.button>
+            <motion.button 
+              className="flex items-center justify-center py-3 px-4 bg-white/90 backdrop-blur-sm border border-gray-200/80 rounded-2xl hover:bg-white transition-all duration-300 group hover:shadow-lg"
+              whileHover={{ y: -2, scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <div className="w-6 h-6 mr-3 bg-blue-600 rounded-full flex items-center justify-center">
+                <FiUser className="w-4 h-4 text-white" />
+              </div>
+              <span className="text-sm font-medium text-gray-700">Facebook</span>
+            </motion.button>
+          </motion.div>
+
+          {/* Signup Link */}
+          {/* <motion.div 
+            className="text-center pt-6 border-t border-gray-100/50"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6 }}
+          >
             <p className="text-gray-600">
               Don't have an account?
-              <button
+              <motion.button
                 onClick={goToSignup}
-                className="ml-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors hover:underline"
+                className="ml-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
                 Sign up now
-              </button>
+              </motion.button>  
             </p>
-          </motion.div>
+          </motion.div>*/}  
         </GlassCard>
       </motion.div>
 
-      {/* Modern Account Verification Modal */}
+      {/* Modern Verification Modal */}
       <AnimatePresence>
         {showVerificationModal && (
           <motion.div 
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div 
-              className="bg-white rounded-3xl w-full max-w-md shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            >
+            <GlassCard className="w-full max-w-md">
               <div className="p-8">
-                <div className="flex justify-between items-center mb-6">
+                {/* Header */}
+                <motion.div 
+                  className="flex justify-between items-center mb-8"
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                >
                   <div>
                     <h3 className="text-2xl font-bold text-gray-800">Verify Your Account</h3>
                     <p className="text-gray-500 text-sm mt-1">We've sent a code to your phone</p>
                   </div>
-                  <button
+                  <motion.button
                     onClick={closeVerificationModal}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-xl"
+                    whileHover={{ rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
                   >
                     <FiX className="w-6 h-6" />
-                  </button>
-                </div>
+                  </motion.button>
+                </motion.div>
 
-                <div className="space-y-6">
+                <motion.div 
+                  className="space-y-6"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.1 }}
+                >
+                  {/* Phone Input */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+                    <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                      <FiSmartphone className="w-4 h-4" />
+                      Phone Number
+                    </label>
                     <div className="flex gap-3">
                       <input
                         type="text"
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         placeholder="+1 (555) 123-4567"
-                        className="flex-1 py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all"
+                        className="flex-1 py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all bg-white/95"
                       />
-                      <button
+                      <motion.button
                         onClick={sendVerification}
                         disabled={!phoneNumber.trim() || verifyReqPending}
                         className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
                       >
                         {verifyReqPending ? 'Sending...' : 'Send'}
-                      </button>
+                      </motion.button>
                     </div>
                   </div>
 
+                  {/* OTP Input */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-4 text-center">
                       Enter Verification Code
@@ -606,174 +789,241 @@ const SignIn = () => {
                       value={otpInputs}
                       onChange={setOtpInputs}
                       disabled={verifyReqPending}
+                      loading={verifyReqPending}
                     />
                     <p className="text-center text-sm text-gray-500 mt-4">
-                      Didn't receive code? 
-                      <button className="ml-2 text-blue-600 hover:text-blue-800 font-medium">
+                      Didn't receive code?
+                      <motion.button 
+                        className="ml-2 text-blue-600 hover:text-blue-800 font-medium"
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
                         Resend
-                      </button>
+                      </motion.button>
                     </p>
                   </div>
 
+                  {/* Action Buttons */}
                   <div className="flex gap-3">
-                    <button
+                    <motion.button
                       onClick={closeVerificationModal}
                       className="flex-1 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
                       Cancel
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
                       onClick={submitVerification}
                       disabled={otpInputs.join('').length < 4 || verifyReqPending}
                       className="flex-1 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
                     >
-                      {verifyReqPending ? 'Verifying...' : 'Verify Account'}
-                    </button>
+                      {verifyReqPending ? (
+                        <span className="flex items-center justify-center gap-2">
+                          <FiRefreshCw className="w-4 h-4 animate-spin" />
+                          Verifying...
+                        </span>
+                      ) : (
+                        'Verify Account'
+                      )}
+                    </motion.button>
                   </div>
-                </div>
+                </motion.div>
               </div>
-            </motion.div>
+            </GlassCard>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Forgot Password Modal */}
+      {/* Enhanced Forgot Password Modal */}
       <AnimatePresence>
         {showForgotPasswordModal && (
           <motion.div 
-            className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+            className="fixed inset-0 bg-black/50 backdrop-blur-md flex items-center justify-center z-50 p-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <motion.div 
-              className="bg-white rounded-3xl w-full max-w-md shadow-2xl"
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            >
+            <GlassCard className="w-full max-w-md">
               <div className="p-8">
-                <div className="flex justify-between items-center mb-8">
+                {/* Header with Steps */}
+                <motion.div 
+                  className="flex justify-between items-center mb-8"
+                  initial={{ y: -20, opacity: 0 }}
+                  animate={{ y: 0, opacity: 1 }}
+                >
                   <div>
                     <h3 className="text-2xl font-bold text-gray-800">Reset Password</h3>
-                    <div className="flex items-center mt-2">
+                    <div className="flex items-center mt-4 gap-1">
                       {[1, 2, 3].map((step) => (
-                        <div key={step} className="flex items-center">
-                          <div className={`w-8 h-8 rounded-full flex items-center justify-center ${forgotStep >= step ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-400'}`}>
-                            {step}
-                          </div>
+                        <React.Fragment key={step}>
+                          <motion.div 
+                            className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                              forgotStep >= step 
+                                ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
+                                : 'bg-gray-100 text-gray-400'
+                            }`}
+                            whileHover={{ scale: 1.1 }}
+                          >
+                            {forgotStep > step ? (
+                              <FiCheck className="w-5 h-5" />
+                            ) : (
+                              step
+                            )}
+                          </motion.div>
                           {step < 3 && (
-                            <div className={`w-12 h-1 mx-2 ${forgotStep > step ? 'bg-blue-500' : 'bg-gray-200'}`} />
+                            <div className={`w-12 h-1 ${forgotStep > step ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gray-200'}`} />
                           )}
-                        </div>
+                        </React.Fragment>
                       ))}
                     </div>
                   </div>
-                  <button
+                  <motion.button
                     onClick={closeForgotPasswordModal}
-                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                    className="text-gray-400 hover:text-gray-600 transition-colors p-2 hover:bg-gray-100 rounded-xl"
+                    whileHover={{ rotate: 90 }}
+                    whileTap={{ scale: 0.9 }}
                   >
                     <FiX className="w-6 h-6" />
-                  </button>
-                </div>
+                  </motion.button>
+                </motion.div>
 
-                {/* Step 1: Phone */}
-                {forgotStep === 1 && (
-                  <motion.div 
-                    className="space-y-6"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                  >
-                    <div className="text-center p-4 bg-blue-50 rounded-2xl">
-                      <FiSmartphone className="w-12 h-12 text-blue-500 mx-auto mb-3" />
-                      <h4 className="font-medium text-gray-700">Enter your phone number</h4>
-                      <p className="text-sm text-gray-500 mt-1">We'll send a verification code</p>
-                    </div>
-                    <input
-                      type="text"
-                      value={forgotPhone}
-                      onChange={(e) => setForgotPhone(e.target.value)}
-                      placeholder="Enter your phone number"
-                      className="w-full py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none"
-                    />
-                    <button
-                      onClick={sendForgotPassword}
-                      disabled={!forgotPhone.trim() || forgotReqPending}
-                      className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+                {/* Step Content */}
+                <AnimatePresence mode="wait">
+                  {forgotStep === 1 && (
+                    <motion.div 
+                      key="step1"
+                      className="space-y-6"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
                     >
-                      {forgotReqPending ? 'Sending OTP...' : 'Send Verification Code'}
-                    </button>
-                  </motion.div>
-                )}
-
-                {/* Step 2: OTP */}
-                {forgotStep === 2 && (
-                  <motion.div 
-                    className="space-y-6"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                  >
-                    <div className="text-center p-4 bg-blue-50 rounded-2xl">
-                      <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-3">
-                        <span className="text-white font-bold">OTP</span>
+                      <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl">
+                        <FcFeedback className="w-16 h-16 mx-auto mb-4" />
+                        <h4 className="font-semibold text-gray-700">Enter your email</h4>
+                        <p className="text-sm text-gray-500 mt-1">We'll send a verification code</p>
                       </div>
-                      <h4 className="font-medium text-gray-700">Enter Verification Code</h4>
-                      <p className="text-sm text-gray-500 mt-1">Check your messages</p>
-                    </div>
-                    <OtpInput 
-                      value={forgotOtpInputs}
-                      onChange={setForgotOtpInputs}
-                      disabled={forgotReqPending}
-                    />
-                    <button
-                      onClick={verifyForgotOtp}
-                      disabled={forgotOtpInputs.join('').length < 4 || forgotReqPending}
-                      className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
-                    >
-                      {forgotReqPending ? 'Verifying...' : 'Verify Code'}
-                    </button>
-                  </motion.div>
-                )}
+                      <input
+                        type="email"
+                        value={forgotEmail}
+                        onChange={(e) => setForgotEmail(e.target.value)}
+                        placeholder="Enter your email"
+                        className="w-full py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white/95"
+                      />
+                      <motion.button
+                        onClick={sendForgotPassword}
+                        disabled={!forgotEmail.trim() || forgotReqPending}
+                        className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {forgotReqPending ? 'Sending...' : 'Send Verification Code'}
+                      </motion.button>
+                    </motion.div>
+                  )}
 
-                {/* Step 3: Reset Password */}
-                {forgotStep === 3 && (
-                  <motion.div 
-                    className="space-y-6"
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                  >
-                    <div className="text-center p-4 bg-green-50 rounded-2xl">
-                      <FiLock className="w-12 h-12 text-green-500 mx-auto mb-3" />
-                      <h4 className="font-medium text-gray-700">Create New Password</h4>
-                      <p className="text-sm text-gray-500 mt-1">Make it strong and secure</p>
-                    </div>
-                    <div className="space-y-4">
-                      <input
-                        type="password"
-                        value={newPassword}
-                        onChange={(e) => setNewPassword(e.target.value)}
-                        placeholder="New password"
-                        className="w-full py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none"
-                      />
-                      <input
-                        type="password"
-                        value={confirmPassword}
-                        onChange={(e) => setConfirmPassword(e.target.value)}
-                        placeholder="Confirm password"
-                        className="w-full py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none"
-                      />
-                    </div>
-                    <button
-                      onClick={submitResetPassword}
-                      disabled={!newPassword.trim() || !confirmPassword.trim() || forgotReqPending}
-                      className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+                  {forgotStep === 2 && (
+                    <motion.div 
+                      key="step2"
+                      className="space-y-6"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
                     >
-                      {forgotReqPending ? 'Resetting...' : 'Reset Password'}
-                    </button>
-                  </motion.div>
-                )}
+                      <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl">
+                        <FcAcceptDatabase className="w-16 h-16 mx-auto mb-4" />
+                        <h4 className="font-semibold text-gray-700">Enter Verification Code</h4>
+                        <p className="text-sm text-gray-500 mt-1">Check your email for the code</p>
+                      </div>
+                      <OtpInput 
+                        value={forgotOtpInputs}
+                        onChange={setForgotOtpInputs}
+                        disabled={forgotReqPending}
+                        loading={forgotReqPending}
+                      />
+                      <motion.button
+                        onClick={verifyForgotOtp}
+                        disabled={forgotOtpInputs.join('').length < 6 || forgotReqPending}
+                        className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {forgotReqPending ? 'Verifying...' : 'Verify Code'}
+                      </motion.button>
+                    </motion.div>
+                  )}
+
+                  {forgotStep === 3 && (
+                    <motion.div 
+                      key="step3"
+                      className="space-y-6"
+                      initial={{ opacity: 0, x: 20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                    >
+                      <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl">
+                        <FcApproval className="w-16 h-16 mx-auto mb-4" />
+                        <h4 className="font-semibold text-gray-700">Create New Password</h4>
+                        <p className="text-sm text-gray-500 mt-1">Check your email and set a new password</p>
+                      </div>
+                      <div className="space-y-4">
+                        <div className="relative">
+                          <input
+                            type={showNewPassword ? 'text' : 'password'}
+                            value={newPassword}
+                            onChange={(e) => setNewPassword(e.target.value)}
+                            placeholder="New password"
+                            className="w-full py-3 px-4 pr-12 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white/95"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowNewPassword(!showNewPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                          >
+                            {showNewPassword ? (
+                              <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                            ) : (
+                              <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                            )}
+                          </button>
+                        </div>
+                        <div className="relative">
+                          <input
+                            type={showConfirmPassword ? 'text' : 'password'}
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
+                            placeholder="Confirm password"
+                            className="w-full py-3 px-4 pr-12 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white/95"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                            className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                          >
+                            {showConfirmPassword ? (
+                              <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                            ) : (
+                              <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
+                            )}
+                          </button>
+                        </div>
+                      </div>
+                      <motion.button
+                        onClick={submitResetPassword}
+                        disabled={!newPassword.trim() || !confirmPassword.trim() || forgotReqPending}
+                        className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {forgotReqPending ? 'Resetting...' : 'Reset Password'}
+                      </motion.button>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            </motion.div>
+            </GlassCard>
           </motion.div>
         )}
       </AnimatePresence>
@@ -781,15 +1031,27 @@ const SignIn = () => {
       {/* Footer Note */}
       <motion.div 
         className="absolute bottom-6 left-0 right-0 text-center"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
       >
         <p className="text-sm text-gray-500">
           By signing in, you agree to our 
-          <button className="mx-1 text-blue-600 hover:underline">Terms</button>
+          <motion.button 
+            className="mx-1 text-blue-600 hover:underline"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Terms
+          </motion.button>
           and 
-          <button className="mx-1 text-blue-600 hover:underline">Privacy Policy</button>
+          <motion.button 
+            className="mx-1 text-blue-600 hover:underline"
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+          >
+            Privacy Policy
+          </motion.button>
         </p>
       </motion.div>
     </div>

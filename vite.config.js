@@ -7,6 +7,6 @@ export default defineConfig({
     alias: [{ find: "@", replacement: "/src" }],
   },
   server: {
-    port: 5178,   // 👈 Set your desired port here
+    port: 5177,   // 👈 Set your desired port here
   },
 });

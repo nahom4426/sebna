@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuthStore } from '@/stores/authStore';
+import defaultProfile from '@/assets/img/profile.png';
 
 const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const auth = useAuthStore((state) => state.auth);
+  const logout = useAuthStore((state) => state.logout);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showLanguageMenu, setShowLanguageMenu] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
@@ -11,24 +15,6 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
   const [animateElements, setAnimateElements] = useState(true);
   const userMenuRef = useRef(null);
   const languageMenuRef = useRef(null);
-
-  // Mock auth store - replace with actual auth store
-  const authStore = {
-    auth: {
-      user: {
-        firstName: 'John',
-        fatherName: 'Doe',
-        email: 'john.doe@example.com',
-        companyName: 'Sebna',
-        roleName: 'Admin',
-        imageData: null,
-      },
-    },
-    logout: () => {
-      localStorage.removeItem('userDetail');
-      navigate('/auth/sign-in');
-    },
-  };
 
   // Handle scroll effect
   useEffect(() => {
@@ -42,14 +28,14 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
   // Process profile picture
   useEffect(() => {
-    if (authStore.auth?.user?.imageData) {
-      if (!authStore.auth.user.imageData.startsWith('data:image/')) {
-        setProfilePicture(`data:image/png;base64,${authStore.auth.user.imageData}`);
+    if (auth?.user?.imageData) {
+      if (!auth.user.imageData.startsWith('data:image/')) {
+        setProfilePicture(`data:image/png;base64,${auth.user.imageData}`);
       } else {
-        setProfilePicture(authStore.auth.user.imageData);
+        setProfilePicture(auth.user.imageData);
       }
     }
-  }, []);
+  }, [auth?.user?.imageData]);
 
   // Close menus when clicking outside
   useEffect(() => {
@@ -72,6 +58,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
   const breadcrumbsList = breadcrumbs?.breadcrumbs || [];
   const currentPage = breadcrumbsList.length > 0 ? breadcrumbsList[breadcrumbsList.length - 1]?.name : 'Sebna';
+  const isMessagesActive = location?.pathname?.startsWith('/admin/messages');
 
   return (
     <div
@@ -136,7 +123,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
           <div className="flex gap-2 items-center">
             <div className="w-2 h-2 rounded-full animate-pulse bg-blue-600"></div>
             <span className="text-sm font-bold tracking-wide text-blue-600 md:text-base">
-              {authStore.auth?.user?.companyName || `${authStore.auth?.user?.firstName} ${authStore.auth?.user?.fatherName}` || 'Admin'}
+              {auth?.user?.companyName || `${auth?.user?.firstName} ${auth?.user?.fatherName}` || 'Admin'}
             </span>
           </div>
         </div>
@@ -144,6 +131,32 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
       {/* Right Section */}
       <div className="flex gap-2 items-center md:gap-4">
+        <button
+          type="button"
+          onClick={() => navigate('/admin/messages')}
+          className={`relative p-2 rounded-xl transition-all duration-200 group hover:scale-105 active:scale-95 ${
+            isMessagesActive
+              ? 'bg-gradient-to-r from-blue-600/15 to-indigo-600/15 border border-blue-600/30 shadow-sm'
+              : 'hover:bg-gray-100'
+          }`}
+          aria-label="Messages"
+        >
+          <svg
+            className={`w-6 h-6 transition-colors ${isMessagesActive ? 'text-blue-600' : 'text-gray-600'} group-hover:text-blue-600`}
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M8 10h8m-8 4h5m6 5l-3.5-2.3a2 2 0 00-1.1-.3H8a4 4 0 01-4-4V7a4 4 0 014-4h8a4 4 0 014 4v8a4 4 0 01-2 3.5V19z"
+            />
+          </svg>
+          <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white"></span>
+        </button>
+
         {/* Language Selector (Hidden on mobile) */}
         {!isMobile && (
           <div ref={languageMenuRef} className="relative">
@@ -180,7 +193,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
             <div className="relative">
               <div className="overflow-hidden w-8 h-8 rounded-full border-2 border-white shadow-md md:w-9 md:h-9">
                 <img
-                  src={profilePicture || ''}
+                  src={profilePicture || defaultProfile}
                   alt="User avatar"
                   className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-110"
                   onError={handleImageError}
@@ -191,10 +204,10 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
             <div className="hidden flex-col items-start lg:flex">
               <span className="text-sm font-semibold text-gray-800 max-w-[120px] line-clamp-1">
-                {authStore.auth.user?.firstName} {authStore.auth.user?.fatherName || 'User'}
+                {auth?.user?.firstName} {auth?.user?.fatherName || 'User'}
               </span>
               <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-600/10 text-blue-600">
-                {authStore.auth?.user?.roleName || 'Admin'}
+                {auth?.user?.roleName || 'Admin'}
               </span>
             </div>
             <svg
@@ -212,14 +225,14 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
             <div className="absolute right-0 z-50 flex flex-col gap-1 p-2 mt-2 w-48 rounded-xl border border-gray-100 shadow-xl backdrop-blur-sm md:w-56 bg-white/95 animate-dropdown">
               <div className="px-3 py-2 border-b border-gray-100">
                 <p className="text-sm font-medium text-gray-800">
-                  {authStore.auth.user?.firstName} {authStore.auth.user?.fatherName}
+                  {auth?.user?.firstName} {auth?.user?.fatherName}
                 </p>
-                <p className="text-xs text-gray-500">{authStore.auth?.user?.email}</p>
+                <p className="text-xs text-gray-500">{auth?.user?.email}</p>
               </div>
 
               <button
                 onClick={() => {
-                  navigate('/profile');
+                  navigate('/dashboard/profile');
                   setShowUserMenu(false);
                 }}
                 className="flex gap-3 items-center p-2 rounded-lg transition-all duration-200 hover:bg-gray-50 text-gray-700"
@@ -232,7 +245,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
               <button
                 onClick={() => {
-                  navigate('/settings');
+                  navigate('/dashboard/profile?tab=security');
                   setShowUserMenu(false);
                 }}
                 className="flex gap-3 items-center p-2 rounded-lg transition-all duration-200 hover:bg-gray-50 text-gray-700"
@@ -248,7 +261,8 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
               <button
                 onClick={() => {
-                  authStore.logout();
+                  logout();
+                  navigate('/auth/sign-in', { replace: true });
                   setShowUserMenu(false);
                 }}
                 className="flex gap-3 items-center p-2 text-red-500 rounded-lg transition-all duration-200 hover:bg-red-50"

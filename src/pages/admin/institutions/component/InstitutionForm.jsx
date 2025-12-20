@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+ import React, { useState, useEffect } from 'react';
 import {
   Input,
   Button,
@@ -201,21 +201,23 @@ const InstitutionForm = ({ institution = null, onSuccess }) => {
     setSuccess('');
 
     try {
-      if (isEditMode) {
-        const institutionId = institution.institutionId || institution.id;
-        await updateInstitutionById(institutionId, formData);
-      } else {
-        await createInstitution(formData);
+      const res = isEditMode
+        ? await updateInstitutionById(institution.institutionId || institution.id, formData)
+        : await createInstitution(formData);
+
+      if (!res?.success) {
+        setError(res?.error || res?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} institution`);
+        return;
       }
 
       setSuccess(isEditMode ? 'Institution updated successfully!' : 'Institution created successfully!');
-      
+
       setTimeout(() => {
         closeModal();
         if (onSuccess) {
           onSuccess();
         }
-      }, 1500);
+      }, 800);
     } catch (err) {
       console.error('Error saving institution:', err);
       setError(err?.response?.data?.message || `Failed to ${isEditMode ? 'update' : 'create'} institution`);
@@ -233,36 +235,35 @@ const InstitutionForm = ({ institution = null, onSuccess }) => {
   );
 
   return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4 overflow-y-auto">
-      <div className="w-full max-w-4xl my-8">
-        <Card className="w-full shadow-2xl border-0 overflow-hidden">
-          {/* Compact Header */}
-          <CardHeader
-            shadow={false}
-            className="rounded-t-xl bg-gradient-to-r from-blue-600 to-indigo-600 py-4 px-6"
-          >
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-white/20 rounded-lg">
-                  <BuildingOfficeIcon className="h-5 w-5 text-white" />
-                </div>
-                <div>
-                  <Typography variant="h5" className="text-white font-bold">
-                    {isEditMode ? 'Edit Institution' : 'Create Institution'}
-                  </Typography>
-                </div>
-              </div>
-              <Button
-                variant="text"
-                className="text-white hover:bg-white/10 p-2 h-8 w-8 min-w-0 rounded-lg"
-                onClick={closeModal}
-              >
-                <XMarkIcon className="h-4 w-4" />
-              </Button>
+    <Card className="w-full max-w-5xl shadow-2xl border-0 overflow-hidden rounded-xl">
+      {/* Compact Header */}
+      <CardHeader
+        floated={false}
+        shadow={false}
+        className="m-0 rounded-none bg-gradient-to-r from-blue-600 to-indigo-600 py-4 px-6"
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-white/20 rounded-lg">
+              <BuildingOfficeIcon className="h-5 w-5 text-white" />
             </div>
-          </CardHeader>
+            <div>
+              <Typography variant="h5" className="text-white font-bold">
+                {isEditMode ? 'Edit Institution' : 'Create Institution'}
+              </Typography>
+            </div>
+          </div>
+          <Button
+            variant="text"
+            className="text-white hover:bg-white/10 p-2 h-8 w-8 min-w-0 rounded-lg"
+            onClick={closeModal}
+          >
+            <XMarkIcon className="h-4 w-4" />
+          </Button>
+        </div>
+      </CardHeader>
 
-          <CardBody className="p-6 bg-gradient-to-br from-gray-50 to-white">
+      <CardBody className="p-6 bg-gradient-to-br from-gray-50 to-white">
             {/* Status Messages */}
             {(error || success) && (
               <div className="mb-4">
@@ -487,10 +488,8 @@ const InstitutionForm = ({ institution = null, onSuccess }) => {
                 </Button>
               </div>
             </form>
-          </CardBody>
-        </Card>
-      </div>
-    </div>
+      </CardBody>
+    </Card>
   );
 };
 

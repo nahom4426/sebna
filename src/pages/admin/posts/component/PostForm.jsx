@@ -2,9 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useModal } from '@/context/ModalContext';
 import { createPost, updatePostById } from '../api/PostsApi';
 import { getAllInstitution } from '../../institutions/api/InstitutionsApi';
+import { useAuthStore } from '@/stores/authStore';
+import { isSuperAdmin } from '@/utils/rbacUtils';
 
 const PostForm = ({ post = null, onSuccess }) => {
   const { closeModal } = useModal();
+  const auth = useAuthStore((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -13,9 +16,15 @@ const PostForm = ({ post = null, onSuccess }) => {
 
   const isEditMode = Boolean(post && (post.postId || post.id));
 
+  const roleName = auth?.user?.roleName;
+  const userInstitutionId = auth?.user?.institutionId || auth?.user?.institutionUuid;
+  const mustHaveInstitution = !isSuperAdmin(roleName);
+  const institutionMissing = mustHaveInstitution && !userInstitutionId;
+
   const [formData, setFormData] = useState({
     title: '',
     content: '',
+    category: '',
     institutionId: '', // optional; empty => Super Admin/public post
     status: 'published',
     imageFile: null,
@@ -37,10 +46,27 @@ const PostForm = ({ post = null, onSuccess }) => {
   }, []);
 
   useEffect(() => {
+    if (!mustHaveInstitution) return;
+    setFormData((prev) => ({
+      ...prev,
+      institutionId: userInstitutionId || prev.institutionId,
+    }));
+  }, [mustHaveInstitution, userInstitutionId]);
+
+  useEffect(() => {
     if (isEditMode) {
+      const normalizedCategory =
+        post.category === 'INVESTMENT_NEWS'
+          ? 'investment'
+          : post.category === 'MARKET_NEWS'
+          ? 'market'
+          : post.category === 'COMPANY_NEWS'
+          ? 'company'
+          : post.category || '';
       setFormData({
         title: post.title || '',
         content: post.content || '',
+        category: normalizedCategory,
         institutionId: post.institutionId || '',
         status: post.status || 'published',
         imageFile: null,
@@ -56,6 +82,15 @@ const PostForm = ({ post = null, onSuccess }) => {
     }
     if (!formData.content.trim()) {
       setError('Content is required');
+      return false;
+    }
+    if (!formData.category) {
+      setError('Category is required');
+      return false;
+    }
+
+    if (institutionMissing) {
+      setError('You are not assigned to an institution');
       return false;
     }
     setError('');
@@ -155,19 +190,55 @@ const PostForm = ({ post = null, onSuccess }) => {
         </div>
 
         <div>
-          <label className="block text-sm font-medium mb-1">Institution (optional)</label>
+          <label className="block text-sm font-medium mb-1">Category</label>
           <select
-            value={formData.institutionId}
-            onChange={(e) => setFormData({ ...formData, institutionId: e.target.value })}
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
             className="w-full px-3 py-2 border rounded"
+            required
           >
-            <option value="">Super Admin (Public)</option>
-            {institutions.map((inst) => (
-              <option key={inst.institutionId || inst.id} value={inst.institutionId || inst.id}>
-                {inst.name}
-              </option>
-            ))}
+            <option value="">Select category</option>
+            <option value="investment">Investment News</option>
+            <option value="market">Market News</option>
+            <option value="company">Company News</option>
           </select>
+        </div>
+
+        {isEditMode && (
+          <div>
+            <label className="block text-sm font-medium mb-1">Views</label>
+            <input
+              type="text"
+              value={post?.views ?? 0}
+              className="w-full px-3 py-2 border rounded bg-gray-50"
+              readOnly
+            />
+          </div>
+        )}
+
+        <div>
+          <label className="block text-sm font-medium mb-1">Institution</label>
+          {mustHaveInstitution ? (
+            <input
+              type="text"
+              value={userInstitutionId || ''}
+              className="w-full px-3 py-2 border rounded bg-gray-50"
+              readOnly
+            />
+          ) : (
+            <select
+              value={formData.institutionId}
+              onChange={(e) => setFormData({ ...formData, institutionId: e.target.value })}
+              className="w-full px-3 py-2 border rounded"
+            >
+              <option value="">Super Admin (Public)</option>
+              {institutions.map((inst) => (
+                <option key={inst.institutionId || inst.id} value={inst.institutionId || inst.id}>
+                  {inst.name}
+                </option>
+              ))}
+            </select>
+          )}
         </div>
 
         <div>
@@ -184,7 +255,7 @@ const PostForm = ({ post = null, onSuccess }) => {
 
         <div className="flex justify-end gap-2">
           <button type="button" onClick={closeModal} className="px-4 py-2 bg-gray-200 rounded">Cancel</button>
-          <button type="submit" disabled={loading} className="px-4 py-2 bg-blue-600 text-white rounded">
+          <button type="submit" disabled={loading || institutionMissing} className="px-4 py-2 bg-blue-600 text-white rounded">
             {loading ? 'Saving...' : isEditMode ? 'Update' : 'Create'}
           </button>
         </div>

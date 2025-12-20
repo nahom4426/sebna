@@ -14,11 +14,11 @@ export function ModalProvider({ children }) {
 
       {modal && (
         <div
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-40 p-4 overflow-y-auto"
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-start justify-center z-40 px-4 py-6 sm:py-10 overflow-y-auto"
           onClick={closeModal}
         >
           <div
-            className="bg-white rounded-xl shadow-2xl min-w-[350px] my-8 max-h-[90vh] overflow-y-auto"
+            className="w-full max-w-6xl min-w-[350px] flex justify-center"
             onClick={(e) => e.stopPropagation()}
           >
             {modal}

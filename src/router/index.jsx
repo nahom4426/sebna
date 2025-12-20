@@ -5,11 +5,20 @@ import SignIn from '@/pages/auth/sign-in';
 import SignUp from '@/pages/auth/sign-up';
 import { Home, Profile, Tables, Notifications } from '@/features/dashboard';
 import { Users, Roles, Privileges, Institutions, Posts, Messages, Comments, Logs } from '@/pages/admin';
+import EditRole from '@/pages/admin/roles/pages/EditRole';
+import CreateRole from '@/pages/admin/roles/pages/CreateRole';
+import EditPrivilege from '@/pages/admin/privileges/pages/EditPrivilege';
+import CreatePrivilege from '@/pages/admin/privileges/pages/CreatePrivilege';
 import SebnaLanding from '@/pages/SebnaLanding';
 import ProtectedRoute from './ProtectedRoute';
 import { ROLES } from '@/constants/roles';
+import { useAuthStore } from '@/stores/authStore';
+import { getDefaultRouteForRole } from '@/utils/rbacUtils';
 
 const AppRouter = () => {
+  const auth = useAuthStore((state) => state.auth);
+  const defaultRoute = auth?.accessToken ? getDefaultRouteForRole(auth?.user?.roleName) : '/auth/sign-in';
+
   return (
     <Routes>
       {/* Public Routes */}
@@ -21,7 +30,12 @@ const AppRouter = () => {
       <Route element={<MainLayout />}>
         <Route
           path="/dashboard/home"
-          element={<ProtectedRoute element={<Home />} />}
+          element={
+            <ProtectedRoute
+              element={<Home />}
+              requiredRoles={[ROLES.READ_REPORTS]}
+            />
+          }
         />
         <Route
           path="/dashboard/profile"
@@ -44,9 +58,6 @@ const AppRouter = () => {
               element={<Users />}
               requiredRoles={[
                 ROLES.READ_USERS,
-                ROLES.CREATE_USER,
-                ROLES.UPDATE_USER,
-                ROLES.DELETE_USER,
               ]}
             />
           }
@@ -60,10 +71,29 @@ const AppRouter = () => {
               element={<Roles />}
               requiredRoles={[
                 ROLES.READ_ROLES,
-                ROLES.CREATE_ROLE,
+              ]}
+            />
+          }
+        />
+        <Route
+          path="/admin/roles/edit/:roleUuid"
+          element={
+            <ProtectedRoute
+              element={<EditRole />}
+              requiredRoles={[
                 ROLES.UPDATE_ROLE,
-                ROLES.DELETE_ROLE,
                 ROLES.READ_ROLE,
+              ]}
+            />
+          }
+        />
+        <Route
+          path="/admin/roles/create"
+          element={
+            <ProtectedRoute
+              element={<CreateRole />}
+              requiredRoles={[
+                ROLES.CREATE_ROLE,
               ]}
             />
           }
@@ -77,10 +107,29 @@ const AppRouter = () => {
               element={<Privileges />}
               requiredRoles={[
                 ROLES.READ_PRIVILEGES,
-                ROLES.CREATE_PRIVILEGE,
+              ]}
+            />
+          }
+        />
+        <Route
+          path="/admin/privileges/edit/:privilegeUuid"
+          element={
+            <ProtectedRoute
+              element={<EditPrivilege />}
+              requiredRoles={[
                 ROLES.UPDATE_PRIVILEGE,
-                ROLES.DELETE_PRIVILEGE,
                 ROLES.READ_PRIVILEGE,
+              ]}
+            />
+          }
+        />
+        <Route
+          path="/admin/privileges/create"
+          element={
+            <ProtectedRoute
+              element={<CreatePrivilege />}
+              requiredRoles={[
+                ROLES.CREATE_PRIVILEGE,
               ]}
             />
           }
@@ -94,10 +143,6 @@ const AppRouter = () => {
               element={<Institutions />}
               requiredRoles={[
                 ROLES.READ_INSTITUTIONS,
-                ROLES.CREATE_INSTITUTION,
-                ROLES.UPDATE_INSTITUTION,
-                ROLES.DELETE_INSTITUTION,
-                ROLES.READ_INSTITUTION,
               ]}
             />
           }
@@ -111,12 +156,6 @@ const AppRouter = () => {
               element={<Posts />}
               requiredRoles={[
                 ROLES.READ_POSTS,
-                ROLES.CREATE_POST,
-                ROLES.UPDATE_POST,
-                ROLES.DELETE_POST,
-                ROLES.READ_POST,
-                ROLES.LIKE_POST,
-                ROLES.UNLIKE_POST,
               ]}
             />
           }
@@ -130,7 +169,6 @@ const AppRouter = () => {
               element={<Messages />}
               requiredRoles={[
                 ROLES.READ_MESSAGES,
-                ROLES.SEND_MESSAGE,
               ]}
             />
           }
@@ -144,8 +182,6 @@ const AppRouter = () => {
               element={<Comments />}
               requiredRoles={[
                 ROLES.READ_COMMENTS,
-                ROLES.CREATE_COMMENT,
-                ROLES.DELETE_COMMENT,
               ]}
             />
           }
@@ -163,8 +199,8 @@ const AppRouter = () => {
         />
       </Route>
 
-      {/* Catch all - redirect to home */}
-      <Route path="*" element={<Navigate to="/dashboard/home" replace />} />
+      {/* Catch all - redirect based on auth/role */}
+      <Route path="*" element={<Navigate to={defaultRoute} replace />} />
     </Routes>
   );
 };

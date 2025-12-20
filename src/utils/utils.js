@@ -23,6 +23,12 @@ export const toast = {
       message,
     });
   },
+  warning: (message) => {
+    addToast({
+      type: "warning",
+      message,
+    });
+  },
   error: (message) => {
     addToast({
       type: "error",

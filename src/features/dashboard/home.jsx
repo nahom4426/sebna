@@ -1,256 +1,359 @@
-import React from "react";
+import React, { useMemo } from "react";
 import {
   Typography,
-  Card,
-  CardHeader,
-  CardBody,
-  IconButton,
-  Menu,
-  MenuHandler,
-  MenuList,
-  MenuItem,
-  Avatar,
-  Tooltip,
-  Progress,
+  Button,
 } from "@material-tailwind/react";
-import {
-  EllipsisVerticalIcon,
-  ArrowUpIcon,
-} from "@heroicons/react/24/outline";
 import { StatisticsCard } from "@/widgets/cards";
 import { StatisticsChart } from "@/widgets/charts";
 import {
-  statisticsCardsData,
-  statisticsChartsData,
-  projectsTableData,
-  ordersOverviewData,
-} from "@/data";
-import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
+  BanknotesIcon,
+  ChartBarIcon,
+  UsersIcon,
+  ChatBubbleLeftRightIcon,
+  ArrowTrendingUpIcon,
+} from "@heroicons/react/24/solid";
+import { useAuthStore } from "@/stores/authStore";
+import { isSuperAdmin } from "@/utils/rbacUtils";
+import { chartsConfig } from "@/configs";
+import { useDashboardReport } from "@/hooks/useDashboardReport";
+
+const RANGE_LABELS = {
+  week: "than last week",
+  month: "than last month",
+};
+
+const KPI_ICONS = [BanknotesIcon, UsersIcon, ChatBubbleLeftRightIcon, ChartBarIcon, ArrowTrendingUpIcon];
+const KPI_COLORS = ["bg-gradient-to-r from-blue-500 to-cyan-500", 
+                   "bg-gradient-to-r from-purple-500 to-pink-500", 
+                   "bg-gradient-to-r from-green-500 to-emerald-500", 
+                   "bg-gradient-to-r from-orange-500 to-red-500", 
+                   "bg-gradient-to-r from-indigo-500 to-purple-500"];
+
+const normalizeChangePercent = (v) => {
+  if (v === null || v === undefined) return "";
+  const str = String(v).trim();
+  if (!str) return "";
+  if (/^[+-]/.test(str)) return str;
+  const num = Number(str.replace("%", ""));
+  if (Number.isFinite(num)) return `${num >= 0 ? "+" : ""}${num}%`;
+  return str;
+};
+
+const makeBarChart = ({ title, points }) => {
+  const categories = (points || []).map((p) => p.label);
+  const data = (points || []).map((p) => Number(p.value) || 0);
+
+  return {
+    color: "white",
+    title,
+    description: "",
+    footer: "",
+    chart: {
+      type: "bar",
+      height: 280,
+      series: [
+        {
+          name: title,
+          data,
+        },
+      ],
+      options: {
+        ...chartsConfig,
+        colors: ["#2563eb"],
+        plotOptions: {
+          bar: {
+            columnWidth: "20%",
+            borderRadius: 6,
+          },
+        },
+        xaxis: {
+          ...chartsConfig.xaxis,
+          categories,
+        },
+      },
+    },
+  };
+};
+
+const makePieChart = ({ title, slices }) => {
+  const labels = (slices || []).map((s) => s.label);
+  const series = (slices || []).map((s) => Number(s.value) || 0);
+
+  return {
+    color: "white",
+    title,
+    description: "",
+    footer: "",
+    chart: {
+      type: "donut",
+      height: 280,
+      series,
+      options: {
+        ...chartsConfig,
+        labels,
+        legend: {
+          ...chartsConfig.legend,
+          show: true,
+          position: "bottom",
+        },
+        dataLabels: {
+          enabled: true,
+        },
+      },
+    },
+  };
+};
+
+// Modern Loading Skeleton Components
+const CardSkeleton = ({ index }) => (
+  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 animate-pulse">
+    <div className="flex items-start justify-between mb-4">
+      <div className="space-y-2">
+        <div className={`h-3 w-24 rounded-full bg-gradient-to-r ${KPI_COLORS[index]} opacity-20`}></div>
+        <div className="h-8 w-32 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+      </div>
+      <div className={`h-12 w-12 rounded-xl ${KPI_COLORS[index]} opacity-20`}></div>
+    </div>
+    <div className="flex items-center space-x-2">
+      <div className="h-4 w-16 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+      <div className="h-4 w-24 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+    </div>
+  </div>
+);
+
+const ChartSkeleton = ({ isPie = false }) => (
+  <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 animate-pulse">
+    <div className="h-6 w-32 mb-6 rounded-full bg-gray-200 dark:bg-gray-700"></div>
+    <div className={`${isPie ? "flex items-center justify-center" : ""}`}>
+      <div className={`h-64 ${isPie ? "w-64 rounded-full" : "w-full"} bg-gray-200 dark:bg-gray-700 rounded-lg`}></div>
+    </div>
+  </div>
+);
+
+const RangeSelectorSkeleton = () => (
+  <div className="flex items-center justify-end gap-2 animate-pulse">
+    <div className="h-10 w-20 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+    <div className="h-10 w-20 rounded-lg bg-gray-200 dark:bg-gray-700"></div>
+  </div>
+);
 
 export function Home() {
+  const auth = useAuthStore((state) => state.auth);
+  const roleName = auth?.user?.roleName;
+  const superAdmin = isSuperAdmin(roleName);
+
+  const { range, setRange, data, loading, isInitialLoad } = useDashboardReport("week");
+
+  const compareLabel = RANGE_LABELS[range] || "than last period";
+
+  const cards = useMemo(() => {
+    const list = Array.isArray(data?.cards) ? data.cards : [];
+    return list.slice(0, 5).map((card, idx) => {
+      const Icon = KPI_ICONS[idx % KPI_ICONS.length];
+      const change = normalizeChangePercent(card?.changePercent);
+      const changeNum = Number(String(card?.changePercent ?? "").replace("%", ""));
+      const isNegative = Number.isFinite(changeNum) ? changeNum < 0 : String(change).startsWith("-");
+      const footerColor = isNegative ? "text-red-500" : "text-green-500";
+      const bgColor = KPI_COLORS[idx % KPI_COLORS.length];
+
+      return {
+        color: "white",
+        iconBg: bgColor,
+        icon: Icon,
+        title: card?.title ?? "",
+        value: card?.value ?? "-",
+        footer: {
+          color: footerColor,
+          value: change,
+          label: compareLabel,
+        },
+      };
+    });
+  }, [data?.cards, compareLabel]);
+
+  const barCharts = useMemo(() => {
+    const list = Array.isArray(data?.barSeries) ? data.barSeries : [];
+    return list.map((s) => makeBarChart(s));
+  }, [data?.barSeries]);
+
+  const pieCharts = useMemo(() => {
+    const list = Array.isArray(data?.pieSeries) ? data.pieSeries : [];
+    const filtered = superAdmin
+      ? list
+      : list.filter((p) => String(p?.title || "").trim().toLowerCase() !== "login_success");
+    return filtered.map((p) => makePieChart(p));
+  }, [data?.pieSeries, superAdmin]);
+
+  const usersDaily = barCharts.find((c) => String(c.title).trim().toLowerCase() === "users_daily") || barCharts[0];
+  const postsDaily = barCharts.find((c) => String(c.title).trim().toLowerCase() === "posts_daily") || barCharts[1];
+
+  const postsByCategory = pieCharts.find((c) => String(c.title).trim().toLowerCase() === "posts_by_category") || pieCharts[0];
+  const messagesByType = pieCharts.find((c) => String(c.title).trim().toLowerCase() === "messages_by_type") || pieCharts[1];
+  const loginSuccess = pieCharts.find((c) => String(c.title).trim().toLowerCase() === "login_success");
+
+  // Show loading skeletons
+  if (isInitialLoad && loading) {
+    return (
+      <div className="mt-12 space-y-8">
+        <RangeSelectorSkeleton />
+        <div className="grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
+          {[...Array(5)].map((_, i) => (
+            <CardSkeleton key={i} index={i} />
+          ))}
+        </div>
+        <div className="grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2">
+          <ChartSkeleton />
+          <ChartSkeleton />
+        </div>
+        <div className="grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
+          <ChartSkeleton isPie />
+          <ChartSkeleton isPie />
+          {superAdmin && <ChartSkeleton isPie />}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mt-12">
-      <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
-        {statisticsCardsData.map(({ icon, title, footer, ...rest }) => (
-          <StatisticsCard
-            key={title}
-            {...rest}
-            title={title}
-            icon={React.createElement(icon, {
-              className: "w-6 h-6 text-white",
-            })}
-            footer={
-              <Typography className="font-normal text-blue-gray-600">
-                <strong className={footer.color}>{footer.value}</strong>
-                &nbsp;{footer.label}
-              </Typography>
-            }
-          />
-        ))}
-      </div>
-      <div className="mb-6 grid grid-cols-1 gap-y-12 gap-x-6 md:grid-cols-2 xl:grid-cols-3">
-        {statisticsChartsData.map((props) => (
-          <StatisticsChart
-            key={props.title}
-            {...props}
-            footer={
-              <Typography
-                variant="small"
-                className="flex items-center font-normal text-blue-gray-600"
-              >
-                <ClockIcon strokeWidth={2} className="h-4 w-4 text-blue-gray-400" />
-                &nbsp;{props.footer}
-              </Typography>
-            }
-          />
-        ))}
-      </div>
-      <div className="mb-4 grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <Card className="overflow-hidden xl:col-span-2 border border-blue-gray-100 shadow-sm">
-          <CardHeader
-            floated={false}
-            shadow={false}
-            color="transparent"
-            className="m-0 flex items-center justify-between p-6"
+      {/* Header with Range Selector */}
+      <div className="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="flex items-center gap-2 bg-white dark:bg-gray-800 p-1 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
+          <Button
+            size="sm"
+            variant={range === "week" ? "filled" : "text"}
+            color={range === "week" ? "blue" : "gray"}
+            className={`rounded-lg transition-all duration-300 ${
+              range === "week" 
+                ? "shadow-md shadow-blue-500/20" 
+                : "hover:bg-gray-100 dark:hover:bg-gray-700"
+            }`}
+            onClick={() => setRange("week")}
           >
-            <div>
-              <Typography variant="h6" color="blue-gray" className="mb-1">
-                Projects
-              </Typography>
-              <Typography
-                variant="small"
-                className="flex items-center gap-1 font-normal text-blue-gray-600"
-              >
-                <CheckCircleIcon strokeWidth={3} className="h-4 w-4 text-blue-gray-200" />
-                <strong>30 done</strong> this month
-              </Typography>
-            </div>
-            <Menu placement="left-start">
-              <MenuHandler>
-                <IconButton size="sm" variant="text" color="blue-gray">
-                  <EllipsisVerticalIcon
-                    strokeWidth={3}
-                    fill="currenColor"
-                    className="h-6 w-6"
-                  />
-                </IconButton>
-              </MenuHandler>
-              <MenuList>
-                <MenuItem>Action</MenuItem>
-                <MenuItem>Another Action</MenuItem>
-                <MenuItem>Something else here</MenuItem>
-              </MenuList>
-            </Menu>
-          </CardHeader>
-          <CardBody className="overflow-x-scroll px-0 pt-0 pb-2">
-            <table className="w-full min-w-[640px] table-auto">
-              <thead>
-                <tr>
-                  {["companies", "members", "budget", "completion"].map(
-                    (el) => (
-                      <th
-                        key={el}
-                        className="border-b border-blue-gray-50 py-3 px-6 text-left"
-                      >
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {el}
-                        </Typography>
-                      </th>
-                    )
-                  )}
-                </tr>
-              </thead>
-              <tbody>
-                {projectsTableData.map(
-                  ({ img, name, members, budget, completion }, key) => {
-                    const className = `py-3 px-5 ${
-                      key === projectsTableData.length - 1
-                        ? ""
-                        : "border-b border-blue-gray-50"
-                    }`;
+            Week
+          </Button>
+          <Button
+            size="sm"
+            variant={range === "month" ? "filled" : "text"}
+            color={range === "month" ? "blue" : "gray"}
+            className={`rounded-lg transition-all duration-300 ${
+              range === "month" 
+                ? "shadow-md shadow-blue-500/20" 
+                : "hover:bg-gray-100 dark:hover:bg-gray-700"
+            }`}
+            onClick={() => setRange("month")}
+          >
+            Month
+          </Button>
+        </div>
+      </div>
 
-                    return (
-                      <tr key={name}>
-                        <td className={className}>
-                          <div className="flex items-center gap-4">
-                            <Avatar src={img} alt={name} size="sm" />
-                            <Typography
-                              variant="small"
-                              color="blue-gray"
-                              className="font-bold"
-                            >
-                              {name}
-                            </Typography>
-                          </div>
-                        </td>
-                        <td className={className}>
-                          {members.map(({ img, name }, key) => (
-                            <Tooltip key={name} content={name}>
-                              <Avatar
-                                src={img}
-                                alt={name}
-                                size="xs"
-                                variant="circular"
-                                className={`cursor-pointer border-2 border-white ${
-                                  key === 0 ? "" : "-ml-2.5"
-                                }`}
-                              />
-                            </Tooltip>
-                          ))}
-                        </td>
-                        <td className={className}>
-                          <Typography
-                            variant="small"
-                            className="text-xs font-medium text-blue-gray-600"
-                          >
-                            {budget}
-                          </Typography>
-                        </td>
-                        <td className={className}>
-                          <div className="w-10/12">
-                            <Typography
-                              variant="small"
-                              className="mb-1 block text-xs font-medium text-blue-gray-600"
-                            >
-                              {completion}%
-                            </Typography>
-                            <Progress
-                              value={completion}
-                              variant="gradient"
-                              color={completion === 100 ? "green" : "blue"}
-                              className="h-1"
-                            />
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  }
-                )}
-              </tbody>
-            </table>
-          </CardBody>
-        </Card>
-        <Card className="border border-blue-gray-100 shadow-sm">
-          <CardHeader
-            floated={false}
-            shadow={false}
-            color="transparent"
-            className="m-0 p-6"
+      {/* Loading indicator for subsequent loads */}
+      {loading && data && (
+        <div className="mb-6 flex items-center justify-center">
+          <div className="relative">
+            <div className="h-2 w-64 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-500 animate-loading-bar"></div>
+            </div>
+            <Typography variant="small" className="mt-2 text-center text-gray-600 dark:text-gray-400 animate-pulse">
+              Updating dashboard data...
+            </Typography>
+          </div>
+        </div>
+      )}
+
+      {/* KPI Cards Grid */}
+      <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
+        {cards.map(({ icon, title, footer, iconBg, ...rest }, idx) => (
+          <div 
+            key={title} 
+            className="group hover:scale-[1.02] transition-all duration-300 hover:shadow-xl"
+            style={{ animationDelay: `${idx * 100}ms` }}
           >
-            <Typography variant="h6" color="blue-gray" className="mb-2">
-              Orders Overview
-            </Typography>
-            <Typography
-              variant="small"
-              className="flex items-center gap-1 font-normal text-blue-gray-600"
-            >
-              <ArrowUpIcon
-                strokeWidth={3}
-                className="h-3.5 w-3.5 text-green-500"
-              />
-              <strong>24%</strong> this month
-            </Typography>
-          </CardHeader>
-          <CardBody className="pt-0">
-            {ordersOverviewData.map(
-              ({ icon, color, title, description }, key) => (
-                <div key={title} className="flex items-start gap-4 py-3">
-                  <div
-                    className={`relative p-1 after:absolute after:-bottom-6 after:left-2/4 after:w-0.5 after:-translate-x-2/4 after:bg-blue-gray-50 after:content-[''] ${
-                      key === ordersOverviewData.length - 1
-                        ? "after:h-0"
-                        : "after:h-4/6"
-                    }`}
-                  >
-                    {React.createElement(icon, {
-                      className: `!w-5 !h-5 ${color}`,
-                    })}
-                  </div>
-                  <div>
-                    <Typography
-                      variant="small"
-                      color="blue-gray"
-                      className="block font-medium"
-                    >
-                      {title}
-                    </Typography>
-                    <Typography
-                      as="span"
-                      variant="small"
-                      className="text-xs font-medium text-blue-gray-500"
-                    >
-                      {description}
+            <StatisticsCard
+              {...rest}
+              title={title}
+              className="bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300"
+              icon={
+                <div className={`${iconBg} p-3 rounded-xl shadow-lg group-hover:scale-110 transition-transform duration-300`}>
+                  {React.createElement(icon, {
+                    className: "w-6 h-6 text-white",
+                  })}
+                </div>
+              }
+              footer={
+                <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100 dark:border-gray-700">
+                  <div className="flex items-center space-x-2">
+                    <div className={`w-2 h-2 rounded-full ${footer.color.includes('red') ? 'bg-red-500' : 'bg-green-500'}`}></div>
+                    <Typography className="font-medium text-blue-gray-600 dark:text-gray-400">
+                      <strong className={footer.color}>{footer.value}</strong>
+                      &nbsp;{footer.label}
                     </Typography>
                   </div>
                 </div>
-              )
-            )}
-          </CardBody>
-        </Card>
+              }
+            />
+          </div>
+        ))}
       </div>
+
+      {/* Bar Charts Section */}
+      <div className="mb-8">
+        <Typography variant="h5" className="mb-6 text-gray-900 dark:text-white font-semibold">
+          Activity Trends
+        </Typography>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+          {usersDaily && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+              <StatisticsChart {...usersDaily} />
+            </div>
+          )}
+          {postsDaily && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+              <StatisticsChart {...postsDaily} />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Pie Charts Section */}
+      <div className="mb-8">
+        <Typography variant="h5" className="mb-6 text-gray-900 dark:text-white font-semibold">
+          Distribution Analysis
+        </Typography>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {postsByCategory && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+              <StatisticsChart {...postsByCategory} />
+            </div>
+          )}
+          {messagesByType && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+              <StatisticsChart {...messagesByType} />
+            </div>
+          )}
+          {superAdmin && loginSuccess && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+              <StatisticsChart {...loginSuccess} />
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Empty State */}
+      {!loading && !data && (
+        <div className="text-center py-16">
+          <div className="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900 flex items-center justify-center">
+            <ChartBarIcon className="w-12 h-12 text-gray-400" />
+          </div>
+          <Typography variant="h5" className="mb-2 text-gray-900 dark:text-white">
+            No Dashboard Data
+          </Typography>
+          <Typography className="text-gray-600 dark:text-gray-400">
+            Unable to load dashboard metrics. Please try again later.
+          </Typography>
+        </div>
+      )}
     </div>
   );
 }
