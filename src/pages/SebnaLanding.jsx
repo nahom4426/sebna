@@ -774,7 +774,7 @@ const SebnaLanding = () => {
             >
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
                 <img 
-                  src="/search_images/3WKayx05pJw1.jpg" 
+                  src="/img/3WKayx05pJw1.jpg" 
                   alt="Business Meeting" 
                   className="w-full h-[400px] object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
@@ -782,7 +782,7 @@ const SebnaLanding = () => {
               </div>
               <div className="absolute -bottom-6 -right-6 w-48 h-36 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
                 <img 
-                  src="/search_images/oMF3X7wxIJ0X.jpg"
+                  src="/img/oMF3X7wxIJ0X.jpg"
                   alt="Office Building"
                   className="w-full h-full object-cover"
                 />
@@ -926,7 +926,7 @@ const SebnaLanding = () => {
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {[
               {
-                image: '/search_images/4u2kdUqkvMAv.jpg',
+                image: '/img/4u2kdUqkvMAv.jpg',
                 icon: AcademicCapIcon,
                 title: 'Education Sector',
                 description: 'Investing in the future through educational infrastructure, technology, and human capital development.',
@@ -936,7 +936,7 @@ const SebnaLanding = () => {
                 delay: '100'
               },
               {
-                image: '/search_images/42fr15EGxcLv.jpg',
+                image: '/img/42fr15EGxcLv.jpg',
                 icon: BuildingOfficeIcon,
                 title: 'Real Estate',
                 description: 'Strategic real estate investments in residential, commercial, and mixed-use developments across Tigray.',
@@ -946,7 +946,7 @@ const SebnaLanding = () => {
                 delay: '200'
               },
               {
-                image: '/search_images/NDWoPWeMGLZ3.jpg',
+                image: '/img/NDWoPWeMGLZ3.jpg',
                 icon: ChartBarIcon,
                 title: 'Agriculture',
                 description: 'Sustainable agricultural investments leveraging Tigray\'s fertile lands and traditional farming expertise.',
@@ -1161,7 +1161,7 @@ const SebnaLanding = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                image: '/search_images/oMF3X7wxIJ0X.jpg',
+                image: '/img/oMF3X7wxIJ0X.jpg',
                 name: 'Commercial Bank',
                 fullName: 'Commercial Bank of Ethiopia',
                 description: 'Ethiopia\'s largest bank with nationwide coverage and digital banking solutions.',
@@ -1170,7 +1170,7 @@ const SebnaLanding = () => {
                 delay: '100'
               },
               {
-                image: '/search_images/vCjGSjoXohCH.png',
+                image: '/img/vCjGSjoXohCH.png',
                 name: 'Dashen Bank',
                 fullName: 'Dashen Bank',
                 description: 'Leading private bank known for innovation and customer service excellence.',
@@ -1179,7 +1179,7 @@ const SebnaLanding = () => {
                 delay: '200'
               },
               {
-                image: '/search_images/yWqmB1gqtEEQ.jpg',
+                image: '/img/yWqmB1gqtEEQ.jpg',
                 name: 'Awash Bank',
                 fullName: 'Awash Bank',
                 description: 'Pioneering private bank with comprehensive financial services and modern technology.',
@@ -1188,7 +1188,7 @@ const SebnaLanding = () => {
                 delay: '300'
               },
               {
-                image: '/search_images/GE0ArumTXX7m.png',
+                image: '/img/GE0ArumTXX7m.png',
                 name: 'NIB Bank',
                 fullName: 'NIB International Bank',
                 description: 'International banking services with focus on trade finance and foreign exchange.',
@@ -1294,7 +1294,7 @@ const SebnaLanding = () => {
                 {/* Image */}
                 <div className="relative h-48 overflow-hidden">
                   <img
-                    src={getImageSrc(post) || '/search_images/4u2kdUqkvMAv.jpg'}
+                    src={getImageSrc(post) || '/img/4u2kdUqkvMAv.jpg'}
                     alt={post.title || 'News'}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
@@ -1368,7 +1368,7 @@ const SebnaLanding = () => {
                 <div className="overflow-y-auto max-h-[70vh]">
                   <div className="h-80">
                     <img
-                      src={getImageSrc(selectedPost || landingPosts[selectedPostIndex]) || '/search_images/4u2kdUqkvMAv.jpg'}
+                      src={getImageSrc(selectedPost || landingPosts[selectedPostIndex]) || '/img/4u2kdUqkvMAv.jpg'}
                       alt={(selectedPost || landingPosts[selectedPostIndex])?.title || 'Post'}
                       className="w-full h-full object-cover"
                     />
