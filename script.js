@@ -386,7 +386,7 @@ function initializeNews() {
             excerpt: "New partnership with leading universities to develop educational infrastructure across Tigray region.",
             category: "investment",
             date: "2024-06-07",
-            image: "search_images/4u2kdUqkvMAv.jpg"
+            image: "/img/4u2kdUqkvMAv.jpg"
         },
         {
             id: 2,
@@ -394,7 +394,7 @@ function initializeNews() {
             excerpt: "Company reports 18% increase in revenue and expanding investor base across Ethiopia.",
             category: "company",
             date: "2024-06-05",
-            image: "search_images/3WKayx05pJw1.jpg"
+            image: "/img/3WKayx05pJw1.jpg"
         },
         {
             id: 3,
@@ -402,7 +402,7 @@ function initializeNews() {
             excerpt: "Comprehensive analysis of real estate opportunities and market trends in northern Ethiopia.",
             category: "market",
             date: "2024-06-03",
-            image: "search_images/42fr15EGxcLv.jpg"
+            image: "/img/42fr15EGxcLv.jpg"
         },
         {
             id: 4,
@@ -410,7 +410,7 @@ function initializeNews() {
             excerpt: "Enhanced digital payment solutions and investment services for Sebna shareholders.",
             category: "investment",
             date: "2024-06-01",
-            image: "search_images/oMF3X7wxIJ0X.jpg"
+            image: "/img/oMF3X7wxIJ0X.jpg"
         },
         {
             id: 5,
@@ -418,7 +418,7 @@ function initializeNews() {
             excerpt: "Supporting local farmers with modern technology and sustainable farming practices.",
             category: "investment",
             date: "2024-05-30",
-            image: "search_images/NDWoPWeMGLZ3.jpg"
+            image: "/img/NDWoPWeMGLZ3.jpg"
         },
         {
             id: 6,
@@ -426,7 +426,7 @@ function initializeNews() {
             excerpt: "Analysis of current market conditions and opportunities for growth in the region.",
             category: "market",
             date: "2024-05-28",
-            image: "search_images/QfyD19FYFhXo.jpeg"
+            image: "/img/QfyD19FYFhXo.jpeg"
         }
     ];
     
@@ -486,7 +486,7 @@ function loadMoreNews() {
             excerpt: "Recognition for outstanding performance and commitment to stakeholder value.",
             category: "company",
             date: "2024-05-25",
-            image: "search_images/LI6fXIUGroB1.webp"
+            image: "/img/LI6fXIUGroB1.webp"
         },
         {
             id: 8,
@@ -494,7 +494,7 @@ function loadMoreNews() {
             excerpt: "Latest developments in our technology infrastructure and digital services.",
             category: "company",
             date: "2024-05-22",
-            image: "search_images/4AHnJj4R9B2d.png"
+            image: "/img/4AHnJj4R9B2d.png"
         }
     ];
     
