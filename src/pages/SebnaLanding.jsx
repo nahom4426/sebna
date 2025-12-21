@@ -1220,10 +1220,10 @@ const SebnaLanding = () => {
           <div className="text-center mb-16">
             <div 
               data-aos="fade-up"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-900/10 to-orange-600/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
-              <BanknotesIcon className="w-4 h-4 text-blue-900" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">
+              <BanknotesIcon className="w-4 h-4 text-sebna-navy" />
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
                 Banking Partners
               </span>
             </div>
@@ -1232,7 +1232,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Trusted <span className="bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">Financial Partners</span>
+              Trusted <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Financial Partners</span>
             </h2>
             <p 
               data-aos="fade-up"
@@ -1251,7 +1251,7 @@ const SebnaLanding = () => {
                 fullName: 'Commercial Bank of Ethiopia',
                 description: 'Ethiopia\'s largest bank with nationwide coverage and digital banking solutions.',
                 features: ['Mobile Banking', 'Online Transfer', '24/7 Support'],
-                gradient: 'from-blue-900 to-blue-700',
+                gradient: 'from-sebna-navy to-sebna-orange',
                 delay: '100'
               },
               {
@@ -1260,7 +1260,7 @@ const SebnaLanding = () => {
                 fullName: 'Dashen Bank',
                 description: 'Leading private bank known for innovation and customer service excellence.',
                 features: ['Digital Wallet', 'Quick Transfer', 'Investment Advisory'],
-                gradient: 'from-indigo-900 to-indigo-700',
+                gradient: 'from-sebna-navy to-sebna-orange',
                 delay: '200'
               },
               {
@@ -1269,7 +1269,7 @@ const SebnaLanding = () => {
                 fullName: 'Awash Bank',
                 description: 'Pioneering private bank with comprehensive financial services and modern technology.',
                 features: ['Internet Banking', 'SMS Banking', 'Corporate Services'],
-                gradient: 'from-purple-900 to-purple-700',
+                gradient: 'from-sebna-navy to-sebna-orange',
                 delay: '300'
               },
               {
@@ -1278,7 +1278,7 @@ const SebnaLanding = () => {
                 fullName: 'NIB International Bank',
                 description: 'International banking services with focus on trade finance and foreign exchange.',
                 features: ['Foreign Exchange', 'Trade Finance', 'International Transfer'],
-                gradient: 'from-green-900 to-green-700',
+                gradient: 'from-sebna-navy to-sebna-orange',
                 delay: '400'
               }
             ].map((bank, idx) => (
@@ -1301,7 +1301,7 @@ const SebnaLanding = () => {
                   {bank.features.map((feature, fidx) => (
                     <span
                       key={fidx}
-                      className="px-2 py-1 bg-gradient-to-r from-blue-900/10 to-orange-600/10 text-blue-900 text-xs font-semibold rounded-lg"
+                      className="px-2 py-1 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 text-sebna-navy text-xs font-semibold rounded-lg"
                     >
                       {feature}
                     </span>
@@ -1319,10 +1319,10 @@ const SebnaLanding = () => {
           <div className="text-center mb-16">
             <div 
               data-aos="fade-up"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-900/10 to-orange-600/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
-              <GlobeAltIcon className="w-4 h-4 text-blue-900" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">
+              <GlobeAltIcon className="w-4 h-4 text-sebna-navy" />
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
                 Latest News
               </span>
             </div>
@@ -1331,7 +1331,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Stay <span className="bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">Updated</span>
+              Stay <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Updated</span>
             </h2>
             <p 
               data-aos="fade-up"
@@ -1358,7 +1358,7 @@ const SebnaLanding = () => {
                 }}
                 className={`px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 ${
                   newsFilter === filter
-                    ? 'bg-gradient-to-r from-blue-900 to-orange-600 text-white shadow-lg shadow-blue-500/30'
+                    ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow-lg shadow-sebna-navy/25'
                     : 'bg-gradient-to-br from-white/60 to-white/40 text-gray-700 hover:bg-white/80'
                 }`}
               >
@@ -1384,7 +1384,7 @@ const SebnaLanding = () => {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                   />
                   <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-gradient-to-r from-blue-900 to-orange-600 text-white text-xs font-semibold rounded-full">
+                    <span className="px-3 py-1 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white text-xs font-semibold rounded-full">
                       {displayCategory(post.category)}
                     </span>
                   </div>
@@ -1414,7 +1414,7 @@ const SebnaLanding = () => {
                   <button
                     type="button"
                     onClick={() => openPostModalByIndex(idx)}
-                    className="flex items-center gap-2 text-blue-900 font-semibold text-sm hover:text-orange-600 transition-colors"
+                    className="flex items-center gap-2 text-sebna-navy font-semibold text-sm hover:text-sebna-orange transition-colors"
                   >
                     Read More
                     <ArrowRightIcon className="w-4 h-4" />
@@ -1431,7 +1431,7 @@ const SebnaLanding = () => {
                 {/* Modal Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/30">
                   <div className="flex items-center gap-3">
-                    <span className="px-3 py-1 bg-gradient-to-r from-blue-900 to-orange-600 text-white text-sm font-semibold rounded-full">
+                    <span className="px-3 py-1 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white text-sm font-semibold rounded-full">
                       {displayCategory((selectedPost || landingPosts[selectedPostIndex])?.category)}
                     </span>
                     <span className="text-sm text-gray-500">
@@ -1481,7 +1481,7 @@ const SebnaLanding = () => {
 
                     {postModalLoading ? (
                       <div className="flex items-center justify-center py-12">
-                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-900 border-t-transparent"></div>
+                        <div className="animate-spin rounded-full h-8 w-8 border-2 border-sebna-navy border-t-transparent"></div>
                       </div>
                     ) : (
                       <div className="prose prose-lg text-gray-700">
@@ -1526,9 +1526,9 @@ const SebnaLanding = () => {
                 type="button"
                 onClick={handleLoadMoreNews}
                 disabled={newsLoading}
-                className="group px-8 py-3 border-2 border-blue-900 text-blue-900 font-semibold rounded-xl hover:bg-blue-900 hover:text-white transition-all duration-500 overflow-hidden relative disabled:opacity-50 disabled:cursor-not-allowed"
+                className="group px-8 py-3 border-2 border-sebna-navy text-sebna-navy font-semibold rounded-xl hover:bg-sebna-navy hover:text-white transition-all duration-500 overflow-hidden relative disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <div className="absolute inset-0 bg-blue-900 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
+                <div className="absolute inset-0 bg-sebna-navy transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                 <span className="relative flex items-center justify-center gap-3">
                   <PlusIcon className="w-5 h-5" />
                   {newsLoading ? 'Loading...' : 'Load More News'}
@@ -1545,10 +1545,10 @@ const SebnaLanding = () => {
           <div className="text-center mb-16">
             <div 
               data-aos="fade-up"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-900/10 to-orange-600/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
-              <EnvelopeIcon className="w-4 h-4 text-blue-900" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">
+              <EnvelopeIcon className="w-4 h-4 text-sebna-navy" />
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
                 Get In Touch
               </span>
             </div>
@@ -1557,7 +1557,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Contact <span className="bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">Us</span>
+              Contact <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Us</span>
             </h2>
             <p 
               data-aos="fade-up"
@@ -1583,7 +1583,7 @@ const SebnaLanding = () => {
                   data-aos-delay={300 + idx * 100}
                   className="group flex gap-4 p-6 rounded-2xl bg-gradient-to-br from-white/70 to-white/50 backdrop-blur-sm border border-white/30 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
                 >
-                  <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-blue-900 to-orange-600 flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
+                  <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-sebna-navy to-sebna-orange flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
                     <contact.icon className="w-7 h-7 text-white" />
                   </div>
                   <div>
@@ -1605,25 +1605,25 @@ const SebnaLanding = () => {
                   <input
                     type="text"
                     placeholder="First Name"
-                    className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition-all duration-300"
+                    className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                   />
                   <input
                     type="text"
                     placeholder="Last Name"
-                    className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition-all duration-300"
+                    className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                   />
                 </div>
                 <input
                   type="email"
                   placeholder="Email Address"
-                  className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition-all duration-300"
+                  className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                 />
                 <input
                   type="tel"
                   placeholder="Phone Number"
-                  className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition-all duration-300"
+                  className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                 />
-                <select className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition-all duration-300">
+                <select className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300">
                   <option>Select a subject</option>
                   <option>Investment Inquiry</option>
                   <option>Partnership</option>
@@ -1633,10 +1633,10 @@ const SebnaLanding = () => {
                 <textarea
                   placeholder="Message"
                   rows="4"
-                  className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-blue-900 focus:ring-2 focus:ring-blue-900/20 outline-none transition-all duration-300 resize-none"
+                  className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300 resize-none"
                 ></textarea>
-                <button className="group w-full px-8 py-3 bg-gradient-to-r from-blue-900 to-orange-600 text-white font-semibold rounded-xl shadow-lg shadow-blue-500/30 hover:shadow-xl hover:shadow-blue-500/40 transition-all duration-500 overflow-hidden">
-                  <div className="absolute inset-0 bg-gradient-to-r from-blue-800 to-orange-500 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+                <button className="group w-full px-8 py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-semibold rounded-xl shadow-lg shadow-sebna-navy/25 hover:shadow-xl hover:shadow-sebna-navy/35 transition-all duration-500 overflow-hidden">
+                  <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy to-sebna-orange opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <span className="relative flex items-center justify-center gap-3">
                     <PaperAirplaneIcon className="w-5 h-5" />
                     Send Message
@@ -1653,8 +1653,8 @@ const SebnaLanding = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-900 to-orange-600 flex items-center justify-center">
-                <span className="text-white font-bold text-lg">S</span>
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sebna-navy to-sebna-orange flex items-center justify-center">
+                  <img src={brandIcon} alt="Sebna" className="w-8 h-8 object-contain" />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
                 Sebna
@@ -1664,7 +1664,7 @@ const SebnaLanding = () => {
               Empowering shared investment, enabling shared growth. Join us in building a prosperous future for Tigray.
             </p>
             <div className="text-gray-500 text-sm">
-              © {new Date().getFullYear()} Sebna S.C. All rights reserved.
+              &copy; {new Date().getFullYear()} Sebna S.C. All rights reserved.
             </div>
           </div>
         </div>
@@ -1673,7 +1673,7 @@ const SebnaLanding = () => {
       {/* Back to Top */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-6 right-6 w-12 h-12 rounded-full bg-gradient-to-r from-blue-900 to-orange-600 text-white shadow-2xl shadow-blue-500/30 hover:shadow-3xl hover:shadow-blue-500/40 transition-all duration-500 ${
+        className={`fixed bottom-6 right-6 w-12 h-12 rounded-full bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow-2xl shadow-sebna-navy/25 hover:shadow-3xl hover:shadow-sebna-navy/35 transition-all duration-500 ${
           scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
         }`}
       >
@@ -1844,12 +1844,12 @@ const SebnaLanding = () => {
         }
 
         ::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+          background: linear-gradient(to bottom, #00174b, #f97316);
           border-radius: 4px;
         }
 
         ::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, #2563eb, #7c3aed);
+          background: linear-gradient(to bottom, #00123a, #ea580c);
         }
       `}</style>
     </div>
