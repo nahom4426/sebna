@@ -1255,7 +1255,7 @@ const SebnaLanding = () => {
                 delay: '100'
               },
               {
-                image: '/img/vCjGSjoXohCH.png',
+                image: '/img/dashen.jpg',
                 name: 'Dashen Bank',
                 fullName: 'Dashen Bank',
                 description: 'Leading private bank known for innovation and customer service excellence.',
