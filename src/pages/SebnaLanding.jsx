@@ -980,25 +980,27 @@ const SebnaLanding = () => {
       </section>
 
       {/* Services Section */}
-      <section id="services" className="py-20 md:py-32 bg-gradient-to-b from-gray-50 to-white">
+      <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <div 
               data-aos="fade-up"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-900/10 to-orange-600/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
-              <BriefcaseIcon className="w-4 h-4 text-blue-900" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">
+              <ChartBarIcon className="w-4 h-4 text-sebna-navy" />
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
                 Our Services
               </span>
             </div>
+
             <h2 
               data-aos="fade-up"
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Investment <span className="bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">Opportunities</span>
+              Investment <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Opportunities</span>
             </h2>
+
             <p 
               data-aos="fade-up"
               data-aos-delay="200"
@@ -1017,7 +1019,7 @@ const SebnaLanding = () => {
                 description: 'Investing in the future through educational infrastructure, technology, and human capital development.',
                 roi: '15-20%',
                 risk: 'Low',
-                gradient: 'from-blue-900 to-blue-700',
+                gradient: 'from-sebna-navy to-sebna-orange',
                 delay: '100'
               },
               {
@@ -1027,7 +1029,7 @@ const SebnaLanding = () => {
                 description: 'Strategic real estate investments in residential, commercial, and mixed-use developments across Tigray.',
                 roi: '12-18%',
                 risk: 'Medium',
-                gradient: 'from-indigo-900 to-indigo-700',
+                gradient: 'from-sebna-navy to-sebna-orange',
                 delay: '200'
               },
               {
@@ -1037,7 +1039,7 @@ const SebnaLanding = () => {
                 description: 'Sustainable agricultural investments leveraging Tigray\'s fertile lands and traditional farming expertise.',
                 roi: '10-15%',
                 risk: 'Medium',
-                gradient: 'from-green-900 to-green-700',
+                gradient: 'from-sebna-navy to-sebna-orange',
                 delay: '300'
               }
             ].map((service, idx) => (
@@ -1047,7 +1049,6 @@ const SebnaLanding = () => {
                 data-aos-delay={service.delay}
                 className="group relative bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-3xl overflow-hidden border border-white/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
               >
-                {/* Image */}
                 <div className="relative h-56 overflow-hidden">
                   <img
                     src={service.image}
@@ -1062,7 +1063,6 @@ const SebnaLanding = () => {
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="p-6">
                   <h3 className="text-xl font-semibold text-gray-900 mb-3">{service.title}</h3>
                   <p className="text-gray-600 mb-6">{service.description}</p>
@@ -1078,7 +1078,7 @@ const SebnaLanding = () => {
                         {service.risk}
                       </div>
                     </div>
-                    <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-blue-900/10 to-orange-600/10 text-blue-900 font-semibold hover:from-blue-900/20 hover:to-orange-600/20 transition-all duration-300">
+                    <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 text-sebna-navy font-semibold hover:from-sebna-navy/20 hover:to-sebna-orange/20 transition-all duration-300">
                       Learn More
                     </button>
                   </div>
@@ -1095,10 +1095,10 @@ const SebnaLanding = () => {
           <div className="text-center mb-16">
             <div 
               data-aos="fade-up"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-900/10 to-orange-600/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
+              className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
-              <ChartBarIcon className="w-4 h-4 text-blue-900" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">
+              <ChartBarIcon className="w-4 h-4 text-sebna-navy" />
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
                 Live Dashboard
               </span>
             </div>
@@ -1107,7 +1107,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Investment <span className="bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">Performance</span>
+              Investment <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Performance</span>
             </h2>
             <p 
               data-aos="fade-up"
@@ -1121,10 +1121,10 @@ const SebnaLanding = () => {
           {/* Metrics Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {[
-              { icon: ChartBarIcon, value: 'ETB 125.75', label: 'Current Share Price', change: '+2.8%', gradient: 'from-blue-900 to-blue-700' },
-              { icon: WalletIcon, value: 'ETB 250M', label: 'Total Investment', change: '+15.2%', gradient: 'from-indigo-900 to-indigo-700' },
-              { icon: UserGroupIcon, value: '15,247', label: 'Active Investors', change: '+8.3%', gradient: 'from-purple-900 to-purple-700' },
-              { icon: BanknotesIcon, value: '16.8%', label: 'Average ROI', change: '+1.2%', gradient: 'from-orange-600 to-orange-500' },
+              { icon: ChartBarIcon, value: 'ETB 125.75', label: 'Current Share Price', change: '+2.8%', gradient: 'from-sebna-navy to-sebna-orange' },
+              { icon: WalletIcon, value: 'ETB 250M', label: 'Total Investment', change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+              { icon: UserGroupIcon, value: '15,247', label: 'Active Investors', change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
+              { icon: BanknotesIcon, value: '16.8%', label: 'Average ROI', change: '+1.2%', gradient: 'from-sebna-navy to-sebna-orange' },
             ].map((metric, idx) => (
               <div
                 key={idx}
@@ -1147,10 +1147,10 @@ const SebnaLanding = () => {
             <div className="text-center mb-12">
               <div 
                 data-aos="fade-up"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-900/10 to-orange-600/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
               >
-                <BuildingLibraryIcon className="w-4 h-4 text-blue-900" />
-                <span className="text-sm font-semibold bg-gradient-to-r from-blue-900 to-orange-600 bg-clip-text text-transparent">
+                <BuildingLibraryIcon className="w-4 h-4 text-sebna-navy" />
+                <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
                   Institutions
                 </span>
               </div>
@@ -1172,7 +1172,7 @@ const SebnaLanding = () => {
 
             {institutionsLoading ? (
               <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-blue-900 border-t-transparent"></div>
+                <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-sebna-navy border-t-transparent"></div>
                 <p className="mt-4 text-gray-600">Loading institutions...</p>
               </div>
             ) : (
@@ -1197,7 +1197,7 @@ const SebnaLanding = () => {
                             className="max-w-full max-h-full object-contain p-1"
                           />
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-blue-900 to-orange-600">
+                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-sebna-navy to-sebna-orange">
                             <span className="text-white font-bold text-lg">
                               {String(name || 'I').trim().charAt(0).toUpperCase()}
                             </span>
