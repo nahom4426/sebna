@@ -12,17 +12,15 @@ import {
 } from '@material-tailwind/react';
 import { useModal } from '@/context/ModalContext';
 import { createUser, updateUserById, getAllRole } from '../api/UsersApi';
-import { getAllInstitution } from '../../institutions/api/InstitutionsApi';
+import { getPricePerShare } from '@/pages/admin/api/SebnaSettingsApi';
 import pako from 'pako';
 import { toast } from '@/utils/utils';
-import { useAuthStore } from '@/stores/authStore';
 import { 
   EnvelopeIcon, 
   KeyIcon, 
   UserIcon, 
   UserCircleIcon,
   PhoneIcon,
-  BuildingOfficeIcon,
   ExclamationTriangleIcon,
   ShieldCheckIcon,
   IdentificationIcon,
@@ -44,12 +42,10 @@ import {
 
 const UserForm = ({ user = null, onSuccess }) => {
   const { closeModal } = useModal();
-  const auth = useAuthStore((state) => state.auth);
   const [loading, setLoading] = useState(false);
   const [roles, setRoles] = useState([]);
   const [rolesLoading, setRolesLoading] = useState(true);
-  const [institutions, setInstitutions] = useState([]);
-  const [institutionsLoading, setInstitutionsLoading] = useState(true);
+  const [pricePerShare, setPricePerShare] = useState(10000);
   const [error, setError] = useState('');
   const [queuedEmailBanner, setQueuedEmailBanner] = useState('');
   const [activeSection, setActiveSection] = useState('personal'); // personal, auth, role
@@ -61,16 +57,11 @@ const UserForm = ({ user = null, onSuccess }) => {
     gender: '',
     mobilePhone: '',
     roleUuid: '',
-    institutionId: '',
+    sharesBoughtAmount: '',
+    amountPaid: '',
   });
 
   const isEditMode = !!user;
-
-  const roleNameRaw = auth?.user?.roleName;
-  const roleNameNormalized = String(roleNameRaw || '').trim().toLowerCase().replace(/\s+/g, '_');
-  const isCompanyAdmin = roleNameNormalized === 'company_admin';
-  const adminInstitutionId = auth?.user?.institutionId || auth?.user?.institutionUuid;
-  const institutionMissing = isCompanyAdmin && !adminInstitutionId;
 
   const normalizeRoleName = (name) => String(name || '').trim().toLowerCase().replace(/\s+/g, '_');
 
@@ -92,7 +83,7 @@ const UserForm = ({ user = null, onSuccess }) => {
     }
   };
 
-  // Fetch roles and institutions on mount
+  // Fetch roles on mount
   useEffect(() => {
     const fetchRoles = async () => {
       try {
@@ -112,7 +103,8 @@ const UserForm = ({ user = null, onSuccess }) => {
           rolesList = response;
         }
         
-        // Process roles with correct field names
+        // Process roles with correct field names (and filter to allowed roles)
+        const allowedRoleNames = new Set(['super_admin', 'shareholders']);
         const validRoles = rolesList
           .filter(role => role && (role.roleUuid || role.id || role.uuid))
           .map(role => ({
@@ -120,7 +112,8 @@ const UserForm = ({ user = null, onSuccess }) => {
             name: role.roleName || role.name || role.title || 'Unnamed Role',
             description: role.roleDescription || role.description || '',
             privileges: role.privileges || [],
-          }));
+          }))
+          .filter((role) => allowedRoleNames.has(normalizeRoleName(role?.name)));
         
         setRoles(validRoles);
         setError('');
@@ -133,64 +126,23 @@ const UserForm = ({ user = null, onSuccess }) => {
         setRolesLoading(false);
       }
     };
-
-    const fetchInstitutions = async () => {
-      try {
-        setInstitutionsLoading(true);
-        const response = await getAllInstitution();
-        
-        let institutionsList = [];
-        
-        // Extract institutions from API response
-        if (response && response.data && response.data.response && Array.isArray(response.data.response)) {
-          institutionsList = response.data.response;
-        } else if (response && response.data && response.data.content && Array.isArray(response.data.content)) {
-          institutionsList = response.data.content;
-        } else if (response && response.content && Array.isArray(response.content)) {
-          institutionsList = response.content;
-        } else if (response && response.data && Array.isArray(response.data)) {
-          institutionsList = response.data;
-        } else if (Array.isArray(response)) {
-          institutionsList = response;
-        }
-        
-        // Process institutions with logos
-        const validInstitutions = institutionsList
-          .filter(inst => inst && (inst.id || inst.institutionId || inst.institutionUuid || inst.uuid))
-          .map(inst => ({
-            id: String(inst.id || inst.institutionId || inst.institutionUuid || inst.uuid || ''),
-            name: inst.name || 'Unnamed Institution',
-            logo: inst.logo ? decompressLogo(inst.logo) : null,
-          }));
-        
-        setInstitutions(validInstitutions);
-        
-      } catch (err) {
-        console.error('Failed to fetch institutions:', err);
-        setInstitutions([]);
-      } finally {
-        setInstitutionsLoading(false);
-      }
-    };
-
     fetchRoles();
-    fetchInstitutions();
   }, []);
 
   useEffect(() => {
-    if (!isCompanyAdmin || isEditMode) return;
-    if (rolesLoading) return;
-    const companyUserRole = roles.find((r) => normalizeRoleName(r?.name) === 'company_user');
-    if (!companyUserRole?.roleUuid) {
-      setError('Company user role not found');
-      return;
-    }
-    setFormData((prev) => ({
-      ...prev,
-      roleUuid: companyUserRole.roleUuid,
-      institutionId: '',
-    }));
-  }, [isCompanyAdmin, isEditMode, rolesLoading, roles]);
+    const fetchPrice = async () => {
+      try {
+        const res = await getPricePerShare();
+        const pps = res?.data?.pricePerShare;
+        if (Number.isFinite(Number(pps)) && Number(pps) > 0) {
+          setPricePerShare(Number(pps));
+        }
+      } catch (err) {
+        console.error('Failed to fetch price per share:', err);
+      }
+    };
+    fetchPrice();
+  }, []);
 
   // Initialize form with user data in edit mode
   useEffect(() => {
@@ -203,15 +155,8 @@ const UserForm = ({ user = null, onSuccess }) => {
         gender: user.gender || '',
         mobilePhone: user.mobilePhone || '',
         roleUuid: user.roleUuid || user.role?.roleUuid || '',
-        institutionId: String(
-          user.institutionId ||
-            user.institutionUuid ||
-            user.institution?.id ||
-            user.institution?.institutionId ||
-            user.institution?.institutionUuid ||
-            user.institution?.uuid ||
-            ''
-        ),
+        sharesBoughtAmount: user.sharesBoughtAmount ?? '',
+        amountPaid: user.amountPaid ?? '',
       });
     }
   }, [user, isEditMode, roles]);
@@ -266,22 +211,33 @@ const UserForm = ({ user = null, onSuccess }) => {
       return false;
     }
 
-    if (institutionMissing) {
-      setError('Admin is not assigned to institution, contact super admin');
-      return false;
-    }
-
     const selectedRole = roles.find((r) => r.roleUuid === formData.roleUuid);
     const selectedRoleNormalized = normalizeRoleName(selectedRole?.name);
-    const roleRequiresInstitution = !isCompanyAdmin && (selectedRoleNormalized === 'company_admin' || selectedRoleNormalized === 'company_user');
-    if (roleRequiresInstitution && !formData.institutionId) {
-      setError('Institution is required for this role');
-      return false;
-    }
+    if (selectedRoleNormalized === 'shareholders') {
+      const sharesQty = Number(formData.sharesBoughtAmount);
+      const paid = Number(formData.amountPaid);
+      const pps = Number(pricePerShare);
 
-    if (isCompanyAdmin && !isEditMode) {
-      if (selectedRoleNormalized !== 'company_user') {
-        setError('Company admin can only create company users');
+      if (!Number.isFinite(sharesQty) || !Number.isInteger(sharesQty)) {
+        setError('Shares quantity must be a whole number');
+        return false;
+      }
+      if (sharesQty < 5) {
+        setError('Shares quantity must be at least 5');
+        return false;
+      }
+      if (!Number.isFinite(pps) || pps <= 0) {
+        setError('Price per share is invalid');
+        return false;
+      }
+      const totalCost = sharesQty * pps;
+
+      if (!Number.isFinite(paid) || paid < 0) {
+        setError('Amount paid cannot be negative');
+        return false;
+      }
+      if (paid > totalCost) {
+        setError('Amount paid cannot exceed total cost');
         return false;
       }
     }
@@ -299,14 +255,14 @@ const UserForm = ({ user = null, onSuccess }) => {
     try {
       const payload = { ...formData };
 
-      if (isCompanyAdmin && !isEditMode) {
-        const companyUserRole = roles.find((r) => normalizeRoleName(r?.name) === 'company_user');
-        if (!companyUserRole?.roleUuid) {
-          setError('Company user role not found');
-          return;
-        }
-        payload.roleUuid = companyUserRole.roleUuid;
-        delete payload.institutionId;
+      const selectedRole = roles.find((r) => r.roleUuid === payload.roleUuid);
+      const selectedRoleNormalized = normalizeRoleName(selectedRole?.name);
+      if (selectedRoleNormalized !== 'shareholders') {
+        delete payload.sharesBoughtAmount;
+        delete payload.amountPaid;
+      } else {
+        payload.sharesBoughtAmount = Number.parseInt(String(payload.sharesBoughtAmount), 10);
+        payload.amountPaid = Number(payload.amountPaid);
       }
 
       const res = isEditMode
@@ -356,7 +312,7 @@ const UserForm = ({ user = null, onSuccess }) => {
 
   const selectedRole = roles.find((r) => r.roleUuid === formData.roleUuid);
   const selectedRoleNormalized = normalizeRoleName(selectedRole?.name);
-  const requiresInstitution = !isCompanyAdmin && (selectedRoleNormalized === 'company_admin' || selectedRoleNormalized === 'company_user');
+  const isShareholderRole = selectedRoleNormalized === 'shareholders';
 
   // Render role options
   const renderRoleOptions = () => {
@@ -409,7 +365,7 @@ const UserForm = ({ user = null, onSuccess }) => {
   const formSections = [
     { id: 'personal', label: 'Personal Info', icon: UserCircleIcon },
     { id: 'auth', label: 'Authentication', icon: ShieldCheckIcon },
-    ...(!(isCompanyAdmin && !isEditMode) ? [{ id: 'role', label: 'Role & Access', icon: BriefcaseIcon }] : [])
+    { id: 'role', label: 'Role & Access', icon: BriefcaseIcon }
   ];
 
   return (
@@ -713,8 +669,7 @@ const UserForm = ({ user = null, onSuccess }) => {
             </div>
 
             {/* Role & Access Section */}
-            {!(isCompanyAdmin && !isEditMode) && (
-              <div className={`space-y-4 ${activeSection !== 'role' ? 'hidden' : ''}`}>
+            <div className={`space-y-4 ${activeSection !== 'role' ? 'hidden' : ''}`}>
                 <div className="bg-gradient-to-r from-purple-50 to-pink-50 p-4 rounded-xl border border-purple-100">
                   <div className="flex items-center gap-3 mb-4">
                     <div className="p-2 bg-white rounded-lg shadow-sm">
@@ -777,72 +732,74 @@ const UserForm = ({ user = null, onSuccess }) => {
                       )}
                     </div>
 
-                    {/* Institution Selection */}
-                    {requiresInstitution && (
-                      <div className="space-y-2">
-                        <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                          <BuildingOfficeIcon className="h-4 w-4" />
-                          <span>Institution</span>
-                          <span className="text-red-500">*</span>
-                        </label>
-                        <div className="relative">
-                          <Select
-                            value={formData.institutionId}
-                            onChange={(value) => handleSelectChange('institutionId', value)}
-                            disabled={institutionsLoading || loading}
+                    {/* Shareholder payment fields */}
+                    {isShareholderRole && (
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                            <span>Shares Quantity</span>
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Input
+                            type="number"
+                            name="sharesBoughtAmount"
+                            value={formData.sharesBoughtAmount}
+                            onChange={handleInputChange}
+                            disabled={loading}
                             className="!border-gray-300 focus:!border-blue-500 !text-sm bg-white"
-                            menuProps={{ className: "max-h-64" }}
-                          >
-                            <Option value="" className="text-gray-400 text-sm">
-                              {institutionsLoading ? 'Loading institutions...' : 'Select institution'}
-                            </Option>
-                            {institutions.map((inst) => (
-                              <Option 
-                                key={inst.id}
-                                value={inst.id}
-                                className="text-gray-700 text-sm"
-                              >
-                                <div className="flex items-center gap-3 py-2">
-                                  {inst.logo ? (
-                                    <img
-                                      src={inst.logo}
-                                      alt={inst.name}
-                                      className="h-6 w-6 object-contain rounded"
-                                    />
-                                  ) : (
-                                    <div className="h-6 w-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded flex items-center justify-center">
-                                      <BuildingOfficeIcon className="h-3 w-3 text-gray-600" />
-                                    </div>
-                                  )}
-                                  <span>{inst.name}</span>
-                                </div>
-                              </Option>
-                            ))}
-                          </Select>
+                            labelProps={{ className: "hidden" }}
+                            placeholder="5"
+                            min={5}
+                            step="1"
+                            required
+                          />
                         </div>
-                      </div>
-                    )}
 
-                    {/* Company Admin Note */}
-                    {isCompanyAdmin && (
-                      <div className="bg-blue-50/50 border border-blue-200 rounded-lg p-3">
-                        <div className="flex items-start gap-2">
-                          <InformationCircleIcon className="h-4 w-4 text-blue-600 mt-0.5 flex-shrink-0" />
-                          <div>
-                            <Typography variant="small" className="font-medium text-blue-900">
-                              Company Admin Restriction
-                            </Typography>
-                            <Typography variant="small" className="text-blue-700">
-                              You can only create users with 'Company User' role.
-                            </Typography>
-                          </div>
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                            <span>Amount Paid</span>
+                            <span className="text-red-500">*</span>
+                          </label>
+                          <Input
+                            type="number"
+                            name="amountPaid"
+                            value={formData.amountPaid}
+                            onChange={handleInputChange}
+                            disabled={loading}
+                            className="!border-gray-300 focus:!border-blue-500 !text-sm bg-white"
+                            labelProps={{ className: "hidden" }}
+                            placeholder="15000"
+                            min={0}
+                            step="0.01"
+                            required
+                          />
+                        </div>
+
+                        <div className="space-y-2">
+                          <label className="flex items-center gap-2 text-sm font-medium text-gray-700">
+                            <span>Amount Remaining</span>
+                          </label>
+                          <Input
+                            type="text"
+                            value={(() => {
+                              const sharesQty = Number(formData.sharesBoughtAmount);
+                              const paid = Number(formData.amountPaid);
+                              const pps = Number(pricePerShare);
+                              if (!Number.isFinite(sharesQty) || !Number.isFinite(paid) || !Number.isFinite(pps)) return '';
+                              const totalCost = sharesQty * pps;
+                              return String(Math.max(0, totalCost - paid));
+                            })()}
+                            disabled
+                            className="!border-gray-200 !text-sm bg-gray-50"
+                            labelProps={{ className: "hidden" }}
+                            placeholder="0"
+                          />
                         </div>
                       </div>
                     )}
                   </div>
                 </div>
               </div>
-            )}
 
             {/* Form Progress & Actions */}
             <div className="pt-4 border-t border-gray-200">
@@ -898,7 +855,7 @@ const UserForm = ({ user = null, onSuccess }) => {
                   ) : (
                     <Button
                       type="submit"
-                      disabled={loading || institutionMissing || (isCompanyAdmin && !isEditMode && (!formData.roleUuid || rolesLoading))}
+                      disabled={loading || (!formData.roleUuid || rolesLoading)}
                       className="px-6 py-2.5 text-sm font-medium bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50"
                     >
                       {loading ? (

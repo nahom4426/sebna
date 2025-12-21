@@ -70,19 +70,19 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-gradient-to-br from-gray-50 via-blue-50/30 to-indigo-50/20 relative overflow-hidden">
+    <div className="flex h-screen w-full bg-gradient-to-br from-gray-50 via-sebna-navy/5 to-sebna-orange/5 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
         {/* Gradient Orbs */}
-        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-blue-500/10 via-purple-500/10 to-pink-500/10 blur-3xl animate-gradient-orb-1"></div>
-        <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-indigo-500/10 via-blue-500/10 to-cyan-500/10 blur-3xl animate-gradient-orb-2"></div>
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-r from-emerald-500/5 via-teal-500/5 to-cyan-500/5 blur-3xl animate-gradient-orb-3"></div>
+        <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-sebna-navy/10 via-sebna-navy/5 to-sebna-orange/10 blur-3xl animate-gradient-orb-1"></div>
+        <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-sebna-orange/10 via-sebna-navy/5 to-sebna-navy/10 blur-3xl animate-gradient-orb-2"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-gradient-to-r from-sebna-navy/5 via-sebna-orange/5 to-sebna-navy/5 blur-3xl animate-gradient-orb-3"></div>
         
         {/* Geometric Grid */}
         <div className="absolute inset-0 opacity-[0.03]">
           <div className="h-full w-full" style={{
-            backgroundImage: `linear-gradient(to right, #1e3a8a 1px, transparent 1px),
-                             linear-gradient(to bottom, #1e3a8a 1px, transparent 1px)`,
+            backgroundImage: `linear-gradient(to right, #00174b 1px, transparent 1px),
+                             linear-gradient(to bottom, #00174b 1px, transparent 1px)`,
             backgroundSize: '50px 50px'
           }}></div>
         </div>
@@ -91,7 +91,7 @@ const MainLayout = () => {
         {[...Array(20)].map((_, i) => (
           <div
             key={i}
-            className="absolute w-1 h-1 bg-blue-400/30 rounded-full"
+            className="absolute w-1 h-1 bg-sebna-orange/25 rounded-full"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
@@ -116,9 +116,9 @@ const MainLayout = () => {
           onClick={toggleSidebar}
           className={`fixed z-30 top-10 transition-all duration-500 ease-[cubic-bezier(0.4,0,0.2,1)] 
                      ${isCollapsed ? 'left-12' : 'left-64'} 
-                     bg-gradient-to-r from-blue-600 to-indigo-600 text-white p-1 
-                     rounded-xl shadow-2xl shadow-blue-500/30 
-                     hover:shadow-3xl hover:shadow-blue-500/40 hover:scale-105
+                     bg-gradient-to-r from-sebna-navy to-sebna-orange text-white p-1 
+                     rounded-xl shadow-2xl shadow-sebna-navy/25 
+                     hover:shadow-3xl hover:shadow-sebna-navy/35 hover:scale-105
                      active:scale-95 border border-white/20
                      flex items-center justify-center`}
           style={{
@@ -137,9 +137,9 @@ const MainLayout = () => {
       {isMobile && (
         <button
           onClick={toggleMobileMenu}
-          className="fixed top-4 left-4 z-50 p-3 bg-gradient-to-r from-blue-600 to-indigo-600 
-                   text-white rounded-xl shadow-2xl shadow-blue-500/30 
-                   hover:shadow-3xl hover:shadow-blue-500/40 hover:scale-105
+          className="fixed top-4 left-4 z-50 p-3 bg-gradient-to-r from-sebna-navy to-sebna-orange 
+                   text-white rounded-xl shadow-2xl shadow-sebna-navy/25 
+                   hover:shadow-3xl hover:shadow-sebna-navy/35 hover:scale-105
                    active:scale-95 border border-white/20 transition-all duration-300"
         >
           {isMobileMenuOpen ? (
@@ -166,7 +166,7 @@ const MainLayout = () => {
         }}
       >
         <div className="h-full rounded-2xl bg-gradient-to-b from-white/90 via-white/80 to-white/70 
-                      backdrop-blur-2xl border border-white/40 shadow-2xl shadow-blue-500/10 
+                      backdrop-blur-2xl border border-white/40 shadow-2xl shadow-sebna-navy/10 
                       overflow-hidden">
           <Sidebar
             isCollapsed={isCollapsed}
@@ -181,17 +181,17 @@ const MainLayout = () => {
       <div className="flex flex-col flex-1 gap-3 p-3 md:p-4 min-w-0 overflow-visible relative z-10">
 
         {/* Scroll Progress Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent z-10">
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-sebna-navy/20 to-transparent z-10">
           <div 
-            className="h-full bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 transition-all duration-300 ease-out"
+            className="h-full bg-gradient-to-r from-sebna-navy via-sebna-orange to-sebna-navy transition-all duration-300 ease-out"
             style={{ width: `${scrollProgress}%` }}
           />
         </div>
 
         {/* NavBar with Glass Effect */}
         <div className="relative z-50 overflow-visible rounded-2xl bg-gradient-to-r from-white/80 via-white/70 to-white/60 
-                      backdrop-blur-2xl border border-white/40 shadow-xl shadow-blue-500/10 
-                      transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/20">
+                      backdrop-blur-2xl border border-white/40 shadow-xl shadow-sebna-navy/10 
+                      transition-all duration-300 hover:shadow-2xl hover:shadow-sebna-navy/20">
           <NavBar
             toggleMobileMenu={toggleMobileMenu}
             isMobile={isMobile}
@@ -203,13 +203,13 @@ const MainLayout = () => {
         <div className="main-content-area show-scrollbar flex-1 overflow-auto rounded-2xl 
                        bg-gradient-to-br from-white/70 via-white/60 to-white/50 
                        backdrop-blur-2xl border border-white/40 
-                       shadow-xl shadow-blue-500/10 
-                       transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 
+                       shadow-xl shadow-sebna-navy/10 
+                       transition-all duration-500 hover:shadow-2xl hover:shadow-sebna-navy/20 
                        p-3 md:p-6 min-w-0 relative group">
           
           {/* Subtle Corner Accents */}
-          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent pointer-events-none"></div>
-          <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-indigo-500/5 via-transparent to-transparent pointer-events-none"></div>
+          <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-sebna-navy/5 via-transparent to-transparent pointer-events-none"></div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-gradient-to-tl from-sebna-orange/5 via-transparent to-transparent pointer-events-none"></div>
           
           {/* Content */}
           <Outlet />
@@ -218,9 +218,9 @@ const MainLayout = () => {
           <div className="absolute bottom-6 right-6 opacity-0 group-hover:opacity-100 
                         transition-opacity duration-500">
             <div className="flex items-center justify-center w-10 h-10 
-                          bg-gradient-to-br from-blue-500/10 to-indigo-500/10 
+                          bg-gradient-to-br from-sebna-navy/10 to-sebna-orange/10 
                           backdrop-blur-sm rounded-full border border-white/20">
-              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 
+              <div className="w-2 h-2 rounded-full bg-gradient-to-r from-sebna-navy to-sebna-orange 
                             animate-pulse"></div>
             </div>
           </div>
@@ -230,12 +230,12 @@ const MainLayout = () => {
       {/* Bottom Status Bar */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 
                     bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-2xl 
-                    border border-white/40 rounded-full shadow-lg shadow-blue-500/10 
+                    border border-white/40 rounded-full shadow-lg shadow-sebna-navy/10 
                     text-sm text-gray-600 flex items-center gap-3">
         <div className="flex items-center gap-2">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+          <div className="w-2 h-2 rounded-full bg-sebna-orange animate-pulse"></div>
           <span className="font-medium">System Status: </span>
-          <span className="text-green-600 font-semibold">Online</span>
+          <span className="text-sebna-navy font-semibold">Online</span>
         </div>
         <div className="w-px h-4 bg-gray-300/50"></div>
         <div className="hidden sm:block">
@@ -339,13 +339,13 @@ const MainLayout = () => {
         }
 
         .show-scrollbar::-webkit-scrollbar-thumb {
-          background: linear-gradient(to bottom, #3b82f6, #8b5cf6);
+          background: linear-gradient(to bottom, #00174b, #f43b11);
           border-radius: 4px;
           transition: all 0.3s ease;
         }
 
         .show-scrollbar::-webkit-scrollbar-thumb:hover {
-          background: linear-gradient(to bottom, #2563eb, #7c3aed);
+          background: linear-gradient(to bottom, #f43b11, #00174b);
         }
 
         /* Smooth transitions */
@@ -355,7 +355,7 @@ const MainLayout = () => {
 
         /* Gradient text effect */
         .gradient-text {
-          background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #ec4899 100%);
+          background: linear-gradient(135deg, #00174b 0%, #f43b11 100%);
           -webkit-background-clip: text;
           -webkit-text-fill-color: transparent;
           background-clip: text;
@@ -366,7 +366,7 @@ const MainLayout = () => {
           background: rgba(255, 255, 255, 0.1);
           backdrop-filter: blur(20px);
           border: 1px solid rgba(255, 255, 255, 0.2);
-          box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1);
+          box-shadow: 0 8px 32px rgba(0, 23, 75, 0.1);
         }
       `}</style>
     </div>

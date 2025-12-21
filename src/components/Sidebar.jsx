@@ -17,15 +17,6 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
       path: '/dashboard/home',
       requiredRoles: [ROLES.READ_REPORTS],
     },
-  
-    {
-      name: 'Institutions',
-      icon: '🏢',
-      path: '/admin/institutions',
-      requiredRoles: [
-        ROLES.READ_INSTITUTIONS,
-      ],
-    },
     {
       name: 'Posts',
       icon: '📰',
@@ -172,9 +163,9 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
       {/* Header Section */}
       <div className="flex-shrink-0 space-y-4">
         <div className="flex gap-2 justify-center items-center py-4 w-full">
-          <span className="transition-transform transform text-blue-600 hover:scale-110 text-2xl">🏥</span>
+          <span className="transition-transform transform text-sebna-navy hover:scale-110 text-2xl">🏥</span>
           {!isCollapsed && (
-            <span className="text-lg font-bold text-blue-600 animate-fade-in">Sebna</span>
+            <span className="text-lg font-bold text-sebna-navy animate-fade-in">Sebna</span>
           )}
         </div>
         <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
@@ -208,16 +199,16 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                     onClick={() => toggleMenu(item.name)}
                     className={`flex justify-between items-center w-full h-12 rounded-xl transition-all duration-200 group ${
                       expandedMenus.includes(item.name) && !isCollapsed
-                        ? 'bg-gradient-to-r from-blue-600/10 to-indigo-600/20 shadow-sm'
+                        ? 'bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 shadow-sm'
                         : 'hover:bg-gray-50'
                     }`}
                   >
                     <span className="flex gap-4 items-center ml-3">
-                      <span className="transition-transform text-blue-600 group-hover:scale-110 text-lg">
+                      <span className="transition-transform text-sebna-navy group-hover:scale-110 text-lg">
                         {item.icon}
                       </span>
                       {!isCollapsed && (
-                        <span className="text-sm font-semibold text-gray-700 transition-colors md:whitespace-nowrap group-hover:text-blue-600">
+                        <span className="text-sm font-semibold text-gray-700 transition-colors md:whitespace-nowrap group-hover:text-sebna-navy">
                           {item.name}
                         </span>
                       )}
@@ -239,7 +230,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                   {/* Submenu Items */}
                   {expandedMenus.includes(item.name) && (
                     <div
-                      className={`pl-1 mt-1 space-y-2 border-l-2 border-blue-600/20 ${
+                      className={`pl-1 mt-1 space-y-2 border-l-2 border-sebna-navy/20 ${
                         isCollapsed ? '' : 'ml-6'
                       }`}
                     >
@@ -252,8 +243,8 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                           }}
                           className={`flex pl-3 h-10 rounded-lg transition-all duration-200 group w-full ${
                             isActive(child.path)
-                              ? 'bg-blue-600 text-white shadow-md'
-                              : 'hover:bg-indigo-600/50 text-gray-600'
+                              ? 'bg-sebna-navy text-white shadow-md'
+                              : 'hover:bg-sebna-navy/10 text-gray-600'
                           }`}
                         >
                           <span className="flex gap-3 items-center">
@@ -286,12 +277,12 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                   }}
                   className={`flex h-12 rounded-xl transition-all duration-200 group w-full ${
                     isActive(item.path)
-                      ? 'bg-blue-600 text-white shadow-md'
+                      ? 'bg-sebna-navy text-white shadow-md'
                       : 'hover:bg-gray-50 hover:shadow-sm'
                   } ${isCollapsed ? 'justify-center' : 'pl-3'}`}
                 >
                   <span className="flex gap-3 items-center">
-                    <span className={`text-lg ${isActive(item.path) ? 'text-white' : 'text-blue-600'}`}>
+                    <span className={`text-lg ${isActive(item.path) ? 'text-white' : 'text-sebna-navy'}`}>
                       {item.icon}
                     </span>
                     {!isCollapsed && (
@@ -299,7 +290,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                         className={`text-sm font-semibold transition-all duration-200 ${
                           isActive(item.path)
                             ? 'text-white'
-                            : 'text-gray-700 group-hover:text-blue-600'
+                            : 'text-gray-700 group-hover:text-sebna-navy'
                         }`}
                       >
                         {item.name}
@@ -316,8 +307,8 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
       {/* Footer Section */}
       {(!isCollapsed || isMobile) && (
         <div className="p-4 bg-gradient-to-br from-gray-50 to-white border-t border-gray-100">
-          <div className="flex gap-3 items-center p-3 rounded-xl bg-blue-600/5">
-            <div className="flex justify-center items-center w-10 h-10 rounded-full bg-blue-600/10">
+          <div className="flex gap-3 items-center p-3 rounded-xl bg-sebna-navy/5">
+            <div className="flex justify-center items-center w-10 h-10 rounded-full bg-sebna-navy/10">
               <span className="text-lg">🏥</span>
             </div>
             <div className="flex-1 min-w-0">

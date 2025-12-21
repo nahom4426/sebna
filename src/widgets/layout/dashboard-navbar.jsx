@@ -25,6 +25,7 @@ import {
   setOpenConfigurator,
   setOpenSidenav,
 } from "@/context";
+import brandLogo from "@/assets/logo.svg";
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -37,7 +38,7 @@ export function DashboardNavbar() {
       color={fixedNavbar ? "white" : "transparent"}
       className={`rounded-xl transition-all ${
         fixedNavbar
-          ? "sticky top-4 z-40 py-3 shadow-md shadow-blue-gray-500/5"
+          ? "sticky top-4 z-40 py-3 shadow-md shadow-sebna-navy/10"
           : "px-0 py-1"
       }`}
       fullWidth
@@ -81,7 +82,7 @@ export function DashboardNavbar() {
             className="grid xl:hidden"
             onClick={() => setOpenSidenav(dispatch, !openSidenav)}
           >
-            <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
+            <Bars3Icon strokeWidth={3} className="h-6 w-6 text-sebna-navy" />
           </IconButton>
           <Link to="/auth/sign-in">
             <Button
@@ -89,7 +90,7 @@ export function DashboardNavbar() {
               color="blue-gray"
               className="hidden items-center gap-1 px-4 xl:flex normal-case"
             >
-              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
+              <UserCircleIcon className="h-5 w-5 text-sebna-navy" />
               Sign In
             </Button>
             <IconButton
@@ -97,19 +98,19 @@ export function DashboardNavbar() {
               color="blue-gray"
               className="grid xl:hidden"
             >
-              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
+              <UserCircleIcon className="h-5 w-5 text-sebna-navy" />
             </IconButton>
           </Link>
           <Menu>
             <MenuHandler>
               <IconButton variant="text" color="blue-gray">
-                <BellIcon className="h-5 w-5 text-blue-gray-500" />
+                <BellIcon className="h-5 w-5 text-sebna-navy" />
               </IconButton>
             </MenuHandler>
             <MenuList className="w-max border-0">
               <MenuItem className="flex items-center gap-3">
                 <Avatar
-                  src="https://demos.creative-tim.com/material-dashboard/assets/img/team-2.jpg"
+                  src={brandLogo}
                   alt="item-1"
                   size="sm"
                   variant="circular"
@@ -133,7 +134,7 @@ export function DashboardNavbar() {
               </MenuItem>
               <MenuItem className="flex items-center gap-4">
                 <Avatar
-                  src="https://demos.creative-tim.com/material-dashboard/assets/img/small-logos/logo-spotify.svg"
+                  src={brandLogo}
                   alt="item-1"
                   size="sm"
                   variant="circular"
@@ -183,7 +184,7 @@ export function DashboardNavbar() {
             color="blue-gray"
             onClick={() => setOpenConfigurator(dispatch, true)}
           >
-            <Cog6ToothIcon className="h-5 w-5 text-blue-gray-500" />
+            <Cog6ToothIcon className="h-5 w-5 text-sebna-navy" />
           </IconButton>
         </div>
       </div>

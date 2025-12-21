@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useModal } from '@/context/ModalContext';
 import { Button, Card, CardBody, CardHeader, Typography } from '@material-tailwind/react';
 import Table from '../../../../components/Table';
@@ -7,6 +7,7 @@ import Pagination from '../../../../composables/Pagination';
 import UsersDataProvider from '../component/UsersDataProvider';
 import UserForm from '../component/UserForm';
 import { adminResetPassword, removeUserById, resendWelcomePasswordEmail } from '../api/UsersApi';
+import { getPricePerShare, updatePricePerShare } from '@/pages/admin/api/SebnaSettingsApi';
 import { toast } from '@/utils/utils';
 import { useAuthStore } from '@/stores/authStore';
 import { ROLES } from '@/constants/roles';
@@ -18,16 +19,58 @@ const Users = () => {
   const [refreshKey, setRefreshKey] = useState(0);
   const [queuedEmailBanner, setQueuedEmailBanner] = useState('');
 
-  const roleNameRaw = auth?.user?.roleName;
-  const roleNameNormalized = String(roleNameRaw || '').trim().toLowerCase().replace(/\s+/g, '_');
-  const isCompanyAdmin = roleNameNormalized === 'company_admin';
-  const institutionId = auth?.user?.institutionId || auth?.user?.institutionUuid;
-  const institutionMissing = isCompanyAdmin && !institutionId;
+  const [pricePerShare, setPricePerShareState] = useState(10000);
+  const [pricePerShareInput, setPricePerShareInput] = useState('10000');
+  const [ppsLoading, setPpsLoading] = useState(false);
+  const [ppsSaving, setPpsSaving] = useState(false);
 
   const userPrivileges = auth?.user?.privileges || [];
   const canCreateUser = userPrivileges.includes(ROLES.CREATE_USER);
   const canUpdateUser = userPrivileges.includes(ROLES.UPDATE_USER);
   const canDeleteUser = userPrivileges.includes(ROLES.DELETE_USER);
+  const isSuperAdmin = String(auth?.user?.roleName || '').trim().toLowerCase() === 'super_admin' || String(auth?.user?.roleName || '').trim() === 'Super Admin';
+
+  useEffect(() => {
+    const fetchPps = async () => {
+      if (!isSuperAdmin) return;
+      setPpsLoading(true);
+      try {
+        const res = await getPricePerShare();
+        const pps = res?.data?.pricePerShare;
+        if (Number.isFinite(Number(pps)) && Number(pps) > 0) {
+          setPricePerShareState(Number(pps));
+          setPricePerShareInput(String(Number(pps)));
+        }
+      } catch (err) {
+        console.error('Failed to load price per share:', err);
+      } finally {
+        setPpsLoading(false);
+      }
+    };
+    fetchPps();
+  }, [isSuperAdmin]);
+
+  const onSavePricePerShare = async () => {
+    if (!isSuperAdmin || ppsSaving) return;
+    const next = Number(pricePerShareInput);
+    if (!Number.isFinite(next) || next <= 0) {
+      toast.error('Price per share must be a positive number');
+      return;
+    }
+    setPpsSaving(true);
+    try {
+      const res = await updatePricePerShare(next);
+      if (res?.success) {
+        setPricePerShareState(next);
+        toast.success('Price per share updated');
+      }
+    } catch (err) {
+      console.error('Failed to update price per share:', err);
+      toast.error('Failed to update price per share');
+    } finally {
+      setPpsSaving(false);
+    }
+  };
 
   const ResetPasswordConfirmModal = ({ userUuid, onDone }) => {
     const { closeModal } = useModal();
@@ -100,8 +143,8 @@ const Users = () => {
   };
 
   const headers = {
-    head: [ 'First Name', 'Email', 'Role', 'Status', 'Actions'],
-    row: ['firstName', 'email', 'roleName', 'status']
+    head: ['First Name', 'Email', 'Role', 'Shares', 'Paid', 'Remaining', 'Status', 'Actions'],
+    row: ['firstName', 'email', 'roleName', 'sharesBoughtAmount', 'amountPaid', 'amountRemaining', 'status']
   };
 
   const handleAddUser = () => {
@@ -185,6 +228,15 @@ const Users = () => {
         {row.roleName || '-'}
       </td>
       <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
+        {row.sharesBoughtAmount ?? '-'}
+      </td>
+      <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
+        {row.amountPaid ?? '-'}
+      </td>
+      <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
+        {row.amountRemaining ?? '-'}
+      </td>
+      <td className="px-1.5 sm:px-2 py-1.5 text-[10px] sm:text-xs text-gray-800 border-r border-gray-100">
         <span className="px-2 py-1 text-xs font-medium bg-green-100 text-green-800 rounded-full">
           {row.status || 'Active'}
         </span>
@@ -229,7 +281,7 @@ const Users = () => {
   );
 
   const SkeletonRowComponent = () => (
-    <TableSkeletonRow columns={4} withActions withIndex actionCount={2} />
+    <TableSkeletonRow columns={7} withActions withIndex actionCount={2} />
   );
 
   return (
@@ -239,22 +291,47 @@ const Users = () => {
           <h1 className="text-3xl font-bold text-gray-800">Users Management</h1>
           <button
             onClick={handleAddUser}
-            disabled={!canCreateUser || institutionMissing}
+            disabled={!canCreateUser}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
           >
             + Add User
           </button>
         </div>
 
-        {institutionMissing && (
-          <div className="p-4 mb-4 bg-yellow-50 border border-yellow-200 rounded-lg text-yellow-800">
-            Admin is not assigned to institution, contact super admin
-          </div>
-        )}
-
         {queuedEmailBanner && (
           <div className="p-4 mb-4 bg-amber-50 border border-amber-200 rounded-lg text-amber-800">
             {queuedEmailBanner}
+          </div>
+        )}
+
+        {isSuperAdmin && (
+          <div className="mb-4 p-4 border border-blue-200 rounded-lg bg-blue-50">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="text-sm font-semibold text-blue-900">Shareholder Price Per Share</div>
+                <div className="text-xs text-blue-700">
+                  Current: {ppsLoading ? 'Loading...' : pricePerShare}
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={1}
+                  step="1"
+                  value={pricePerShareInput}
+                  onChange={(e) => setPricePerShareInput(e.target.value)}
+                  className="w-40 px-3 py-2 border border-blue-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  disabled={ppsLoading || ppsSaving}
+                />
+                <button
+                  onClick={onSavePricePerShare}
+                  disabled={ppsLoading || ppsSaving}
+                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {ppsSaving ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            </div>
           </div>
         )}
 

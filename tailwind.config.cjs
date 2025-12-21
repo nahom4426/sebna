@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 const withMT = require("@material-tailwind/react/utils/withMT");
 
-module.exports = withMT({
+ module.exports = withMT({
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: 'class', // Enable class-based dark mode
   theme: {
@@ -9,39 +9,39 @@ module.exports = withMT({
       colors: {
         // Sebna Brand Colors
         'sebna': {
-          'navy': '#1e3a8a',
+          'navy': '#00174b',
           'orange': '#f43b11',
-          'navy-light': '#2d4b9e',
-          'orange-light': '#f55b33',
+          'navy-light': '#00174b',
+          'orange-light': '#f43b11',
         },
         // Custom colors for your existing theme
-        'primary': 'rgb(60 60 158)',
-        'secondary': 'rgb(31 56 76)',
+        'primary': '#00174b',
+        'secondary': '#00174b',
         'accent': 'rgb(224 229 242)',
         'dark': 'rgb(32 34 36)',
-        'text-clr': 'rgb(31 56 76)',
+        'text-clr': '#00174b',
         'base-clr': 'rgb(248 250 255)',
         'base-clr2': 'rgb(247 248 251)',
         'base-clr3': 'rgb(30 30 30)',
-        'base-clr4': 'rgb(6 86 162)',
-        'base-clr5': 'rgb(43 54 116)',
+        'base-clr4': '#00174b',
+        'base-clr5': '#00174b',
       },
       backgroundImage: {
         // Gradient backgrounds
-        'sebna-gradient': 'linear-gradient(135deg, #1e3a8a 0%, #f43b11 100%)',
-        'sebna-gradient-reverse': 'linear-gradient(135deg, #f43b11 0%, #1e3a8a 100%)',
-        'sebna-gradient-light': 'linear-gradient(135deg, rgba(30, 58, 138, 0.1) 0%, rgba(244, 59, 17, 0.1) 100%)',
-        'gradient-blue': 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-        'gradient-purple': 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
-        'gradient-green': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-        'gradient-orange': 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
-        'gradient-indigo': 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+        'sebna-gradient': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'sebna-gradient-reverse': 'linear-gradient(135deg, #f43b11 0%, #00174b 100%)',
+        'sebna-gradient-light': 'linear-gradient(135deg, rgba(0, 23, 75, 0.1) 0%, rgba(244, 59, 17, 0.1) 100%)',
+        'gradient-blue': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'gradient-purple': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'gradient-green': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'gradient-orange': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'gradient-indigo': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
         // Card gradients
-        'card-gradient-1': 'linear-gradient(135deg, #2563eb 0%, #3b82f6 100%)',
-        'card-gradient-2': 'linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%)',
-        'card-gradient-3': 'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
-        'card-gradient-4': 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)',
-        'card-gradient-5': 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+        'card-gradient-1': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'card-gradient-2': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'card-gradient-3': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'card-gradient-4': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
+        'card-gradient-5': 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
       },
       animation: {
         // Loading animations
@@ -143,7 +143,7 @@ module.exports = withMT({
     function({ addUtilities }) {
       const newUtilities = {
         '.text-gradient': {
-          background: 'linear-gradient(135deg, #1e3a8a 0%, #f43b11 100%)',
+          background: 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',
           '-webkit-background-clip': 'text',
           '-webkit-text-fill-color': 'transparent',
           'background-clip': 'text',

@@ -76,7 +76,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
             aria-label="Toggle menu"
           >
             <svg
-              className="w-6 h-6 text-gray-700 transition-colors group-hover:text-blue-600"
+              className="w-6 h-6 text-gray-700 transition-colors group-hover:text-sebna-navy"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -93,7 +93,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
             className="p-2 rounded-lg transition-colors duration-200 hover:bg-primary/10 group hover:scale-105"
             aria-label="Go back"
           >
-            <svg className="w-5 h-5 text-gray-600 transition-colors duration-200 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-600 transition-colors duration-200 group-hover:text-sebna-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -109,7 +109,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
               {breadcrumbsList.map((crumb, index) => (
                 <span key={index}>
                   {index > 0 && <span>/</span>}
-                  <span className="transition-colors hover:text-blue-600">{crumb.name}</span>
+                  <span className="transition-colors hover:text-sebna-navy">{crumb.name}</span>
                 </span>
               ))}
             </p>
@@ -119,10 +119,10 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
       {/* Center Section - Company Name */}
       <div className="hidden items-center md:flex animate-zoom-in">
-        <div className="px-4 py-2.5 bg-gradient-to-r from-blue-600/10 via-blue-600/5 to-indigo-600/10 rounded-xl border border-blue-600/30 shadow-md backdrop-blur-sm">
+        <div className="px-4 py-2.5 bg-gradient-to-r from-sebna-navy/10 via-sebna-navy/5 to-sebna-orange/10 rounded-xl border border-sebna-navy/30 shadow-md backdrop-blur-sm">
           <div className="flex gap-2 items-center">
-            <div className="w-2 h-2 rounded-full animate-pulse bg-blue-600"></div>
-            <span className="text-sm font-bold tracking-wide text-blue-600 md:text-base">
+            <div className="w-2 h-2 rounded-full animate-pulse bg-sebna-orange"></div>
+            <span className="text-sm font-bold tracking-wide text-sebna-navy md:text-base">
               {auth?.user?.companyName || `${auth?.user?.firstName} ${auth?.user?.fatherName}` || 'Admin'}
             </span>
           </div>
@@ -136,13 +136,13 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
           onClick={() => navigate('/admin/messages')}
           className={`relative p-2 rounded-xl transition-all duration-200 group hover:scale-105 active:scale-95 ${
             isMessagesActive
-              ? 'bg-gradient-to-r from-blue-600/15 to-indigo-600/15 border border-blue-600/30 shadow-sm'
+              ? 'bg-gradient-to-r from-sebna-navy/15 to-sebna-orange/15 border border-sebna-navy/30 shadow-sm'
               : 'hover:bg-gray-100'
           }`}
           aria-label="Messages"
         >
           <svg
-            className={`w-6 h-6 transition-colors ${isMessagesActive ? 'text-blue-600' : 'text-gray-600'} group-hover:text-blue-600`}
+            className={`w-6 h-6 transition-colors ${isMessagesActive ? 'text-sebna-navy' : 'text-gray-600'} group-hover:text-sebna-navy`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -154,7 +154,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
               d="M8 10h8m-8 4h5m6 5l-3.5-2.3a2 2 0 00-1.1-.3H8a4 4 0 01-4-4V7a4 4 0 014-4h8a4 4 0 014 4v8a4 4 0 01-2 3.5V19z"
             />
           </svg>
-          <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 border-2 border-white"></span>
+          <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-sebna-orange border-2 border-white"></span>
         </button>
 
         {/* Language Selector (Hidden on mobile) */}
@@ -164,9 +164,9 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
               onClick={() => setShowLanguageMenu(!showLanguageMenu)}
               className="flex gap-2 items-center px-2 py-2 rounded-lg transition-all duration-200 md:px-3 hover:bg-gray-100 group hover:scale-105"
             >
-              <span className="text-xs font-medium text-gray-700 md:text-sm group-hover:text-blue-600">ENG</span>
+              <span className="text-xs font-medium text-gray-700 md:text-sm group-hover:text-sebna-navy">ENG</span>
               <svg
-                className={`w-4 h-4 text-gray-500 transition-transform group-hover:text-blue-600 ${showLanguageMenu ? 'rotate-180' : ''}`}
+                className={`w-4 h-4 text-gray-500 transition-transform group-hover:text-sebna-navy ${showLanguageMenu ? 'rotate-180' : ''}`}
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -199,19 +199,19 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
                   onError={handleImageError}
                 />
               </div>
-              <span className="absolute -right-0.5 -bottom-0.5 w-2.5 h-2.5 bg-green-500 rounded-full border-2 border-white md:w-3 md:h-3"></span>
+              <span className="absolute -right-0.5 -bottom-0.5 w-2.5 h-2.5 bg-sebna-orange rounded-full border-2 border-white md:w-3 md:h-3"></span>
             </div>
 
             <div className="hidden flex-col items-start lg:flex">
               <span className="text-sm font-semibold text-gray-800 max-w-[120px] line-clamp-1">
                 {auth?.user?.firstName} {auth?.user?.fatherName || 'User'}
               </span>
-              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-blue-600/10 text-blue-600">
+              <span className="px-2 py-0.5 text-xs font-medium rounded-full bg-sebna-navy/10 text-sebna-navy">
                 {auth?.user?.roleName || 'Admin'}
               </span>
             </div>
             <svg
-              className={`hidden w-4 h-4 text-gray-500 transition-transform md:block group-hover:text-blue-600 ${showUserMenu ? 'rotate-180' : ''}`}
+              className={`hidden w-4 h-4 text-gray-500 transition-transform md:block group-hover:text-sebna-navy ${showUserMenu ? 'rotate-180' : ''}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -265,7 +265,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
                   navigate('/auth/sign-in', { replace: true });
                   setShowUserMenu(false);
                 }}
-                className="flex gap-3 items-center p-2 text-red-500 rounded-lg transition-all duration-200 hover:bg-red-50"
+                className="flex gap-3 items-center p-2 text-sebna-orange rounded-lg transition-all duration-200 hover:bg-sebna-orange/10"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />

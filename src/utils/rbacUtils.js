@@ -53,11 +53,8 @@ export const getDefaultRouteForRole = (userRole) => {
   if (role === 'super_admin' || role === 'SUPER_ADMIN' || role === 'Super Admin') {
     return '/admin/users';
   }
-  if (role === 'company_admin' || role === 'COMPANY_ADMIN' || role === 'Company Admin') {
-    return '/admin/users';
-  }
-  if (role === 'company_user' || role === 'COMPANY_USER' || role === 'Company User') {
-    return '/admin/posts';
+  if (role === 'shareholders' || role === 'SHAREHOLDERS' || role === 'Shareholders') {
+    return '/dashboard/home';
   }
   return '/dashboard/home';
 };

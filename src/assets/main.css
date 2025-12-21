@@ -6,16 +6,16 @@
 
 @layer base {
   :root {
-    --primary: 60 60 158;
-    --secondary: 31 56 76;
+    --primary: 0 23 75;
+    --secondary: 0 23 75;
     --accent: 224 229 242;
     --dark: 32 34 36;
     --text-clr: var(--secondary);
     --base-clr: 248 250 255;
     --base-clr2: 247 248 251;
     --base-clr3: 30 30 30;
-    --base-clr4: 6 86 162;
-    --base-clr5: 43 54 116;
+    --base-clr4: 0 23 75;
+    --base-clr5: 0 23 75;
     --drawer-width: 18rem;
     --navbar-height: 3.5rem;
   }

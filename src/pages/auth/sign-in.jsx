@@ -47,13 +47,13 @@ const InputField = ({ icon: Icon, type, placeholder, value, onChange, className 
     >
       <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
         <Icon className={`h-5 w-5 transition-all duration-300 ${
-          isFocused ? 'text-blue-500 scale-110' : 
-          isHovered ? 'text-blue-400' : 'text-gray-400'
+          isFocused ? 'text-sebna-navy scale-110' : 
+          isHovered ? 'text-sebna-orange' : 'text-gray-400'
         }`} />
       </div>
       <motion.input
         type={isPassword && showPassword ? 'text' : type}
-        className="w-full pl-12 pr-12 py-4 bg-white/95 backdrop-blur-sm border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-400 shadow-sm transition-all duration-500"
+        className="w-full pl-12 pr-12 py-4 bg-white/95 backdrop-blur-sm border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-sebna-navy/20 focus:border-sebna-navy shadow-sm transition-all duration-500"
         placeholder={placeholder}
         value={value}
         onChange={onChange}
@@ -64,12 +64,12 @@ const InputField = ({ icon: Icon, type, placeholder, value, onChange, className 
         {...props}
         animate={{
           boxShadow: isFocused 
-            ? '0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04)'
+            ? '0 10px 25px -5px rgba(0, 23, 75, 0.12), 0 10px 10px -5px rgba(0, 23, 75, 0.05)'
             : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
           borderColor: isFocused 
-            ? '#60a5fa' 
+            ? '#00174b' 
             : isHovered 
-              ? '#93c5fd' 
+              ? '#f43b11' 
               : '#e5e7eb'
         }}
       />
@@ -120,7 +120,7 @@ const OtpInput = ({ value, onChange, disabled = false, loading = false }) => {
               document.getElementById(`otp-${index - 1}`)?.focus();
             }
           }}
-          className="w-16 h-16 text-center text-3xl font-bold bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-blue-500/30 focus:border-blue-400 outline-none transition-all duration-300"
+          className="w-16 h-16 text-center text-3xl font-bold bg-gradient-to-br from-white to-gray-50 border-2 border-gray-200 rounded-xl focus:ring-4 focus:ring-sebna-navy/30 focus:border-sebna-navy outline-none transition-all duration-300"
           disabled={disabled || loading}
           whileFocus={{ scale: 1.05 }}
           whileHover={{ scale: 1.02 }}
@@ -138,7 +138,7 @@ const GlassCard = ({ children, className = '', hover = true }) => (
     transition={{ type: "spring", stiffness: 300, damping: 20 }}
   >
     {/* Gradient border effect */}
-    <div className="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-10 rounded-3xl" />
+    <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy via-sebna-orange to-sebna-navy opacity-10 rounded-3xl" />
     <div className="absolute inset-[1px] bg-gradient-to-br from-white/95 via-white/90 to-white/95 backdrop-blur-xl rounded-3xl" />
     <div className="relative z-10">{children}</div>
   </motion.div>
@@ -195,7 +195,7 @@ const SignIn = () => {
     <div className="absolute inset-0 overflow-hidden">
       {/* Animated gradient orbs */}
       <motion.div 
-        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-blue-500/10 to-purple-500/10 blur-3xl"
+        className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 blur-3xl"
         animate={{
           x: [0, 50, 0],
           y: [0, -50, 0],
@@ -208,7 +208,7 @@ const SignIn = () => {
         }}
       />
       <motion.div 
-        className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-pink-500/10 to-orange-500/10 blur-3xl"
+        className="absolute bottom-1/4 right-1/4 w-96 h-96 rounded-full bg-gradient-to-r from-sebna-orange/10 to-sebna-navy/10 blur-3xl"
         animate={{
           x: [0, -30, 0],
           y: [0, 30, 0],
@@ -225,7 +225,7 @@ const SignIn = () => {
       {[...Array(12)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-blue-400/30 to-purple-400/30"
+          className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-sebna-navy/25 to-sebna-orange/25"
           style={{
             left: `${Math.random() * 100}%`,
             top: `${Math.random() * 100}%`,
@@ -436,14 +436,14 @@ const SignIn = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+    <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 overflow-hidden bg-gradient-to-br from-gray-50 via-sebna-navy/5 to-sebna-orange/5">
       <ParticleBackground />
       
       {/* Background grid pattern */}
       <div className="absolute inset-0 opacity-5">
         <div className="absolute inset-0" style={{
-          backgroundImage: `linear-gradient(to right, #3b82f6 1px, transparent 1px),
-                           linear-gradient(to bottom, #3b82f6 1px, transparent 1px)`,
+          backgroundImage: `linear-gradient(to right, #00174b 1px, transparent 1px),
+                           linear-gradient(to bottom, #00174b 1px, transparent 1px)`,
           backgroundSize: '50px 50px',
         }} />
       </div>
@@ -451,7 +451,7 @@ const SignIn = () => {
       {/* Back Button */}
       <motion.button 
         onClick={handleBack}
-        className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-xl text-gray-600 hover:text-blue-600 hover:bg-white transition-all group border border-white/40 shadow-lg"
+        className="absolute top-6 left-6 sm:top-8 sm:left-8 z-20 flex items-center gap-2 px-4 py-2 bg-white/80 backdrop-blur-sm rounded-xl text-gray-600 hover:text-sebna-navy hover:bg-white transition-all group border border-white/40 shadow-lg"
         whileHover={{ x: -4, scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
         initial={{ opacity: 0, x: -20 }}
@@ -483,11 +483,11 @@ const SignIn = () => {
             transition={{ delay: 0.2, type: "spring" }}
           >
             <motion.div 
-              className="mb-6 p-4 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 rounded-2xl shadow-lg relative overflow-hidden"
+              className="mb-6 p-4 bg-gradient-to-r from-sebna-navy via-sebna-orange to-sebna-navy rounded-2xl shadow-lg relative overflow-hidden"
               whileHover={{ scale: 1.05, rotate: 5 }}
               transition={{ type: "spring", stiffness: 200 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600/20 via-purple-600/20 to-pink-600/20 animate-pulse" />
+              <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy/20 via-sebna-orange/20 to-sebna-navy/20 animate-pulse" />
               <img 
                 src={logo} 
                 alt="Logo" 
@@ -495,7 +495,7 @@ const SignIn = () => {
               />
             </motion.div>
             <div className="text-center">
-              <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
                 Welcome Back
               </h1>
               <p className="text-gray-500 mt-2">Sign in to your account to continue</p>
@@ -521,7 +521,7 @@ const SignIn = () => {
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                   <FiMail className={`h-5 w-5 transition-all duration-300 ${
-                    isEmailFocused ? 'text-blue-500 scale-110' : 'text-gray-400'
+                    isEmailFocused ? 'text-sebna-navy scale-110' : 'text-gray-400'
                   }`} />
                 </div>
                 <motion.input
@@ -531,13 +531,13 @@ const SignIn = () => {
                   onFocus={() => setIsEmailFocused(true)}
                   onBlur={() => setIsEmailFocused(false)}
                   placeholder="Enter your email or phone"
-                  className="w-full pl-12 pr-4 py-4 bg-white/95 border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-400 shadow-sm transition-all duration-500"
+                  className="w-full pl-12 pr-4 py-4 bg-white/95 border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-sebna-navy/20 focus:border-sebna-navy shadow-sm transition-all duration-500"
                   required
                   animate={{
                     boxShadow: isEmailFocused 
-                      ? '0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04)'
+                      ? '0 10px 25px -5px rgba(0, 23, 75, 0.12), 0 10px 10px -5px rgba(0, 23, 75, 0.05)'
                       : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                    borderColor: isEmailFocused ? '#60a5fa' : '#e5e7eb'
+                    borderColor: isEmailFocused ? '#00174b' : '#e5e7eb'
                   }}
                 />
               </div>
@@ -555,7 +555,7 @@ const SignIn = () => {
                 <motion.button
                   type="button"
                   onClick={openForgotPasswordModal}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium transition-colors"
+                  className="text-sm text-sebna-navy hover:text-sebna-orange font-medium transition-colors"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
@@ -565,7 +565,7 @@ const SignIn = () => {
               <div className="relative group">
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none z-10">
                   <FiLock className={`h-5 w-5 transition-all duration-300 ${
-                    isPasswordFocused ? 'text-blue-500 scale-110' : 'text-gray-400'
+                    isPasswordFocused ? 'text-sebna-navy scale-110' : 'text-gray-400'
                   }`} />
                 </div>
                 <motion.input
@@ -575,13 +575,13 @@ const SignIn = () => {
                   onFocus={() => setIsPasswordFocused(true)}
                   onBlur={() => setIsPasswordFocused(false)}
                   placeholder="Enter your password"
-                  className="w-full pl-12 pr-12 py-4 bg-white/95 border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-blue-500/20 focus:border-blue-400 shadow-sm transition-all duration-500"
+                  className="w-full pl-12 pr-12 py-4 bg-white/95 border border-gray-200/80 rounded-2xl text-gray-700 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-sebna-navy/20 focus:border-sebna-navy shadow-sm transition-all duration-500"
                   required
                   animate={{
                     boxShadow: isPasswordFocused 
-                      ? '0 10px 25px -5px rgba(59, 130, 246, 0.1), 0 10px 10px -5px rgba(59, 130, 246, 0.04)'
+                      ? '0 10px 25px -5px rgba(0, 23, 75, 0.12), 0 10px 10px -5px rgba(0, 23, 75, 0.05)'
                       : '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-                    borderColor: isPasswordFocused ? '#60a5fa' : '#e5e7eb'
+                    borderColor: isPasswordFocused ? '#00174b' : '#e5e7eb'
                   }}
                 />
                 <motion.button
@@ -610,7 +610,7 @@ const SignIn = () => {
                 id="remember"
                 checked={rememberMe}
                 onChange={(e) => setRememberMe(e.target.checked)}
-                className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-2 focus:ring-blue-500/30"
+                className="w-5 h-5 text-sebna-navy border-gray-300 rounded focus:ring-2 focus:ring-sebna-navy/30"
               />
               <label htmlFor="remember" className="ml-3 text-sm text-gray-600 cursor-pointer select-none">
                 Keep me logged in
@@ -623,10 +623,10 @@ const SignIn = () => {
               disabled={loginReqPending}
               whileHover={{ scale: 1.02, y: -2 }}
               whileTap={{ scale: 0.98 }}
-              className="relative w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden group"
+              className="relative w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-sebna-navy via-sebna-orange to-sebna-navy text-white font-semibold shadow-lg hover:shadow-xl hover:shadow-sebna-navy/20 transition-all duration-300 disabled:opacity-70 disabled:cursor-not-allowed overflow-hidden group"
             >
               {/* Animated gradient background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+              <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy via-sebna-orange to-sebna-navy opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
               
               {/* Shimmer effect */}
               <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000" />
@@ -688,7 +688,7 @@ const SignIn = () => {
               whileHover={{ y: -2, scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
             >
-              <div className="w-6 h-6 mr-3 bg-blue-600 rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 mr-3 bg-sebna-navy rounded-full flex items-center justify-center">
                 <FiUser className="w-4 h-4 text-white" />
               </div>
               <span className="text-sm font-medium text-gray-700">Facebook</span>
@@ -706,7 +706,7 @@ const SignIn = () => {
               Don't have an account?
               <motion.button
                 onClick={goToSignup}
-                className="ml-2 text-blue-600 hover:text-blue-800 font-semibold transition-colors"
+                className="ml-2 text-sebna-navy hover:text-sebna-orange font-semibold transition-colors"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
@@ -766,12 +766,12 @@ const SignIn = () => {
                         value={phoneNumber}
                         onChange={(e) => setPhoneNumber(e.target.value)}
                         placeholder="+1 (555) 123-4567"
-                        className="flex-1 py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none transition-all bg-white/95"
+                        className="flex-1 py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-sebna-navy/30 focus:border-sebna-navy outline-none transition-all bg-white/95"
                       />
                       <motion.button
                         onClick={sendVerification}
                         disabled={!phoneNumber.trim() || verifyReqPending}
-                        className="px-6 py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-6 py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -794,7 +794,7 @@ const SignIn = () => {
                     <p className="text-center text-sm text-gray-500 mt-4">
                       Didn't receive code?
                       <motion.button 
-                        className="ml-2 text-blue-600 hover:text-blue-800 font-medium"
+                        className="ml-2 text-sebna-navy hover:text-sebna-orange font-medium"
                         whileHover={{ scale: 1.05 }}
                         whileTap={{ scale: 0.95 }}
                       >
@@ -816,7 +816,7 @@ const SignIn = () => {
                     <motion.button
                       onClick={submitVerification}
                       disabled={otpInputs.join('').length < 4 || verifyReqPending}
-                      className="flex-1 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                     >
@@ -862,7 +862,7 @@ const SignIn = () => {
                           <motion.div 
                             className={`w-10 h-10 rounded-full flex items-center justify-center ${
                               forgotStep >= step 
-                                ? 'bg-gradient-to-r from-blue-500 to-purple-500 text-white' 
+                                ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white' 
                                 : 'bg-gray-100 text-gray-400'
                             }`}
                             whileHover={{ scale: 1.1 }}
@@ -874,7 +874,7 @@ const SignIn = () => {
                             )}
                           </motion.div>
                           {step < 3 && (
-                            <div className={`w-12 h-1 ${forgotStep > step ? 'bg-gradient-to-r from-blue-500 to-purple-500' : 'bg-gray-200'}`} />
+                            <div className={`w-12 h-1 ${forgotStep > step ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange' : 'bg-gray-200'}`} />
                           )}
                         </React.Fragment>
                       ))}
@@ -900,7 +900,7 @@ const SignIn = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                     >
-                      <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl">
+                      <div className="text-center p-6 bg-gradient-to-br from-sebna-navy/5 to-sebna-orange/5 rounded-2xl">
                         <FcFeedback className="w-16 h-16 mx-auto mb-4" />
                         <h4 className="font-semibold text-gray-700">Enter your email</h4>
                         <p className="text-sm text-gray-500 mt-1">We'll send a verification code</p>
@@ -910,12 +910,12 @@ const SignIn = () => {
                         value={forgotEmail}
                         onChange={(e) => setForgotEmail(e.target.value)}
                         placeholder="Enter your email"
-                        className="w-full py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white/95"
+                        className="w-full py-3 px-4 border border-gray-200 rounded-xl focus:ring-3 focus:ring-sebna-navy/30 focus:border-sebna-navy outline-none bg-white/95"
                       />
                       <motion.button
                         onClick={sendForgotPassword}
                         disabled={!forgotEmail.trim() || forgotReqPending}
-                        className="w-full py-3 bg-gradient-to-r from-blue-500 to-blue-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+                        className="w-full py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
@@ -932,12 +932,12 @@ const SignIn = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                     >
-                      <div className="text-center p-6 bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl">
+                      <div className="text-center p-6 bg-gradient-to-br from-sebna-navy/5 to-sebna-orange/5 rounded-2xl">
                         <FcAcceptDatabase className="w-16 h-16 mx-auto mb-4" />
                         <h4 className="font-semibold text-gray-700">Enter Verification Code</h4>
                         <p className="text-sm text-gray-500 mt-1">Check your email for the code</p>
                       </div>
-                      <OtpInput 
+                      <OtpInput
                         value={forgotOtpInputs}
                         onChange={setForgotOtpInputs}
                         disabled={forgotReqPending}
@@ -946,11 +946,18 @@ const SignIn = () => {
                       <motion.button
                         onClick={verifyForgotOtp}
                         disabled={forgotOtpInputs.join('').length < 6 || forgotReqPending}
-                        className="w-full py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+                        className="w-full py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        {forgotReqPending ? 'Verifying...' : 'Verify Code'}
+                        {forgotReqPending ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <FiRefreshCw className="w-4 h-4 animate-spin" />
+                            Verifying...
+                          </span>
+                        ) : (
+                          'Verify Code'
+                        )}
                       </motion.button>
                     </motion.div>
                   )}
@@ -963,11 +970,12 @@ const SignIn = () => {
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: -20 }}
                     >
-                      <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-pink-50 rounded-2xl">
+                      <div className="text-center p-6 bg-gradient-to-br from-sebna-navy/5 to-sebna-orange/5 rounded-2xl">
                         <FcApproval className="w-16 h-16 mx-auto mb-4" />
                         <h4 className="font-semibold text-gray-700">Create New Password</h4>
-                        <p className="text-sm text-gray-500 mt-1">Check your email and set a new password</p>
+                        <p className="text-sm text-gray-500 mt-1">Set a new password for your account</p>
                       </div>
+
                       <div className="space-y-4">
                         <div className="relative">
                           <input
@@ -975,49 +983,50 @@ const SignIn = () => {
                             value={newPassword}
                             onChange={(e) => setNewPassword(e.target.value)}
                             placeholder="New password"
-                            className="w-full py-3 px-4 pr-12 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white/95"
+                            className="w-full py-3 px-4 pr-12 border border-gray-200 rounded-xl focus:ring-3 focus:ring-sebna-navy/30 focus:border-sebna-navy outline-none bg-white/95"
                           />
                           <button
                             type="button"
-                            onClick={() => setShowNewPassword(!showNewPassword)}
-                            className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                            onClick={() => setShowNewPassword((v) => !v)}
+                            className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-600"
                           >
-                            {showNewPassword ? (
-                              <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                            ) : (
-                              <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                            )}
+                            {showNewPassword ? <FiEyeOff /> : <FiEye />}
                           </button>
                         </div>
+
                         <div className="relative">
                           <input
                             type={showConfirmPassword ? 'text' : 'password'}
                             value={confirmPassword}
                             onChange={(e) => setConfirmPassword(e.target.value)}
                             placeholder="Confirm password"
-                            className="w-full py-3 px-4 pr-12 border border-gray-200 rounded-xl focus:ring-3 focus:ring-blue-500/30 focus:border-blue-500 outline-none bg-white/95"
+                            className="w-full py-3 px-4 pr-12 border border-gray-200 rounded-xl focus:ring-3 focus:ring-sebna-navy/30 focus:border-sebna-navy outline-none bg-white/95"
                           />
                           <button
                             type="button"
-                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                            className="absolute inset-y-0 right-0 pr-4 flex items-center"
+                            onClick={() => setShowConfirmPassword((v) => !v)}
+                            className="absolute inset-y-0 right-0 px-4 flex items-center text-gray-400 hover:text-gray-600"
                           >
-                            {showConfirmPassword ? (
-                              <FiEyeOff className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                            ) : (
-                              <FiEye className="h-5 w-5 text-gray-400 hover:text-gray-600" />
-                            )}
+                            {showConfirmPassword ? <FiEyeOff /> : <FiEye />}
                           </button>
                         </div>
                       </div>
+
                       <motion.button
                         onClick={submitResetPassword}
                         disabled={!newPassword.trim() || !confirmPassword.trim() || forgotReqPending}
-                        className="w-full py-3 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
+                        className="w-full py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-medium rounded-xl hover:shadow-lg transition-all disabled:opacity-50"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
-                        {forgotReqPending ? 'Resetting...' : 'Reset Password'}
+                        {forgotReqPending ? (
+                          <span className="flex items-center justify-center gap-2">
+                            <FiRefreshCw className="w-4 h-4 animate-spin" />
+                            Resetting...
+                          </span>
+                        ) : (
+                          'Reset Password'
+                        )}
                       </motion.button>
                     </motion.div>
                   )}
@@ -1029,8 +1038,8 @@ const SignIn = () => {
       </AnimatePresence>
 
       {/* Footer Note */}
-      <motion.div 
-        className="absolute bottom-6 left-0 right-0 text-center"
+      {/* <motion.div 
+        className="absolute bottom-18 left-0 right-0 text-center"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.8 }}
@@ -1038,7 +1047,7 @@ const SignIn = () => {
         <p className="text-sm text-gray-500">
           By signing in, you agree to our 
           <motion.button 
-            className="mx-1 text-blue-600 hover:underline"
+            className="mx-1 text-sebna-navy hover:underline"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
@@ -1046,14 +1055,14 @@ const SignIn = () => {
           </motion.button>
           and 
           <motion.button 
-            className="mx-1 text-blue-600 hover:underline"
+            className="mx-1 text-sebna-navy hover:underline"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
           >
             Privacy Policy
           </motion.button>
         </p>
-      </motion.div>
+      </motion.div> */}
     </div>
   );
 };

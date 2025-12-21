@@ -4,7 +4,7 @@ import MainLayout from '@/layouts/MainLayout';
 import SignIn from '@/pages/auth/sign-in';
 import SignUp from '@/pages/auth/sign-up';
 import { Home, Profile, Tables, Notifications } from '@/features/dashboard';
-import { Users, Roles, Privileges, Institutions, Posts, Messages, Comments, Logs } from '@/pages/admin';
+import { Users, Roles, Privileges, Posts, Messages, Comments, Logs } from '@/pages/admin';
 import EditRole from '@/pages/admin/roles/pages/EditRole';
 import CreateRole from '@/pages/admin/roles/pages/CreateRole';
 import EditPrivilege from '@/pages/admin/privileges/pages/EditPrivilege';
@@ -130,19 +130,6 @@ const AppRouter = () => {
               element={<CreatePrivilege />}
               requiredRoles={[
                 ROLES.CREATE_PRIVILEGE,
-              ]}
-            />
-          }
-        />
-
-        {/* Admin Routes - Institutions Management */}
-        <Route
-          path="/admin/institutions"
-          element={
-            <ProtectedRoute
-              element={<Institutions />}
-              requiredRoles={[
-                ROLES.READ_INSTITUTIONS,
               ]}
             />
           }
