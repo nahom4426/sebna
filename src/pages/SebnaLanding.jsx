@@ -1246,7 +1246,7 @@ const SebnaLanding = () => {
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {[
               {
-                image: '/img/oMF3X7wxIJ0X.jpg',
+                image: '/img/W83dIgAvVmg6.jpg',
                 name: 'Commercial Bank',
                 fullName: 'Commercial Bank of Ethiopia',
                 description: 'Ethiopia\'s largest bank with nationwide coverage and digital banking solutions.',
@@ -1273,9 +1273,9 @@ const SebnaLanding = () => {
                 delay: '300'
               },
               {
-                image: '/img/GE0ArumTXX7m.png',
-                name: 'NIB Bank',
-                fullName: 'NIB International Bank',
+                image: '/img/wegagen.jpg',
+                name: 'WEGAGEN Bank',
+                fullName: 'WEGAGEN Bank',
                 description: 'International banking services with focus on trade finance and foreign exchange.',
                 features: ['Foreign Exchange', 'Trade Finance', 'International Transfer'],
                 gradient: 'from-sebna-navy to-sebna-orange',
