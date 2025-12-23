@@ -24,6 +24,14 @@ export const useAuthStore = create((set, get) => ({
     }
   },
 
+  patchAuthUser: (patch = {}) => {
+    const current = get().auth;
+    if (!current?.user) return;
+    const next = { ...current, user: { ...current.user, ...patch } };
+    get().setAuth(next);
+    localStorage.setItem('userDetail', JSON.stringify(next.user));
+  },
+
   setProfile: (imageData) => {
     set({ imageData });
     if (imageData) {

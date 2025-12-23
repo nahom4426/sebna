@@ -10,6 +10,8 @@ import CreateRole from '@/pages/admin/roles/pages/CreateRole';
 import EditPrivilege from '@/pages/admin/privileges/pages/EditPrivilege';
 import CreatePrivilege from '@/pages/admin/privileges/pages/CreatePrivilege';
 import SebnaLanding from '@/pages/SebnaLanding';
+import News from '@/pages/News';
+import ShareholderDashboard from '@/pages/ShareholderDashboard';
 import ProtectedRoute from './ProtectedRoute';
 import { ROLES } from '@/constants/roles';
 import { useAuthStore } from '@/stores/authStore';
@@ -23,11 +25,16 @@ const AppRouter = () => {
     <Routes>
       {/* Public Routes */}
       <Route path="/" element={<SebnaLanding />} />
+      <Route path="/news" element={<News />} />
       <Route path="/auth/sign-in" element={<SignIn />} />
       <Route path="/auth/sign-up" element={<SignUp />} />
 
       {/* Protected Dashboard Routes */}
       <Route element={<MainLayout />}>
+        <Route
+          path="/dashboard/shareholder"
+          element={<ProtectedRoute element={<ShareholderDashboard />} />}
+        />
         <Route
           path="/dashboard/home"
           element={

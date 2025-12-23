@@ -54,7 +54,7 @@ export const getDefaultRouteForRole = (userRole) => {
     return '/admin/users';
   }
   if (role === 'shareholders' || role === 'SHAREHOLDERS' || role === 'Shareholders') {
-    return '/dashboard/home';
+    return '/dashboard/shareholder';
   }
   return '/dashboard/home';
 };

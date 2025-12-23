@@ -257,9 +257,19 @@ const SignIn = () => {
       const response = await login({ email, password });
       
       if (response.success) {
+        const initialShareStats =
+          response.data?.shareStats ||
+          response.data?.shareStatsDto ||
+          response.data?.share_stats ||
+          response.data?.shareStatsResponse ||
+          null;
+
         // Set auth in store
         setAuth({
-          user: response.data,
+          user: {
+            ...response.data,
+            ...(initialShareStats ? { shareStats: initialShareStats } : {}),
+          },
           accessToken: response.data?.token || response.data?.accessToken,
         });
         localStorage.setItem('userDetail', JSON.stringify(response.data));
@@ -483,15 +493,14 @@ const SignIn = () => {
             transition={{ delay: 0.2, type: "spring" }}
           >
             <motion.div 
-              className="mb-6 p-4 bg-gradient-to-r from-sebna-navy via-sebna-orange to-sebna-navy rounded-2xl shadow-lg relative overflow-hidden"
+              className="mb-6"
               whileHover={{ scale: 1.05, rotate: 5 }}
               transition={{ type: "spring", stiffness: 200 }}
             >
-              <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy/20 via-sebna-orange/20 to-sebna-navy/20 animate-pulse" />
               <img 
                 src={logo} 
                 alt="Logo" 
-                className="h-12 sm:h-16 w-auto filter brightness-0 invert relative z-10" 
+                className="h-12 sm:h-16 w-auto" 
               />
             </motion.div>
             <div className="text-center">

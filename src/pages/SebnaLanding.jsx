@@ -6,9 +6,7 @@ import { Button } from '@/components';
 import { getLandingPosts, getPublicPostById } from '@/pages/admin/posts/api/PostsApi';
 import { checkIfPublicUserLiked, togglePublicLike } from '@/pages/admin/posts/api/LikesApi';
 import { getPublicPostComments, createPublicComment } from '@/pages/admin/comments/api/CommentsApi';
-import { getAllInstitution } from '@/pages/admin/institutions/api/InstitutionsApi';
 import { getPricePerSharePublic } from '@/pages/admin/api/SebnaSettingsApi';
-import pako from 'pako';
 import brandLogo from '@/assets/logo.svg';
 import brandIcon from '@/assets/Icon@300x.png';
 import { 
@@ -47,6 +45,7 @@ import {
   BriefcaseIcon,
   UserIcon
 } from '@heroicons/react/24/outline';
+
 import { 
   HeartIcon as HeartSolidIcon,
   StarIcon as StarSolidIcon
@@ -60,12 +59,15 @@ const SebnaLanding = () => {
   const [currentPrice, setCurrentPrice] = useState(10000);
   const [priceChange, setPriceChange] = useState(0);
   const [priceHistory, setPriceHistory] = useState(() => Array.from({ length: 24 }, () => 10000));
+  const [priceLoading, setPriceLoading] = useState(true);
+  const hasLoadedPriceRef = useRef(false);
   const [newsFilter, setNewsFilter] = useState('all');
   const [landingPosts, setLandingPosts] = useState([]);
   const [newsLimit, setNewsLimit] = useState(8);
   const [newsTotalElements, setNewsTotalElements] = useState(0);
   const [newsLast, setNewsLast] = useState(false);
   const [newsLoading, setNewsLoading] = useState(false);
+
   const [selectedPostIndex, setSelectedPostIndex] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
   const [postModalOpen, setPostModalOpen] = useState(false);
@@ -79,8 +81,6 @@ const SebnaLanding = () => {
   const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
-  const [institutions, setInstitutions] = useState([]);
-  const [institutionsLoading, setInstitutionsLoading] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   // Handle scroll for navbar effect
@@ -126,6 +126,12 @@ const SebnaLanding = () => {
   };
 
   const scrollToSection = (sectionId) => {
+    if (sectionId === 'news') {
+      navigate('/news');
+      setMobileMenuOpen(false);
+      return;
+    }
+
     try {
       const el = document.getElementById(sectionId);
       if (!el) return;
@@ -156,24 +162,6 @@ const SebnaLanding = () => {
       return post.imageBase64.startsWith('data:') ? post.imageBase64 : `data:image/jpeg;base64,${post.imageBase64}`;
     }
     return '';
-  };
-
-  const decompressLogo = (compressedBase64) => {
-    if (!compressedBase64) return null;
-    try {
-      if (String(compressedBase64).startsWith('data:')) return compressedBase64;
-      const binaryString = atob(compressedBase64);
-      const bytes = new Uint8Array(binaryString.length);
-      for (let i = 0; i < binaryString.length; i++) {
-        bytes[i] = binaryString.charCodeAt(i);
-      }
-      const decompressed = pako.inflate(bytes);
-      const binaryDecompressed = String.fromCharCode.apply(null, decompressed);
-      const decompressedBase64 = btoa(binaryDecompressed);
-      return `data:image/png;base64,${decompressedBase64}`;
-    } catch (error) {
-      return null;
-    }
   };
 
   // Check if mobile on mount and resize
@@ -241,28 +229,61 @@ const SebnaLanding = () => {
 
   const handleLoadMoreNews = () => {
     if (newsLoading) return;
-    setNewsLimit((prev) => prev + 4);
+    navigate('/news');
   };
 
   useEffect(() => {
-    const fetchInstitutions = async () => {
+    let isMounted = true;
+
+    const applyPrice = (nextPrice) => {
+      const next = Number(nextPrice);
+      if (!Number.isFinite(next) || next <= 0) return;
+
+      setCurrentPrice((prev) => {
+        const prevNum = Number(prev);
+        const change = prevNum > 0 ? ((next - prevNum) / prevNum) * 100 : 0;
+        setPriceChange(Number.isFinite(change) ? change : 0);
+        return next;
+      });
+
+      setPriceHistory((prev) => {
+        const safePrev = Array.isArray(prev) ? prev : [];
+        const trimmed = safePrev.slice(-23);
+        return [...trimmed, next];
+      });
+    };
+
+    const fetchLivePrice = async () => {
+      const isInitial = !hasLoadedPriceRef.current;
+      if (isInitial) setPriceLoading(true);
       try {
-        setInstitutionsLoading(true);
-        const res = await getAllInstitution({ page: 1, size: 12 });
-        if (res?.success) {
-          const data = res.data;
-          const list = Array.isArray(data?.response) ? data.response : (Array.isArray(data?.content) ? data.content : []);
-          setInstitutions(Array.isArray(list) ? list : []);
+        const res = await getPricePerSharePublic();
+        const pps = res?.data?.pricePerShare;
+        if (!isMounted) return;
+        if (Number.isFinite(Number(pps)) && Number(pps) > 0) {
+          applyPrice(Number(pps));
         } else {
-          setInstitutions([]);
+          applyPrice(10000);
         }
       } catch (e) {
-        setInstitutions([]);
+        if (!isMounted) return;
+        applyPrice(10000);
       } finally {
-        setInstitutionsLoading(false);
+        if (!isMounted) return;
+        if (!hasLoadedPriceRef.current) {
+          hasLoadedPriceRef.current = true;
+          setPriceLoading(false);
+        }
       }
     };
-    fetchInstitutions();
+
+    fetchLivePrice();
+    const intervalId = setInterval(fetchLivePrice, 60_000);
+
+    return () => {
+      isMounted = false;
+      clearInterval(intervalId);
+    };
   }, []);
 
   useEffect(() => {
@@ -370,51 +391,30 @@ const SebnaLanding = () => {
     }
   };
 
-  useEffect(() => {
-    let isMounted = true;
+  const MetricSkeleton = () => (
+    <div className="group bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/40 shadow-lg animate-pulse">
+      <div className="w-12 h-12 rounded-xl bg-slate-200/70 mb-4" />
+      <div className="h-7 w-28 rounded-lg bg-slate-200/70 mb-2" />
+      <div className="h-4 w-36 rounded-full bg-slate-200/70 mb-3" />
+      <div className="h-4 w-16 rounded-full bg-slate-200/70" />
+    </div>
+  );
 
-    const applyPrice = (nextPrice) => {
-      const next = Number(nextPrice);
-      if (!Number.isFinite(next) || next <= 0) return;
-
-      setCurrentPrice((prev) => {
-        const prevNum = Number(prev);
-        const change = prevNum > 0 ? ((next - prevNum) / prevNum) * 100 : 0;
-        setPriceChange(Number.isFinite(change) ? change : 0);
-        return next;
-      });
-
-      setPriceHistory((prev) => {
-        const safePrev = Array.isArray(prev) ? prev : [];
-        const trimmed = safePrev.slice(-23);
-        return [...trimmed, next];
-      });
-    };
-
-    const fetchLivePrice = async () => {
-      try {
-        const res = await getPricePerSharePublic();
-        const pps = res?.data?.pricePerShare;
-        if (!isMounted) return;
-        if (Number.isFinite(Number(pps)) && Number(pps) > 0) {
-          applyPrice(Number(pps));
-        } else {
-          applyPrice(10000);
-        }
-      } catch (e) {
-        if (!isMounted) return;
-        applyPrice(10000);
-      }
-    };
-
-    fetchLivePrice();
-    const intervalId = setInterval(fetchLivePrice, 60_000);
-
-    return () => {
-      isMounted = false;
-      clearInterval(intervalId);
-    };
-  }, []);
+  const NewsCardSkeleton = () => (
+    <div className="group bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/40 shadow-lg animate-pulse">
+      <div className="h-48 w-full bg-slate-200/70" />
+      <div className="p-6">
+        <div className="flex items-center justify-between mb-3">
+          <div className="h-4 w-24 rounded-full bg-slate-200/70" />
+          <div className="h-4 w-20 rounded-full bg-slate-200/70" />
+        </div>
+        <div className="h-5 w-5/6 rounded-lg bg-slate-200/70 mb-3" />
+        <div className="h-4 w-full rounded-lg bg-slate-200/70 mb-2" />
+        <div className="h-4 w-4/5 rounded-lg bg-slate-200/70 mb-4" />
+        <div className="h-4 w-24 rounded-full bg-slate-200/70" />
+      </div>
+    </div>
+  );
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-sebna-navy/5 to-sebna-orange/5 overflow-x-hidden">
@@ -675,78 +675,81 @@ const SebnaLanding = () => {
                   </button>
                 </div>
 
+                {priceLoading && (
+                  <div className="mb-6 flex items-center justify-center">
+                    <div className="relative">
+                      <div className="h-2 w-64 bg-gray-200 rounded-full overflow-hidden">
+                        <div className="h-full bg-gradient-to-r from-sebna-navy to-sebna-orange animate-loading-bar"></div>
+                      </div>
+                      <div className="mt-2 text-center text-sm font-semibold text-gray-600 animate-pulse">
+                        Loading price...
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 {/* Price Display */}
                 <div className="text-center mb-6">
-                  <div className="inline-flex items-baseline justify-center gap-2 mb-2">
-                    <span className="text-gray-500">ETB</span>
-                    <span className="text-5xl md:text-6xl font-bold text-gray-900">{Number(currentPrice || 0).toLocaleString()}</span>
-                    <span className="bg-sebna-orange/10 text-sebna-orange px-3 py-1 rounded-xl text-sm font-semibold">
-                      {priceChange >= 0 ? '+' : ''}{Number(priceChange || 0).toFixed(1)}%
-                    </span>
-                  </div>
+                  {priceLoading ? (
+                    <div className="flex flex-col items-center gap-3">
+                      <div className="h-12 w-56 rounded-2xl bg-gray-200 animate-pulse" />
+                      <div className="h-4 w-40 rounded-full bg-gray-200 animate-pulse" />
+                    </div>
+                  ) : (
+                    <div className="inline-flex items-baseline justify-center gap-2 mb-2">
+                      <span className="text-gray-500">ETB</span>
+                      <span className="text-5xl md:text-6xl font-bold text-gray-900">{Number(currentPrice || 0).toLocaleString()}</span>
+                      <span className="bg-sebna-orange/10 text-sebna-orange px-3 py-1 rounded-xl text-sm font-semibold">
+                        {priceChange >= 0 ? '+' : ''}{Number(priceChange || 0).toFixed(1)}%
+                      </span>
+                    </div>
+                  )}
                   <p className="text-sm text-gray-500">Real-time trading data</p>
                 </div>
 
                 {/* Chart Placeholder */}
                 <div className="h-48 mb-6 rounded-xl bg-gradient-to-br from-sebna-navy/5 to-sebna-orange/5 border border-white/50 overflow-hidden">
-                  {(() => {
-                    const series = Array.isArray(priceHistory) ? priceHistory : [];
-                    if (series.length < 2) return null;
+                  {priceLoading ? (
+                    <div className="w-full h-full bg-white/40 animate-pulse" />
+                  ) : (
+                    <svg viewBox="0 0 100 40" preserveAspectRatio="none" className="w-full h-full">
+                      <defs>
+                        <linearGradient id="sebnaLine" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0%" stopColor="#1f3a5f" />
+                          <stop offset="100%" stopColor="#f97316" />
+                        </linearGradient>
+                        <linearGradient id="sebnaFill" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#1f3a5f" stopOpacity="0.28" />
+                          <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
+                        </linearGradient>
+                      </defs>
 
-                    const min = Math.min(...series);
-                    const max = Math.max(...series);
-                    const range = Math.max(1, max - min);
-                    const w = 100;
-                    const h = 40;
-                    const pad = 2;
-                    const stepX = (w - pad * 2) / (series.length - 1);
-
-                    const points = series
-                      .map((v, i) => {
-                        const x = pad + i * stepX;
-                        const y = pad + (h - pad * 2) * (1 - (v - min) / range);
-                        return `${x.toFixed(2)},${y.toFixed(2)}`;
-                      })
-                      .join(' ');
-
-                    const areaPoints = `${pad},${h - pad} ${points} ${w - pad},${h - pad}`;
-
-                    return (
-                      <svg viewBox={`0 0 ${w} ${h}`} preserveAspectRatio="none" className="w-full h-full">
-                        <defs>
-                          <linearGradient id="sebnaLine" x1="0" y1="0" x2="1" y2="0">
-                            <stop offset="0%" stopColor="#1f3a5f" />
-                            <stop offset="100%" stopColor="#f97316" />
-                          </linearGradient>
-                          <linearGradient id="sebnaFill" x1="0" y1="0" x2="0" y2="1">
-                            <stop offset="0%" stopColor="#1f3a5f" stopOpacity="0.28" />
-                            <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-
-                        <polyline points={areaPoints} fill="url(#sebnaFill)" stroke="none" />
-                        <polyline
-                          points={points}
-                          fill="none"
-                          stroke="url(#sebnaLine)"
-                          strokeWidth="2"
-                          strokeLinejoin="round"
-                          strokeLinecap="round"
-                        />
-                      </svg>
-                    );
-                  })()}
+                      <polyline points="0,40 20,20 40,40 60,20 80,40 100,20" fill="none" stroke="url(#sebnaLine)" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+                    </svg>
+                  )}
                 </div>
 
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gradient-to-br from-sebna-navy/5 to-sebna-orange/5 rounded-xl p-4">
                     <div className="text-sm text-gray-500 mb-1">24h High</div>
-                    <div className="text-lg font-semibold text-gray-900">ETB {Math.max(...priceHistory).toLocaleString()}</div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {priceLoading ? (
+                        <div className="h-6 w-28 rounded-lg bg-gray-200 animate-pulse" />
+                      ) : (
+                        <>ETB {Math.max(...priceHistory).toLocaleString()}</>
+                      )}
+                    </div>
                   </div>
                   <div className="bg-gradient-to-br from-sebna-orange/5 to-sebna-navy/5 rounded-xl p-4">
                     <div className="text-sm text-gray-500 mb-1">24h Low</div>
-                    <div className="text-lg font-semibold text-gray-900">ETB {Math.min(...priceHistory).toLocaleString()}</div>
+                    <div className="text-lg font-semibold text-gray-900">
+                      {priceLoading ? (
+                        <div className="h-6 w-28 rounded-lg bg-gray-200 animate-pulse" />
+                      ) : (
+                        <>ETB {Math.min(...priceHistory).toLocaleString()}</>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1011,80 +1014,39 @@ const SebnaLanding = () => {
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[
-              {
-                image: '/img/4u2kdUqkvMAv.jpg',
-                icon: AcademicCapIcon,
-                title: 'Education Sector',
-                description: 'Investing in the future through educational infrastructure, technology, and human capital development.',
-                roi: '15-20%',
-                risk: 'Low',
-                gradient: 'from-sebna-navy to-sebna-orange',
-                delay: '100'
-              },
-              {
-                image: '/img/42fr15EGxcLv.jpg',
-                icon: BuildingOfficeIcon,
-                title: 'Real Estate',
-                description: 'Strategic real estate investments in residential, commercial, and mixed-use developments across Tigray.',
-                roi: '12-18%',
-                risk: 'Medium',
-                gradient: 'from-sebna-navy to-sebna-orange',
-                delay: '200'
-              },
-              {
-                image: '/img/NDWoPWeMGLZ3.jpg',
-                icon: ChartBarIcon,
-                title: 'Agriculture',
-                description: 'Sustainable agricultural investments leveraging Tigray\'s fertile lands and traditional farming expertise.',
-                roi: '10-15%',
-                risk: 'Medium',
-                gradient: 'from-sebna-navy to-sebna-orange',
-                delay: '300'
-              }
-            ].map((service, idx) => (
-              <div
-                key={idx}
-                data-aos="fade-up"
-                data-aos-delay={service.delay}
-                className="group relative bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-3xl overflow-hidden border border-white/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-              >
-                <div className="relative h-56 overflow-hidden">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
-                  <div className="absolute top-4 right-4">
-                    <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${service.gradient} flex items-center justify-center`}>
-                      <service.icon className="w-6 h-6 text-white" />
-                    </div>
-                  </div>
+            {priceLoading ? (
+              [...Array(3)].map((_, idx) => (
+                <div key={idx} data-aos="fade-up" data-aos-delay={300 + idx * 100}>
+                  <MetricSkeleton />
                 </div>
-
-                <div className="p-6">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">{service.title}</h3>
-                  <p className="text-gray-600 mb-6">{service.description}</p>
-                  
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="text-sm text-gray-500">ROI</div>
-                      <div className="text-lg font-semibold text-gray-900">{service.roi}</div>
-                    </div>
-                    <div>
-                      <div className="text-sm text-gray-500">Risk</div>
-                      <div className={`text-lg font-semibold ${service.risk === 'Low' ? 'text-green-600' : 'text-yellow-600'}`}>
-                        {service.risk}
-                      </div>
-                    </div>
-                    <button className="px-4 py-2 rounded-lg bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 text-sebna-navy font-semibold hover:from-sebna-navy/20 hover:to-sebna-orange/20 transition-all duration-300">
-                      Learn More
-                    </button>
+              ))
+            ) : (
+              [
+                {
+                  icon: ChartBarIcon,
+                  value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
+                  label: 'Current Share Price',
+                  change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
+                  gradient: 'from-sebna-navy to-sebna-orange'
+                },
+                { icon: WalletIcon, value: 'ETB 250M', label: 'Total Investment', change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '15,247', label: 'Active Investors', change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
+              ].map((metric, idx) => (
+                <div
+                  key={idx}
+                  data-aos="fade-up"
+                  data-aos-delay={300 + idx * 100}
+                  className="group bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${metric.gradient} flex items-center justify-center mb-4`}>
+                    <metric.icon className="w-6 h-6 text-white" />
                   </div>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</div>
+                  <div className="text-sm text-gray-500 mb-2">{metric.label}</div>
+                  <div className="text-sm text-green-600 font-semibold">{metric.change}</div>
                 </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
       </section>
@@ -1120,95 +1082,39 @@ const SebnaLanding = () => {
 
           {/* Metrics Grid */}
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {[
-              { icon: ChartBarIcon, value: 'ETB 125.75', label: 'Current Share Price', change: '+2.8%', gradient: 'from-sebna-navy to-sebna-orange' },
-              { icon: WalletIcon, value: 'ETB 250M', label: 'Total Investment', change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
-              { icon: UserGroupIcon, value: '15,247', label: 'Active Investors', change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
-              { icon: BanknotesIcon, value: '16.8%', label: 'Average ROI', change: '+1.2%', gradient: 'from-sebna-navy to-sebna-orange' },
-            ].map((metric, idx) => (
-              <div
-                key={idx}
-                data-aos="fade-up"
-                data-aos-delay={300 + idx * 100}
-                className="group bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
-              >
-                <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${metric.gradient} flex items-center justify-center mb-4`}>
-                  <metric.icon className="w-6 h-6 text-white" />
+            {priceLoading ? (
+              [...Array(4)].map((_, idx) => (
+                <div key={idx} data-aos="fade-up" data-aos-delay={300 + idx * 100}>
+                  <MetricSkeleton />
                 </div>
-                <div className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</div>
-                <div className="text-sm text-gray-500 mb-2">{metric.label}</div>
-                <div className="text-sm text-green-600 font-semibold">{metric.change}</div>
-              </div>
-            ))}
-          </div>
-
-          {/* Institutions */}
-          <div className="mt-20">
-            <div className="text-center mb-12">
-              <div 
-                data-aos="fade-up"
-                className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
-              >
-                <BuildingLibraryIcon className="w-4 h-4 text-sebna-navy" />
-                <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                  Institutions
-                </span>
-              </div>
-              <h3 
-                data-aos="fade-up"
-                data-aos-delay="100"
-                className="text-3xl md:text-4xl font-bold mb-4"
-              >
-                Our Partner Institutions
-              </h3>
-              <p 
-                data-aos="fade-up"
-                data-aos-delay="200"
-                className="text-lg text-gray-600 max-w-2xl mx-auto"
-              >
-                Browse institutions participating on Sebna.
-              </p>
-            </div>
-
-            {institutionsLoading ? (
-              <div className="text-center py-12">
-                <div className="inline-block animate-spin rounded-full h-8 w-8 border-2 border-sebna-navy border-t-transparent"></div>
-                <p className="mt-4 text-gray-600">Loading institutions...</p>
-              </div>
+              ))
             ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
-                {(institutions || []).slice(0, 12).map((inst, idx) => {
-                  const id = inst?.institutionId || inst?.institutionUuid || inst?.uuid || inst?.id || idx;
-                  const name = inst?.name || inst?.institutionName || '-';
-                  const logoSrc = inst?.logoUrl || inst?.imageUrl || (inst?.logo ? decompressLogo(inst.logo) : null);
-                  
-                  return (
-                    <div
-                      key={id}
-                      data-aos="fade-up"
-                      data-aos-delay={100 + (idx % 6) * 50}
-                      className="group bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-xl p-4 border border-white/40 shadow-sm hover:shadow-lg transition-all duration-500 hover:-translate-y-1"
-                    >
-                      <div className="w-16 h-12 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-3 overflow-hidden">
-                        {logoSrc ? (
-                          <img
-                            src={logoSrc}
-                            alt={name}
-                            className="max-w-full max-h-full object-contain p-1"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-r from-sebna-navy to-sebna-orange">
-                            <span className="text-white font-bold text-lg">
-                              {String(name || 'I').trim().charAt(0).toUpperCase()}
-                            </span>
-                          </div>
-                        )}
-                      </div>
-                      <h4 className="text-xs font-semibold text-gray-900 text-center line-clamp-2">{name}</h4>
-                    </div>
-                  );
-                })}
-              </div>
+              [
+                {
+                  icon: ChartBarIcon,
+                  value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
+                  label: 'Current Share Price',
+                  change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
+                  gradient: 'from-sebna-navy to-sebna-orange'
+                },
+                { icon: WalletIcon, value: 'ETB 250M', label: 'Total Investment', change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '15,247', label: 'Active Investors', change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: BanknotesIcon, value: '16.8%', label: 'Average ROI', change: '+1.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+              ].map((metric, idx) => (
+                <div
+                  key={idx}
+                  data-aos="fade-up"
+                  data-aos-delay={300 + idx * 100}
+                  className="group bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-2xl p-6 border border-white/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
+                >
+                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${metric.gradient} flex items-center justify-center mb-4`}>
+                    <metric.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</div>
+                  <div className="text-sm text-gray-500 mb-2">{metric.label}</div>
+                  <div className="text-sm text-green-600 font-semibold">{metric.change}</div>
+                </div>
+              ))
             )}
           </div>
         </div>
@@ -1368,66 +1274,105 @@ const SebnaLanding = () => {
           </div>
 
           {/* News Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-            {landingPosts.map((post, idx) => (
-              <div
-                key={post.id || post.postId || idx}
-                data-aos="fade-up"
-                data-aos-delay={400 + (idx % 4) * 100}
-                className="group bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
-              >
-                {/* Image */}
-                <div className="relative h-48 overflow-hidden">
-                  <img
-                    src={getImageSrc(post) || '/img/4u2kdUqkvMAv.jpg'}
-                    alt={post.title || 'News'}
-                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                  />
-                  <div className="absolute top-4 left-4">
-                    <span className="px-3 py-1 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white text-xs font-semibold rounded-full">
-                      {displayCategory(post.category)}
-                    </span>
+          {newsLoading && landingPosts.length > 0 && (
+            <div className="mb-6 flex items-center justify-center" data-aos="fade-up">
+              <div className="relative">
+                <div className="h-2 w-64 bg-gray-200 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-sebna-navy to-sebna-orange animate-loading-bar"></div>
+                </div>
+                <div className="mt-2 text-center text-sm font-semibold text-gray-600 animate-pulse">
+                  Updating news...
+                </div>
+              </div>
+            </div>
+          )}
+
+          {newsLoading && landingPosts.length === 0 ? (
+            <div className="mb-12" data-aos="fade-up">
+              <div className="mb-8 flex items-center justify-center">
+                <div className="relative">
+                  <div className="h-2 w-64 bg-gray-200 rounded-full overflow-hidden">
+                    <div className="h-full bg-gradient-to-r from-sebna-navy to-sebna-orange animate-loading-bar"></div>
+                  </div>
+                  <div className="mt-2 text-center text-sm font-semibold text-gray-600 animate-pulse">
+                    Loading news...
                   </div>
                 </div>
-
-                {/* Content */}
-                <div className="p-6">
-                  <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-                    <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ''}</span>
-                    <div className="flex items-center gap-3">
-                      <span className="flex items-center gap-1">
-                        <EyeOpenIcon className="w-4 h-4" />
-                        {post.views ?? 0}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <HeartIcon className="w-4 h-4" />
-                        {post.likeCount ?? 0}
+              </div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {[...Array(8)].map((_, i) => (
+                  <NewsCardSkeleton key={i} />
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+              {landingPosts.map((post, idx) => (
+                <div
+                  key={post.id || post.postId || idx}
+                  data-aos="fade-up"
+                  data-aos-delay={400 + (idx % 4) * 100}
+                  className="group bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-sm rounded-2xl overflow-hidden border border-white/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2"
+                >
+                  {/* Image */}
+                  <div className="relative h-48 overflow-hidden">
+                    <img
+                      src={getImageSrc(post) || '/img/4u2kdUqkvMAv.jpg'}
+                      alt={post.title || 'News'}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    <div className="absolute top-4 left-4">
+                      <span className="px-3 py-1 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white text-xs font-semibold rounded-full">
+                        {displayCategory(post.category)}
                       </span>
                     </div>
                   </div>
 
-                  <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">{post.title}</h3>
-                  <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-                    {post.content ? String(post.content).slice(0, 120) : ''}
-                  </p>
+                  {/* Content */}
+                  <div className="p-6">
+                    <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+                      <span>{post.createdAt ? new Date(post.createdAt).toLocaleDateString() : ''}</span>
+                      <div className="flex items-center gap-3">
+                        <span className="flex items-center gap-1">
+                          <EyeOpenIcon className="w-4 h-4" />
+                          {post.views ?? 0}
+                        </span>
+                        <span className="flex items-center gap-1">
+                          <HeartIcon className="w-4 h-4" />
+                          {post.likeCount ?? 0}
+                        </span>
+                      </div>
+                    </div>
 
-                  <button
-                    type="button"
-                    onClick={() => openPostModalByIndex(idx)}
-                    className="flex items-center gap-2 text-sebna-navy font-semibold text-sm hover:text-sebna-orange transition-colors"
-                  >
-                    Read More
-                    <ArrowRightIcon className="w-4 h-4" />
-                  </button>
+                    <h3 className="text-lg font-semibold text-gray-900 mb-3 line-clamp-2">{post.title}</h3>
+                    <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                      {post.content ? String(post.content).slice(0, 120) : ''}
+                    </p>
+
+                    <button
+                      type="button"
+                      onClick={() => openPostModalByIndex(idx)}
+                      className="flex items-center gap-2 text-sebna-navy font-semibold text-sm hover:text-sebna-orange transition-colors"
+                    >
+                      Read More
+                      <ArrowRightIcon className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
 
           {/* Post Modal */}
           {postModalOpen && (
-            <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-              <div className="relative w-full max-w-4xl max-h-[90vh] overflow-hidden rounded-3xl bg-gradient-to-br from-white/90 to-white/70 backdrop-blur-xl border border-white/40 shadow-2xl">
+            <div
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center"
+              onClick={closePostModal}
+            >
+              <div
+                className="bg-white/80 rounded-3xl p-8 w-full max-w-2xl mx-auto shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
                 {/* Modal Header */}
                 <div className="flex items-center justify-between p-6 border-b border-white/30">
                   <div className="flex items-center gap-3">
@@ -1649,18 +1594,16 @@ const SebnaLanding = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 text-white py-12">
+      <footer className="bg-gradient-to-br from-slate-900 via-gray-50 to-slate-600 text-gray-800 py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-6">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-sebna-navy to-sebna-orange flex items-center justify-center">
-                  <img src={brandIcon} alt="Sebna" className="w-8 h-8 object-contain" />
+              <div className=" h-10 rounded-xl bg-gradient-to-br flex items-center justify-center">
+              <img src={brandLogo} alt="Sebna" className="h-6 w-auto" />
               </div>
-              <span className="text-2xl font-bold bg-gradient-to-r from-white to-gray-300 bg-clip-text text-transparent">
-                Sebna
-              </span>
+             
             </div>
-            <p className="text-gray-400 mb-6 max-w-2xl mx-auto">
+            <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
               Empowering shared investment, enabling shared growth. Join us in building a prosperous future for Tigray.
             </p>
             <div className="text-gray-500 text-sm">

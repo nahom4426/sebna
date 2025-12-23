@@ -11,6 +11,9 @@ import {
   UsersIcon,
   ChatBubbleLeftRightIcon,
   ArrowTrendingUpIcon,
+  CurrencyDollarIcon,
+  ExclamationTriangleIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/solid";
 import { useAuthStore } from "@/stores/authStore";
 import { isSuperAdmin } from "@/utils/rbacUtils";
@@ -20,6 +23,35 @@ import { useDashboardReport } from "@/hooks/useDashboardReport";
 const RANGE_LABELS = {
   week: "than last week",
   month: "than last month",
+};
+
+const formatInteger = (value) => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "-";
+  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(n);
+};
+
+const formatCurrency = (value) => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "-";
+  return new Intl.NumberFormat(undefined, {
+    style: "currency",
+    currency: "ETB",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
+};
+
+const formatPercent = (value) => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "-";
+  return `${new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(n)}%`;
+};
+
+const formatNumber = (value) => {
+  const n = Number(value);
+  if (!Number.isFinite(n)) return "-";
+  return new Intl.NumberFormat(undefined, { maximumFractionDigits: 2 }).format(n);
 };
 
 const KPI_ICONS = [BanknotesIcon, UsersIcon, ChatBubbleLeftRightIcon, ChartBarIcon, ArrowTrendingUpIcon];
@@ -146,6 +178,10 @@ export function Home() {
 
   const compareLabel = RANGE_LABELS[range] || "than last period";
 
+  const finance = data?.finance || null;
+  const financeRemaining = Number(finance?.totalRemainingAmount);
+  const remainingPositive = Number.isFinite(financeRemaining) ? financeRemaining > 0 : false;
+
   const cards = useMemo(() => {
     const list = Array.isArray(data?.cards) ? data.cards : [];
     return list.slice(0, 5).map((card, idx) => {
@@ -178,11 +214,27 @@ export function Home() {
 
   const pieCharts = useMemo(() => {
     const list = Array.isArray(data?.pieSeries) ? data.pieSeries : [];
+    const withoutShareholderPaymentStatus = list.filter(
+      (p) => String(p?.key || "").trim().toLowerCase() !== "shareholder_payment_status"
+    );
     const filtered = superAdmin
-      ? list
-      : list.filter((p) => String(p?.title || "").trim().toLowerCase() !== "login_success");
+      ? withoutShareholderPaymentStatus
+      : withoutShareholderPaymentStatus.filter(
+          (p) => String(p?.title || "").trim().toLowerCase() !== "login_success"
+        );
     return filtered.map((p) => makePieChart(p));
   }, [data?.pieSeries, superAdmin]);
+
+  const shareholderPaymentStatus = useMemo(() => {
+    const list = Array.isArray(data?.pieSeries) ? data.pieSeries : [];
+    const series = list.find((p) => String(p?.key || "").trim().toLowerCase() === "shareholder_payment_status");
+    if (!series) return null;
+
+    return makePieChart({
+      title: "Fully Paid vs Outstanding",
+      slices: series?.slices || series?.data || series?.points,
+    });
+  }, [data?.pieSeries]);
 
   const usersDaily = barCharts.find((c) => String(c.title).trim().toLowerCase() === "users_daily") || barCharts[0];
   const postsDaily = barCharts.find((c) => String(c.title).trim().toLowerCase() === "posts_daily") || barCharts[1];
@@ -262,6 +314,109 @@ export function Home() {
         </div>
       )}
 
+      {/* Finance KPI Cards (Top Row) */}
+      {finance && (
+        <div className="mb-10">
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+              <div className="flex items-start justify-between">
+                <div>
+                  <Typography variant="small" className="font-medium text-gray-600 dark:text-gray-400">
+                    Total Shares Sold
+                  </Typography>
+                  <Typography variant="h3" className="mt-2 text-gray-900 dark:text-white font-bold">
+                    {formatInteger(finance.totalSharesSold)}
+                  </Typography>
+                </div>
+                <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg">
+                  <ChartBarIcon className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+              <div className="flex items-start justify-between">
+                <div>
+                  <Typography variant="small" className="font-medium text-gray-600 dark:text-gray-400">
+                    Total Deposited
+                  </Typography>
+                  <Typography variant="h3" className="mt-2 text-gray-900 dark:text-white font-bold">
+                    {formatCurrency(finance.totalDepositedAmount)}
+                  </Typography>
+                </div>
+                <div className="p-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg">
+                  <BanknotesIcon className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+              <div className="flex items-start justify-between">
+                <div>
+                  <Typography variant="small" className="font-medium text-gray-600 dark:text-gray-400">
+                    Total Remaining
+                  </Typography>
+                  <Typography variant="h3" className="mt-2 text-gray-900 dark:text-white font-bold">
+                    {formatCurrency(finance.totalRemainingAmount)}
+                  </Typography>
+                  <Typography variant="small" className={`mt-2 font-medium ${remainingPositive ? "text-amber-600" : "text-green-600"}`}>
+                    {remainingPositive ? "Outstanding remains" : "All fully paid"}
+                  </Typography>
+                </div>
+                <div className={`p-3 rounded-xl shadow-lg ${remainingPositive ? "bg-gradient-to-r from-amber-500 to-orange-500" : "bg-gradient-to-r from-green-500 to-emerald-500"}`}>
+                  {remainingPositive ? (
+                    <ExclamationTriangleIcon className="w-6 h-6 text-white" />
+                  ) : (
+                    <CheckCircleIcon className="w-6 h-6 text-white" />
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Secondary KPIs */}
+          <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+            <Typography variant="h6" className="mb-4 text-gray-900 dark:text-white font-semibold">
+              Secondary KPIs
+            </Typography>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                  <CurrencyDollarIcon className="w-4 h-4" />
+                  Price Per Share
+                </div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.pricePerShare)}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Collection Rate</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatPercent(finance.collectionRatePercent)}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Shareholders</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatInteger(finance.shareholdersCount)}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Fully Paid Shareholders</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatInteger(finance.fullyPaidShareholdersCount)}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Outstanding Shareholders</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatInteger(finance.outstandingShareholdersCount)}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Avg Shares / Shareholder</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatNumber(finance.avgSharesPerShareholder)}</div>
+              </div>
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Avg Paid / Shareholder</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.avgPaidPerShareholder)}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* KPI Cards Grid */}
       <div className="mb-12 grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5">
         {cards.map(({ icon, title, footer, iconBg, ...rest }, idx) => (
@@ -322,6 +477,11 @@ export function Home() {
           Distribution Analysis
         </Typography>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {shareholderPaymentStatus && (
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
+              <StatisticsChart {...shareholderPaymentStatus} />
+            </div>
+          )}
           {postsByCategory && (
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700 hover:shadow-xl transition-all duration-300">
               <StatisticsChart {...postsByCategory} />
