@@ -150,6 +150,9 @@ const ShareholderDashboard = () => {
   const remaining = Number(stats?.amountRemaining);
   const remainingPositive = Number.isFinite(remaining) ? remaining > 0 : false;
 
+  const increaseAmount = Number(stats?.valueIncreaseAmount);
+  const increasePositive = Number.isFinite(increaseAmount) ? increaseAmount >= 0 : true;
+
   const status = statusConfig(stats?.paymentStatus);
   const StatusIcon = status.icon;
 
@@ -208,54 +211,140 @@ const ShareholderDashboard = () => {
         </div>
       ) : (
         <>
-          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <Typography variant="small" className="text-gray-600 font-medium">
-                My Shares
-              </Typography>
-              <Typography variant="h3" className="mt-2 text-gray-900 font-bold">
-                {formatInteger(stats?.sharesBoughtAmount)}
-              </Typography>
+          <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
+            <Typography variant="h6" className="text-gray-900 font-semibold">
+              Payment (Cost Basis)
+            </Typography>
+
+            <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Shares owned
+                </Typography>
+                <Typography variant="h4" className="mt-2 text-gray-900 font-bold">
+                  {formatInteger(stats?.sharesBoughtAmount)}
+                </Typography>
+              </div>
+
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Purchase price/share
+                </Typography>
+                <Typography variant="h4" className="mt-2 text-gray-900 font-bold">
+                  {formatCurrency(stats?.purchasePricePerShare)}
+                </Typography>
+              </div>
+
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Total cost (cost basis)
+                </Typography>
+                <Typography variant="h4" className="mt-2 text-gray-900 font-bold">
+                  {formatCurrency(stats?.totalCost)}
+                </Typography>
+              </div>
+
+              <div className={`rounded-2xl p-6 border ${remainingPositive ? "border-amber-200" : "border-green-200"} bg-white`}>
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Remaining
+                </Typography>
+                <Typography variant="h4" className="mt-2 text-gray-900 font-bold">
+                  {formatCurrency(stats?.amountRemaining)}
+                </Typography>
+                <Typography variant="small" className={`mt-2 font-semibold ${remainingPositive ? "text-amber-700" : "text-green-700"}`}>
+                  {remainingPositive ? "Payment outstanding" : "All paid"}
+                </Typography>
+              </div>
             </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <Typography variant="small" className="text-gray-600 font-medium">
-                Total Cost
-              </Typography>
-              <Typography variant="h3" className="mt-2 text-gray-900 font-bold">
-                {formatCurrency(stats?.totalCost)}
-              </Typography>
-            </div>
+            <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Paid
+                </Typography>
+                <Typography variant="h4" className="mt-2 text-gray-900 font-bold">
+                  {formatCurrency(stats?.amountPaid)}
+                </Typography>
+              </div>
 
-            <div className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-              <Typography variant="small" className="text-gray-600 font-medium">
-                Paid
-              </Typography>
-              <Typography variant="h3" className="mt-2 text-gray-900 font-bold">
-                {formatCurrency(stats?.amountPaid)}
-              </Typography>
-            </div>
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Status
+                </Typography>
+                <div className={`inline-flex items-center gap-2 mt-2 px-3 py-1.5 rounded-full border text-sm font-semibold ${status.color}`}>
+                  <StatusIcon className="w-4 h-4" />
+                  {status.label}
+                </div>
+              </div>
 
-            <div className={`bg-white rounded-2xl p-6 shadow-lg border ${remainingPositive ? "border-amber-200" : "border-green-200"}`}>
-              <Typography variant="small" className="text-gray-600 font-medium">
-                Remaining
-              </Typography>
-              <Typography variant="h3" className="mt-2 text-gray-900 font-bold">
-                {formatCurrency(stats?.amountRemaining)}
-              </Typography>
-              <Typography variant="small" className={`mt-2 font-semibold ${remainingPositive ? "text-amber-700" : "text-green-700"}`}>
-                {remainingPositive ? "Payment outstanding" : "All paid"}
-              </Typography>
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <ProgressBar value={stats?.paymentProgressPercent} />
+              </div>
             </div>
           </div>
 
           <div className="mt-8 bg-white rounded-2xl p-6 shadow-lg border border-gray-100">
-            <ProgressBar value={stats?.paymentProgressPercent} />
+            <Typography variant="h6" className="text-gray-900 font-semibold">
+              Value / Performance (Market)
+            </Typography>
+
+            <div className="mt-3 text-gray-700">
+              <Typography variant="small" className="text-gray-600">
+                You bought at {formatCurrency(stats?.purchasePricePerShare)}. Current price is {formatCurrency(stats?.pricePerShare)}.
+              </Typography>
+            </div>
+
+            <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Current price/share
+                </Typography>
+                <Typography variant="h4" className="mt-2 text-gray-900 font-bold">
+                  {formatCurrency(stats?.pricePerShare)}
+                </Typography>
+              </div>
+
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Current market value
+                </Typography>
+                <Typography variant="h4" className="mt-2 text-gray-900 font-bold">
+                  {formatCurrency(stats?.currentMarketValue)}
+                </Typography>
+              </div>
+
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Increase amount
+                </Typography>
+                <Typography variant="h4" className={`mt-2 font-bold ${increasePositive ? "text-green-700" : "text-red-700"}`}>
+                  {increasePositive ? "+" : ""}{formatCurrency(stats?.valueIncreaseAmount)}
+                </Typography>
+              </div>
+
+              <div className="rounded-2xl p-6 border border-gray-100 bg-gray-50/60">
+                <Typography variant="small" className="text-gray-600 font-medium">
+                  Increase %
+                </Typography>
+                <Typography variant="h4" className={`mt-2 font-bold ${increasePositive ? "text-green-700" : "text-red-700"}`}>
+                  {increasePositive ? "+" : ""}{formatPercent(stats?.valueIncreasePercent)}
+                </Typography>
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <Typography variant="small" className="text-gray-600">
+                Market value: {formatCurrency(stats?.currentMarketValue)}
+              </Typography>
+              <Typography variant="small" className="text-gray-600">
+                Increase: {increasePositive ? "+" : ""}{formatCurrency(stats?.valueIncreaseAmount)} ({increasePositive ? "+" : ""}{formatPercent(stats?.valueIncreasePercent)})
+              </Typography>
+            </div>
           </div>
         </>
       )}
     </div>
   );
-};
+ };
 
 export default ShareholderDashboard;

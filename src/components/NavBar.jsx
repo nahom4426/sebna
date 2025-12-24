@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
+import { useI18n } from '@/i18n/I18nContext';
 import defaultProfile from '@/assets/img/profile.png';
 
 const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const { lang, setLang, t } = useI18n();
   const auth = useAuthStore((state) => state.auth);
   const logout = useAuthStore((state) => state.logout);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -59,6 +61,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
   const breadcrumbsList = breadcrumbs?.breadcrumbs || [];
   const currentPage = breadcrumbsList.length > 0 ? breadcrumbsList[breadcrumbsList.length - 1]?.name : 'Sebna';
   const isMessagesActive = location?.pathname?.startsWith('/admin/messages');
+  const currentLangLabel = lang === 'am' ? 'አማ' : lang === 'ti' ? 'ትግ' : 'EN';
 
   return (
     <div
@@ -157,14 +160,13 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
           <span className="absolute top-1 right-1 w-2.5 h-2.5 rounded-full bg-sebna-orange border-2 border-white"></span>
         </button>
 
-        {/* Language Selector (Hidden on mobile) */}
-        {!isMobile && (
-          <div ref={languageMenuRef} className="relative">
+        {/* Language Selector */}
+        <div ref={languageMenuRef} className="relative">
             <button
               onClick={() => setShowLanguageMenu(!showLanguageMenu)}
               className="flex gap-2 items-center px-2 py-2 rounded-lg transition-all duration-200 md:px-3 hover:bg-gray-100 group hover:scale-105"
             >
-              <span className="text-xs font-medium text-gray-700 md:text-sm group-hover:text-sebna-navy">ENG</span>
+              <span className="text-xs font-medium text-gray-700 md:text-sm group-hover:text-sebna-navy">{currentLangLabel}</span>
               <svg
                 className={`w-4 h-4 text-gray-500 transition-transform group-hover:text-sebna-navy ${showLanguageMenu ? 'rotate-180' : ''}`}
                 fill="none"
@@ -176,13 +178,42 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
             </button>
             {showLanguageMenu && (
               <div className="absolute right-0 mt-2 w-40 rounded-lg border border-gray-100 shadow-lg backdrop-blur-sm bg-white/95 animate-dropdown z-50">
-                <button className="w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 text-sm text-gray-700">
-                  English
+                <button
+                  onClick={() => {
+                    setLang('en');
+                    setShowLanguageMenu(false);
+                  }}
+                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 text-sm ${
+                    lang === 'en' ? 'text-sebna-navy font-semibold' : 'text-gray-700'
+                  }`}
+                >
+                  {t('admin.language.english')}
+                </button>
+                <button
+                  onClick={() => {
+                    setLang('am');
+                    setShowLanguageMenu(false);
+                  }}
+                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 text-sm ${
+                    lang === 'am' ? 'text-sebna-navy font-semibold' : 'text-gray-700'
+                  }`}
+                >
+                  {t('admin.language.amharic')}
+                </button>
+                <button
+                  onClick={() => {
+                    setLang('ti');
+                    setShowLanguageMenu(false);
+                  }}
+                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 text-sm ${
+                    lang === 'ti' ? 'text-sebna-navy font-semibold' : 'text-gray-700'
+                  }`}
+                >
+                  {t('admin.language.tigrinya')}
                 </button>
               </div>
             )}
           </div>
-        )}
 
         {/* User Profile Dropdown */}
         <div ref={userMenuRef} className="relative">
@@ -240,7 +271,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
                 <svg className="w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                 </svg>
-                <span className="text-sm">My Profile</span>
+                <span className="text-sm">{t('admin.userMenu.myProfile')}</span>
               </button>
 
               <button
@@ -254,7 +285,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                 </svg>
-                <span className="text-sm">Settings</span>
+                <span className="text-sm">{t('admin.userMenu.settings')}</span>
               </button>
 
               <div className="my-1 border-t border-gray-100"></div>
@@ -270,7 +301,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span className="text-sm">Logout</span>
+                <span className="text-sm">{t('admin.userMenu.logout')}</span>
               </button>
             </div>
           )}

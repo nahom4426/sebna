@@ -830,9 +830,13 @@ const UserForm = ({ user = null, onSuccess }) => {
                 {/* Action Buttons */}
                 <div className="flex items-center gap-3">
                   <Button
+                    type="button"
                     variant="text"
                     color="gray"
-                    onClick={closeModal}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      closeModal();
+                    }}
                     disabled={loading}
                     className="px-4 py-2.5 text-sm font-medium hover:bg-gray-100 transition-all"
                   >
@@ -842,7 +846,8 @@ const UserForm = ({ user = null, onSuccess }) => {
                   {activeSection !== formSections[formSections.length - 1].id ? (
                     <Button
                       type="button"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.preventDefault();
                         const currentIndex = formSections.findIndex(s => s.id === activeSection);
                         if (currentIndex < formSections.length - 1) {
                           setActiveSection(formSections[currentIndex + 1].id);

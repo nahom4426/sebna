@@ -179,7 +179,7 @@ export function Home() {
   const compareLabel = RANGE_LABELS[range] || "than last period";
 
   const finance = data?.finance || null;
-  const financeRemaining = Number(finance?.totalRemainingAmount);
+  const financeRemaining = Number(finance?.costBasisTotalRemainingAmount);
   const remainingPositive = Number.isFinite(financeRemaining) ? financeRemaining > 0 : false;
 
   const cards = useMemo(() => {
@@ -322,13 +322,29 @@ export function Home() {
               <div className="flex items-start justify-between">
                 <div>
                   <Typography variant="small" className="font-medium text-gray-600 dark:text-gray-400">
-                    Total Shares Sold
+                    Price per share (current)
+                  </Typography>
+                  <Typography variant="h3" className="mt-2 text-gray-900 dark:text-white font-bold">
+                    {formatCurrency(finance.pricePerShare)}
+                  </Typography>
+                </div>
+                <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg">
+                  <CurrencyDollarIcon className="w-6 h-6 text-white" />
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+              <div className="flex items-start justify-between">
+                <div>
+                  <Typography variant="small" className="font-medium text-gray-600 dark:text-gray-400">
+                    Total shares sold
                   </Typography>
                   <Typography variant="h3" className="mt-2 text-gray-900 dark:text-white font-bold">
                     {formatInteger(finance.totalSharesSold)}
                   </Typography>
                 </div>
-                <div className="p-3 rounded-xl bg-gradient-to-r from-blue-500 to-cyan-500 shadow-lg">
+                <div className="p-3 rounded-xl bg-gradient-to-r from-indigo-500 to-purple-500 shadow-lg">
                   <ChartBarIcon className="w-6 h-6 text-white" />
                 </div>
               </div>
@@ -338,26 +354,10 @@ export function Home() {
               <div className="flex items-start justify-between">
                 <div>
                   <Typography variant="small" className="font-medium text-gray-600 dark:text-gray-400">
-                    Total Deposited
+                    Remaining (cost basis)
                   </Typography>
                   <Typography variant="h3" className="mt-2 text-gray-900 dark:text-white font-bold">
-                    {formatCurrency(finance.totalDepositedAmount)}
-                  </Typography>
-                </div>
-                <div className="p-3 rounded-xl bg-gradient-to-r from-green-500 to-emerald-500 shadow-lg">
-                  <BanknotesIcon className="w-6 h-6 text-white" />
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
-              <div className="flex items-start justify-between">
-                <div>
-                  <Typography variant="small" className="font-medium text-gray-600 dark:text-gray-400">
-                    Total Remaining
-                  </Typography>
-                  <Typography variant="h3" className="mt-2 text-gray-900 dark:text-white font-bold">
-                    {formatCurrency(finance.totalRemainingAmount)}
+                    {formatCurrency(finance.costBasisTotalRemainingAmount)}
                   </Typography>
                   <Typography variant="small" className={`mt-2 font-medium ${remainingPositive ? "text-amber-600" : "text-green-600"}`}>
                     {remainingPositive ? "Outstanding remains" : "All fully paid"}
@@ -374,43 +374,63 @@ export function Home() {
             </div>
           </div>
 
-          {/* Secondary KPIs */}
           <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
             <Typography variant="h6" className="mb-4 text-gray-900 dark:text-white font-semibold">
-              Secondary KPIs
+              Accounting KPIs
             </Typography>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
-                <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                  <CurrencyDollarIcon className="w-4 h-4" />
-                  Price Per Share
-                </div>
-                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.pricePerShare)}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Expected (cost basis)</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.costBasisTotalExpectedAmount)}</div>
               </div>
+
               <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Collection Rate</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Deposited</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.totalDepositedAmount)}</div>
+              </div>
+
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Remaining (cost basis)</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.costBasisTotalRemainingAmount)}</div>
+              </div>
+
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Collection rate %</div>
                 <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatPercent(finance.collectionRatePercent)}</div>
               </div>
+            </div>
+          </div>
+
+          <div className="mt-6 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
+            <Typography variant="h6" className="mb-4 text-gray-900 dark:text-white font-semibold">
+              Valuation KPIs
+            </Typography>
+
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
               <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Shareholders</div>
-                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatInteger(finance.shareholdersCount)}</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Market total value</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.marketTotalValue)}</div>
               </div>
+
               <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Fully Paid Shareholders</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Unrealized gain amount</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.marketUnrealizedGainAmount)}</div>
+              </div>
+
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Unrealized gain %</div>
+                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatPercent(finance.marketUnrealizedGainPercent)}</div>
+              </div>
+
+              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
+                <div className="text-sm text-gray-600 dark:text-gray-400">Fully paid shareholders</div>
                 <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatInteger(finance.fullyPaidShareholdersCount)}</div>
               </div>
+
               <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Outstanding Shareholders</div>
+                <div className="text-sm text-gray-600 dark:text-gray-400">Outstanding shareholders</div>
                 <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatInteger(finance.outstandingShareholdersCount)}</div>
-              </div>
-              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Avg Shares / Shareholder</div>
-                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatNumber(finance.avgSharesPerShareholder)}</div>
-              </div>
-              <div className="rounded-xl p-4 bg-gray-50 dark:bg-gray-900/40 border border-gray-100 dark:border-gray-700">
-                <div className="text-sm text-gray-600 dark:text-gray-400">Avg Paid / Shareholder</div>
-                <div className="mt-2 text-lg font-bold text-gray-900 dark:text-white">{formatCurrency(finance.avgPaidPerShareholder)}</div>
               </div>
             </div>
           </div>

@@ -3,12 +3,14 @@ import { useNavigate } from 'react-router-dom';
 import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Button } from '@/components';
+import { useI18n } from '@/i18n/I18nContext';
 import { getLandingPosts, getPublicPostById } from '@/pages/admin/posts/api/PostsApi';
 import { checkIfPublicUserLiked, togglePublicLike } from '@/pages/admin/posts/api/LikesApi';
 import { getPublicPostComments, createPublicComment } from '@/pages/admin/comments/api/CommentsApi';
 import { getPricePerSharePublic } from '@/pages/admin/api/SebnaSettingsApi';
 import brandLogo from '@/assets/logo.svg';
 import brandIcon from '@/assets/Icon@300x.png';
+
 import { 
   ArrowUpIcon, 
   Bars3Icon, 
@@ -55,11 +57,13 @@ const NAV_ITEMS = ['home', 'about', 'services', 'investment', 'banking', 'news',
 
 const SebnaLanding = () => {
   const navigate = useNavigate();
+  const { lang, setLang, t } = useI18n();
   const deviceIdRef = useRef(null);
   const [currentPrice, setCurrentPrice] = useState(10000);
   const [priceChange, setPriceChange] = useState(0);
   const [priceHistory, setPriceHistory] = useState(() => Array.from({ length: 24 }, () => 10000));
   const [priceLoading, setPriceLoading] = useState(true);
+
   const hasLoadedPriceRef = useRef(false);
   const [newsFilter, setNewsFilter] = useState('all');
   const [landingPosts, setLandingPosts] = useState([]);
@@ -438,7 +442,7 @@ const SebnaLanding = () => {
                 <div className="w-3 h-3 rounded-full bg-white animate-pulse animation-delay-200"></div>
                 <div className="w-3 h-3 rounded-full bg-white animate-pulse animation-delay-400"></div>
               </div>
-              <p className="text-lg md:text-xl text-white/90 animate-fade-in">Empowering Shared Investment</p>
+              <p className="text-lg md:text-xl text-white/90 animate-fade-in">{t('landing.loadingScreenTagline')}</p>
             </div>
           </div>
         </div>
@@ -499,24 +503,60 @@ const SebnaLanding = () => {
                   onClick={() => scrollToSection(item)}
                   className="px-4 py-2 text-gray-700 hover:text-sebna-navy font-medium transition-all duration-300 rounded-lg hover:bg-white/50 hover:shadow-sm capitalize text-sm"
                 >
-                  {item}
+                  {t(`nav.${item}`)}
                 </button>
               ))}
             </div>
 
             {/* Auth Buttons */}
             <div className="hidden md:flex items-center gap-3">
+              {/* Language Selector */}
+              <div className="relative">
+                <div className="flex items-center gap-1 bg-white/60 backdrop-blur-sm border border-white/30 rounded-xl p-1 shadow-sm">
+                  <button
+                    type="button"
+                    onClick={() => setLang('en')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                      lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                    }`}
+                    aria-label="English"
+                  >
+                    EN
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLang('am')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                      lang === 'am' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                    }`}
+                    aria-label="Amharic"
+                  >
+                    አማ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLang('ti')}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                      lang === 'ti' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                    }`}
+                    aria-label="Tigrinya"
+                  >
+                    ትግ
+                  </button>
+                </div>
+              </div>
+
               <button 
                 onClick={() => navigate('/auth/sign-in')}
                 className="px-4 py-2 text-gray-700 hover:text-sebna-navy font-medium transition-colors"
               >
-                Sign In
+                {t('landing.signIn')}
               </button>
               <button
                 onClick={() => navigate('/dashboard/home')}
                 className="px-6 py-2.5 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-semibold rounded-xl shadow-lg shadow-sebna-navy/25 hover:shadow-2xl hover:shadow-sebna-navy/35 transition-all duration-300 hover:scale-105"
               >
-                Dashboard
+                {t('landing.dashboard')}
               </button>
             </div>
 
@@ -537,6 +577,40 @@ const SebnaLanding = () => {
           {mobileMenuOpen && (
             <div className="md:hidden absolute top-full left-4 right-4 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-sebna-navy/15 border border-white/30 animate-slide-in-down overflow-hidden">
               <div className="p-4 space-y-1">
+                {/* Mobile Language Selector */}
+                <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gradient-to-br from-white/70 to-white/40 border border-white/30">
+                  <div className="text-sm font-semibold text-gray-800">{t('common.language')}</div>
+                  <div className="flex items-center gap-1">
+                    <button
+                      type="button"
+                      onClick={() => setLang('en')}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                        lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                      }`}
+                    >
+                      EN
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLang('am')}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                        lang === 'am' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                      }`}
+                    >
+                      አማ
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setLang('ti')}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
+                        lang === 'ti' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                      }`}
+                    >
+                      ትግ
+                    </button>
+                  </div>
+                </div>
+
                 {NAV_ITEMS.map((item) => (
                   <button
                     key={item}
@@ -544,7 +618,7 @@ const SebnaLanding = () => {
                     className="w-full px-4 py-3 text-gray-700 hover:text-sebna-navy hover:bg-sebna-navy/5 font-medium transition-all duration-300 rounded-xl capitalize text-left flex items-center gap-3"
                   >
                     <ChevronRightIcon className="w-4 h-4" />
-                    {item}
+                    {t(`nav.${item}`)}
                   </button>
                 ))}
                 <div className="border-t border-gray-200/50 pt-3 mt-3 space-y-2">
@@ -552,13 +626,13 @@ const SebnaLanding = () => {
                     onClick={() => navigate('/auth/sign-in')}
                     className="w-full px-4 py-3 text-gray-700 hover:text-sebna-navy hover:bg-sebna-navy/5 font-medium transition-all duration-300 rounded-xl text-left"
                   >
-                    Sign In
+                    {t('landing.signIn')}
                   </button>
                   <button
                     onClick={() => navigate('/dashboard/home')}
                     className="w-full px-4 py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-semibold rounded-xl shadow-lg shadow-sebna-navy/25 transition-all duration-300"
                   >
-                    Go to Dashboard
+                    {t('landing.goToDashboard')}
                   </button>
                 </div>
               </div>
@@ -587,7 +661,7 @@ const SebnaLanding = () => {
               >
                 <StarIcon className="w-4 h-4 text-sebna-orange" />
                 <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                  Trusted by 10,000+ Investors
+                  {t('landing.trustedBy')}
                 </span>
               </div>
 
@@ -596,9 +670,9 @@ const SebnaLanding = () => {
                 data-aos-delay="200"
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
               >
-                <span className="block text-gray-900">You are the</span>
+                <span className="block text-gray-900">{t('landing.heroLine1')}</span>
                 <span className="block bg-gradient-to-r from-sebna-navy via-sebna-navy to-sebna-orange bg-clip-text text-transparent animate-gradient-shift">
-                  Epicenter
+                  {t('landing.heroHighlight')}
                 </span>
               </h1>
 
@@ -607,7 +681,7 @@ const SebnaLanding = () => {
                 data-aos-delay="300"
                 className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl"
               >
-                Empowering shared investment, enabling shared growth. Join Sebna and be part of Tigray's leading platform for collaborative growth and sustainable prosperity.
+                {t('landing.heroDescription')}
               </p>
 
               {/* Stats */}
@@ -617,13 +691,17 @@ const SebnaLanding = () => {
                 className="grid grid-cols-3 gap-6 mb-8"
               >
                 {[ 
-                  { value: '15,000', label: 'Active Investors', color: 'from-sebna-navy to-sebna-navy' },
-                  { value: '250M', label: 'ETB Invested', color: 'from-sebna-navy to-sebna-navy' },
-                  { value: '45', label: 'Projects Funded', color: 'from-sebna-orange to-sebna-orange' },
+                  { value: '15,000', label: t('landing.statsActiveInvestors'), color: 'from-sebna-navy to-sebna-navy' },
+                  { value: '250M', label: t('landing.statsEtbInvested'), color: 'from-sebna-navy to-sebna-navy' },
+                  { value: '45', label: t('landing.statsProjectsFunded'), color: 'from-sebna-orange to-sebna-orange' },
                 ].map((stat, idx) => (
                   <div key={idx} className="text-center">
                     <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</div>
-                    <div className="text-sm text-gray-500">{stat.label}</div>
+                    <div className="text-sm text-gray-500">
+                      {idx === 0 && t('landing.statsActiveInvestors')}
+                      {idx === 1 && t('landing.statsEtbInvested')}
+                      {idx === 2 && t('landing.statsProjectsFunded')}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -638,7 +716,7 @@ const SebnaLanding = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy to-sebna-orange opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <span className="relative flex items-center justify-center gap-3">
                     <RocketLaunchIcon className="w-5 h-5" />
-                    Start Investing Today
+                    {t('landing.startInvesting')}
                   </span>
                 </button>
                 <button
@@ -648,7 +726,7 @@ const SebnaLanding = () => {
                   <div className="absolute inset-0 bg-sebna-navy transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                   <span className="relative flex items-center justify-center gap-3">
                     <PlayIcon className="w-5 h-5" />
-                    Watch Our Story
+                    {t('landing.watchStory')}
                   </span>
                 </button>
               </div>
@@ -668,8 +746,9 @@ const SebnaLanding = () => {
                       <div className="w-3 h-3 bg-sebna-orange rounded-full animate-pulse"></div>
                       <div className="absolute -inset-1 bg-sebna-orange rounded-full blur animate-ping-slow"></div>
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Live Share Price</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">{t('landing.liveSharePrice')}</h3>
                   </div>
+
                   <button className="p-2 hover:bg-white/50 rounded-xl transition-all duration-300 hover:rotate-180">
                     <ArrowPathIcon className="w-5 h-5 text-gray-600" />
                   </button>
@@ -682,7 +761,7 @@ const SebnaLanding = () => {
                         <div className="h-full bg-gradient-to-r from-sebna-navy to-sebna-orange animate-loading-bar"></div>
                       </div>
                       <div className="mt-2 text-center text-sm font-semibold text-gray-600 animate-pulse">
-                        Loading price...
+                        {t('landing.loadingPrice')}
                       </div>
                     </div>
                   </div>
@@ -704,7 +783,7 @@ const SebnaLanding = () => {
                       </span>
                     </div>
                   )}
-                  <p className="text-sm text-gray-500">Real-time trading data</p>
+                  <p className="text-sm text-gray-500">{t('landing.realTimeTradingData')}</p>
                 </div>
 
                 {/* Chart Placeholder */}
@@ -732,7 +811,7 @@ const SebnaLanding = () => {
                 {/* Stats */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-gradient-to-br from-sebna-navy/5 to-sebna-orange/5 rounded-xl p-4">
-                    <div className="text-sm text-gray-500 mb-1">24h High</div>
+                    <div className="text-sm text-gray-500 mb-1">{t('landing.high24h')}</div>
                     <div className="text-lg font-semibold text-gray-900">
                       {priceLoading ? (
                         <div className="h-6 w-28 rounded-lg bg-gray-200 animate-pulse" />
@@ -742,7 +821,7 @@ const SebnaLanding = () => {
                     </div>
                   </div>
                   <div className="bg-gradient-to-br from-sebna-orange/5 to-sebna-navy/5 rounded-xl p-4">
-                    <div className="text-sm text-gray-500 mb-1">24h Low</div>
+                    <div className="text-sm text-gray-500 mb-1">{t('landing.low24h')}</div>
                     <div className="text-lg font-semibold text-gray-900">
                       {priceLoading ? (
                         <div className="h-6 w-28 rounded-lg bg-gray-200 animate-pulse" />
@@ -768,7 +847,7 @@ const SebnaLanding = () => {
             data-aos-delay="800"
             className="flex flex-col items-center gap-2"
           >
-            <span className="text-sm text-gray-500">Scroll to explore</span>
+            <span className="text-sm text-gray-500">{t('landing.scrollToExplore')}</span>
             <div className="w-6 h-10 border-2 border-gray-300 rounded-full flex justify-center">
               <div className="w-1 h-3 bg-gradient-to-b from-sebna-navy to-sebna-orange rounded-full mt-2 animate-bounce"></div>
             </div>
@@ -786,7 +865,7 @@ const SebnaLanding = () => {
             >
               <ShieldCheckIcon className="w-4 h-4 text-sebna-navy" />
               <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                About Sebna
+                {t('landing.aboutSebna')}
               </span>
             </div>
 
@@ -795,9 +874,9 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              <span className="block text-gray-900">Breaking the Cycle of</span>
+              <span className="block text-gray-900">{t('landing.aboutTitleLine1')}</span>
               <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                Broken Promises
+                {t('landing.aboutTitleHighlight')}
               </span>
             </h2>
 
@@ -806,7 +885,7 @@ const SebnaLanding = () => {
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Sebna is a new share company based in Tigray, entering diverse sectors like education and real estate. Unlike previous share companies that made promises and failed, Sebna is committed to delivering results.
+              {t('landing.aboutDescription')}
             </p>
           </div>
 
@@ -816,20 +895,20 @@ const SebnaLanding = () => {
               {[
                 {
                   icon: BuildingLibraryIcon,
-                  title: 'Diverse Sectors',
-                  description: 'Strategic investments across education and real estate sectors, creating multiple revenue streams and growth opportunities.',
+                  title: t('landing.diverseSectors'),
+                  description: t('landing.diverseSectorsDesc'),
                   gradient: 'from-sebna-navy to-sebna-navy'
                 },
                 {
                   icon: ShieldCheckIcon,
-                  title: 'Proven Commitment',
-                  description: 'All registration documentation finalized. We\'re ready to deliver on our promises where others have failed.',
+                  title: t('landing.provenCommitment'),
+                  description: t('landing.provenCommitmentDesc'),
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
                 {
                   icon: UserGroupIcon,
-                  title: 'Community Focused',
-                  description: 'Sebna means "our people" in Tigrinya. We prioritize our buyers, employees, and stakeholders above all.',
+                  title: t('landing.communityFocused'),
+                  description: t('landing.communityFocusedDesc'),
                   gradient: 'from-sebna-orange to-sebna-orange'
                 }
               ].map((feature, idx) => (
@@ -892,9 +971,9 @@ const SebnaLanding = () => {
                 </div>
               </div>
 
-              <h3 className="text-2xl font-bold text-white text-center mb-4">Our Mission</h3>
+              <h3 className="text-2xl font-bold text-white text-center mb-4">{t('landing.ourMission')}</h3>
               <p className="text-lg text-white/80 text-center leading-relaxed">
-                Empowering shared investment, enabling shared growth through transparent and sustainable partnerships.
+                {t('landing.missionDesc')}
               </p>
             </div>
 
@@ -910,9 +989,9 @@ const SebnaLanding = () => {
                 </div>
               </div>
 
-              <h3 className="text-2xl font-bold text-white text-center mb-4">Vision 2035</h3>
+              <h3 className="text-2xl font-bold text-white text-center mb-4">{t('landing.vision2035')}</h3>
               <p className="text-lg text-white/80 text-center leading-relaxed">
-                To be the leading platform for collaborative growth and sustainable prosperity in Tigray.
+                {t('landing.visionDesc')}
               </p>
             </div>
           </div>
@@ -929,7 +1008,7 @@ const SebnaLanding = () => {
             >
               <StarIcon className="w-4 h-4 text-sebna-orange" />
               <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                Our Values
+                {t('landing.ourValues')}
               </span>
             </div>
 
@@ -938,7 +1017,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              The <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">SEBNA</span> Values
+              {t('landing.valuesTitlePrefix')} <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">SEBNA</span> {t('landing.valuesTitleSuffix')}
             </h2>
 
             <p 
@@ -946,17 +1025,17 @@ const SebnaLanding = () => {
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Our core values guide every decision and action we take, ensuring we deliver on our promises.
+              {t('landing.valuesDescription')}
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 lg:grid-cols-5 gap-6">
             {[
-              { letter: 'S', title: 'Sincerity', icon: ShieldCheckIcon, gradient: 'from-sebna-navy to-sebna-navy', delay: '100' },
-              { letter: 'E', title: 'Excellence', icon: TrophyIcon, gradient: 'from-sebna-navy to-sebna-orange', delay: '200' },
-              { letter: 'B', title: 'Bravery', icon: BriefcaseIcon, gradient: 'from-sebna-navy to-sebna-orange', delay: '300' },
-              { letter: 'N', title: 'Neutrality', icon: ScaleIcon, gradient: 'from-sebna-navy to-sebna-navy', delay: '400' },
-              { letter: 'A', title: 'Adaptability', icon: ArrowPathIcon, gradient: 'from-sebna-orange to-sebna-orange', delay: '500' },
+              { letter: 'S', title: t('landing.sincerity'), icon: ShieldCheckIcon, gradient: 'from-sebna-navy to-sebna-navy', delay: '100' },
+              { letter: 'E', title: t('landing.excellence'), icon: TrophyIcon, gradient: 'from-sebna-navy to-sebna-orange', delay: '200' },
+              { letter: 'B', title: t('landing.bravery'), icon: BriefcaseIcon, gradient: 'from-sebna-navy to-sebna-orange', delay: '300' },
+              { letter: 'N', title: t('landing.neutrality'), icon: ScaleIcon, gradient: 'from-sebna-navy to-sebna-navy', delay: '400' },
+              { letter: 'A', title: t('landing.adaptability'), icon: ArrowPathIcon, gradient: 'from-sebna-orange to-sebna-orange', delay: '500' },
             ].map((value, idx) => (
               <div
                 key={idx}
@@ -992,7 +1071,7 @@ const SebnaLanding = () => {
             >
               <ChartBarIcon className="w-4 h-4 text-sebna-navy" />
               <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                Our Services
+                {t('landing.ourServices')}
               </span>
             </div>
 
@@ -1001,7 +1080,10 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Investment <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Opportunities</span>
+              {t('landing.investmentOpportunities').split(' ')[0]}{' '}
+              <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
+                {t('landing.investmentOpportunities').split(' ').slice(1).join(' ') || t('landing.investmentOpportunities')}
+              </span>
             </h2>
 
             <p 
@@ -1009,7 +1091,7 @@ const SebnaLanding = () => {
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Explore our diverse portfolio of investment opportunities across key sectors in Tigray.
+              {t('landing.servicesDescription')}
             </p>
           </div>
 
@@ -1025,12 +1107,12 @@ const SebnaLanding = () => {
                 {
                   icon: ChartBarIcon,
                   value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
-                  label: 'Current Share Price',
+                  label: t('landing.currentSharePrice'),
                   change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
-                { icon: WalletIcon, value: 'ETB 250M', label: 'Total Investment', change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: UserGroupIcon, value: '15,247', label: 'Active Investors', change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: WalletIcon, value: 'ETB 250M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '15,247', label: t('landing.activeInvestors'), change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
                   key={idx}
@@ -1061,7 +1143,7 @@ const SebnaLanding = () => {
             >
               <ChartBarIcon className="w-4 h-4 text-sebna-navy" />
               <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                Live Dashboard
+                {t('landing.liveDashboard')}
               </span>
             </div>
             <h2 
@@ -1069,14 +1151,14 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Investment <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Performance</span>
+              <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.investmentPerformance')}</span>
             </h2>
             <p 
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Real-time insights into our investment performance and market trends.
+              {t('landing.performanceDescription')}
             </p>
           </div>
 
@@ -1093,13 +1175,13 @@ const SebnaLanding = () => {
                 {
                   icon: ChartBarIcon,
                   value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
-                  label: 'Current Share Price',
+                  label: t('landing.currentSharePrice'),
                   change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
-                { icon: WalletIcon, value: 'ETB 250M', label: 'Total Investment', change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: UserGroupIcon, value: '15,247', label: 'Active Investors', change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: BanknotesIcon, value: '16.8%', label: 'Average ROI', change: '+1.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: WalletIcon, value: 'ETB 250M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '15,247', label: t('landing.activeInvestors'), change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: BanknotesIcon, value: '16.8%', label: t('landing.averageRoi'), change: '+1.2%', gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
                   key={idx}
@@ -1130,7 +1212,7 @@ const SebnaLanding = () => {
             >
               <BanknotesIcon className="w-4 h-4 text-sebna-navy" />
               <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                Banking Partners
+                {t('landing.bankingPartners')}
               </span>
             </div>
             <h2 
@@ -1138,14 +1220,14 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Trusted <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Financial Partners</span>
+              <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.trustedFinancialPartners')}</span>
             </h2>
             <p 
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Seamless integration with Ethiopia's leading banks for secure and convenient transactions.
+              {t('landing.bankingDescription')}
             </p>
           </div>
 
@@ -1229,7 +1311,7 @@ const SebnaLanding = () => {
             >
               <GlobeAltIcon className="w-4 h-4 text-sebna-navy" />
               <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                Latest News
+                {t('landing.latestNews')}
               </span>
             </div>
             <h2 
@@ -1237,14 +1319,14 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Stay <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Updated</span>
+              <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.stayUpdated')}</span>
             </h2>
             <p 
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Get the latest updates on our investments, market insights, and company developments.
+              {t('landing.newsDescription')}
             </p>
           </div>
 
@@ -1268,7 +1350,7 @@ const SebnaLanding = () => {
                     : 'bg-gradient-to-br from-white/60 to-white/40 text-gray-700 hover:bg-white/80'
                 }`}
               >
-                {filter.charAt(0).toUpperCase() + filter.slice(1)} News
+                {t(`landing.${filter}`)} {t('landing.newsSuffix')}
               </button>
             ))}
           </div>
@@ -1281,7 +1363,7 @@ const SebnaLanding = () => {
                   <div className="h-full bg-gradient-to-r from-sebna-navy to-sebna-orange animate-loading-bar"></div>
                 </div>
                 <div className="mt-2 text-center text-sm font-semibold text-gray-600 animate-pulse">
-                  Updating news...
+                  {t('landing.updatingNews')}
                 </div>
               </div>
             </div>
@@ -1295,7 +1377,7 @@ const SebnaLanding = () => {
                     <div className="h-full bg-gradient-to-r from-sebna-navy to-sebna-orange animate-loading-bar"></div>
                   </div>
                   <div className="mt-2 text-center text-sm font-semibold text-gray-600 animate-pulse">
-                    Loading news...
+                    {t('landing.loadingNews')}
                   </div>
                 </div>
               </div>
@@ -1354,7 +1436,7 @@ const SebnaLanding = () => {
                       onClick={() => openPostModalByIndex(idx)}
                       className="flex items-center gap-2 text-sebna-navy font-semibold text-sm hover:text-sebna-orange transition-colors"
                     >
-                      Read More
+                      {t('landing.readMore')}
                       <ArrowRightIcon className="w-4 h-4" />
                     </button>
                   </div>
@@ -1445,8 +1527,9 @@ const SebnaLanding = () => {
                       disabled={selectedPostIndex === 0}
                       className="px-4 py-2 rounded-lg bg-gradient-to-br from-white/60 to-white/40 text-gray-700 font-semibold disabled:opacity-50 transition-all duration-300 hover:bg-white/80"
                     >
-                      Previous
+                      {t('landing.previous')}
                     </button>
+
                     <div className="text-sm text-gray-500">
                       {selectedPostIndex != null ? `${selectedPostIndex + 1} / ${landingPosts.length}` : ''}
                     </div>
@@ -1456,7 +1539,7 @@ const SebnaLanding = () => {
                       disabled={selectedPostIndex == null || selectedPostIndex >= landingPosts.length - 1}
                       className="px-4 py-2 rounded-lg bg-gradient-to-br from-white/60 to-white/40 text-gray-700 font-semibold disabled:opacity-50 transition-all duration-300 hover:bg-white/80"
                     >
-                      Next
+                      {t('landing.next')}
                     </button>
                   </div>
                 </div>
@@ -1476,7 +1559,7 @@ const SebnaLanding = () => {
                 <div className="absolute inset-0 bg-sebna-navy transform scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left"></div>
                 <span className="relative flex items-center justify-center gap-3">
                   <PlusIcon className="w-5 h-5" />
-                  {newsLoading ? 'Loading...' : 'Load More News'}
+                  {newsLoading ? t('landing.loading') : t('landing.loadMoreNews')}
                 </span>
               </button>
             </div>
@@ -1494,7 +1577,7 @@ const SebnaLanding = () => {
             >
               <EnvelopeIcon className="w-4 h-4 text-sebna-navy" />
               <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">
-                Get In Touch
+                {t('landing.getInTouch')}
               </span>
             </div>
             <h2 
@@ -1502,14 +1585,14 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              Contact <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">Us</span>
+              <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.contactUs')}</span>
             </h2>
             <p 
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
-              Ready to start your investment journey? Get in touch with our expert team.
+              {t('landing.contactDescription')}
             </p>
           </div>
 
@@ -1517,10 +1600,10 @@ const SebnaLanding = () => {
             {/* Contact Info */}
             <div className="space-y-6">
               {[
-                { icon: MapPinIcon, title: 'Visit Our Office', content: 'Mekelle, Tigray, Ethiopia\nNear Commercial Bank Building' },
-                { icon: PhoneIcon, title: 'Call Us', content: '+251 914 858 538\n+251 911 234 567' },
-                { icon: EnvelopeIcon, title: 'Email Us', content: 'info@sebna.et\ninvest@sebna.et' },
-                { icon: ClockIcon, title: 'Business Hours', content: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 2:00 PM' },
+                { icon: MapPinIcon, title: t('landing.visitOffice'), content: 'Mekelle, Tigray, Ethiopia\nNear Commercial Bank Building' },
+                { icon: PhoneIcon, title: t('landing.callUs'), content: '+251 914 858 538\n+251 911 234 567' },
+                { icon: EnvelopeIcon, title: t('landing.emailUs'), content: 'info@sebna.et\ninvest@sebna.et' },
+                { icon: ClockIcon, title: t('landing.businessHours'), content: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 2:00 PM' },
               ].map((contact, idx) => (
                 <div
                   key={idx}
@@ -1549,34 +1632,34 @@ const SebnaLanding = () => {
                 <div className="grid sm:grid-cols-2 gap-4">
                   <input
                     type="text"
-                    placeholder="First Name"
+                    placeholder={t('landing.firstName')}
                     className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                   />
                   <input
                     type="text"
-                    placeholder="Last Name"
+                    placeholder={t('landing.lastName')}
                     className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                   />
                 </div>
                 <input
                   type="email"
-                  placeholder="Email Address"
+                  placeholder={t('landing.emailAddress')}
                   className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                 />
                 <input
                   type="tel"
-                  placeholder="Phone Number"
+                  placeholder={t('landing.phoneNumber')}
                   className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                 />
                 <select className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300">
-                  <option>Select a subject</option>
-                  <option>Investment Inquiry</option>
-                  <option>Partnership</option>
-                  <option>Customer Support</option>
-                  <option>Other</option>
+                  <option>{t('landing.selectSubject')}</option>
+                  <option>{t('landing.investmentInquiry')}</option>
+                  <option>{t('landing.partnership')}</option>
+                  <option>{t('landing.customerSupport')}</option>
+                  <option>{t('landing.other')}</option>
                 </select>
                 <textarea
-                  placeholder="Message"
+                  placeholder={t('landing.message')}
                   rows="4"
                   className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300 resize-none"
                 ></textarea>
@@ -1584,7 +1667,7 @@ const SebnaLanding = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy to-sebna-orange opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <span className="relative flex items-center justify-center gap-3">
                     <PaperAirplaneIcon className="w-5 h-5" />
-                    Send Message
+                    {t('landing.sendMessage')}
                   </span>
                 </button>
               </form>
@@ -1604,10 +1687,10 @@ const SebnaLanding = () => {
              
             </div>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-              Empowering shared investment, enabling shared growth. Join us in building a prosperous future for Tigray.
+              {t('landing.footerDescription')}
             </p>
             <div className="text-gray-500 text-sm">
-              &copy; {new Date().getFullYear()} Sebna S.C. All rights reserved.
+              &copy; {new Date().getFullYear()} Sebna S.C. {t('landing.allRightsReserved')}
             </div>
           </div>
         </div>

@@ -25,13 +25,16 @@ import {
   setOpenConfigurator,
   setOpenSidenav,
 } from "@/context";
+import { useI18n } from "@/i18n/I18nContext";
 import brandLogo from "@/assets/logo.svg";
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
   const { fixedNavbar, openSidenav } = controller;
+  const { lang, setLang, t } = useI18n();
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
+  const currentLangLabel = lang === 'am' ? 'አማ' : lang === 'ti' ? 'ትግ' : 'EN';
 
   return (
     <Navbar
@@ -74,8 +77,69 @@ export function DashboardNavbar() {
         </div>
         <div className="flex items-center">
           <div className="mr-auto md:mr-4 md:w-56">
-            <Input label="Search" />
+            <Input label={t('dashboard.search')} />
           </div>
+
+          <Menu placement="bottom-end">
+            <MenuHandler>
+              <Button
+                variant="text"
+                color="blue-gray"
+                className="hidden items-center gap-2 px-3 xl:flex normal-case"
+              >
+                {currentLangLabel}
+              </Button>
+            </MenuHandler>
+            <MenuList className="w-max border-0">
+              <MenuItem
+                onClick={() => setLang('en')}
+                className={lang === 'en' ? 'font-semibold text-sebna-navy' : ''}
+              >
+                {t('admin.language.english')}
+              </MenuItem>
+              <MenuItem
+                onClick={() => setLang('am')}
+                className={lang === 'am' ? 'font-semibold text-sebna-navy' : ''}
+              >
+                {t('admin.language.amharic')}
+              </MenuItem>
+              <MenuItem
+                onClick={() => setLang('ti')}
+                className={lang === 'ti' ? 'font-semibold text-sebna-navy' : ''}
+              >
+                {t('admin.language.tigrinya')}
+              </MenuItem>
+            </MenuList>
+          </Menu>
+
+          <Menu placement="bottom-end">
+            <MenuHandler>
+              <IconButton variant="text" color="blue-gray" className="grid xl:hidden">
+                <span className="text-xs font-semibold text-sebna-navy">{currentLangLabel}</span>
+              </IconButton>
+            </MenuHandler>
+            <MenuList className="w-max border-0">
+              <MenuItem
+                onClick={() => setLang('en')}
+                className={lang === 'en' ? 'font-semibold text-sebna-navy' : ''}
+              >
+                {t('admin.language.english')}
+              </MenuItem>
+              <MenuItem
+                onClick={() => setLang('am')}
+                className={lang === 'am' ? 'font-semibold text-sebna-navy' : ''}
+              >
+                {t('admin.language.amharic')}
+              </MenuItem>
+              <MenuItem
+                onClick={() => setLang('ti')}
+                className={lang === 'ti' ? 'font-semibold text-sebna-navy' : ''}
+              >
+                {t('admin.language.tigrinya')}
+              </MenuItem>
+            </MenuList>
+          </Menu>
+
           <IconButton
             variant="text"
             color="blue-gray"
@@ -91,7 +155,7 @@ export function DashboardNavbar() {
               className="hidden items-center gap-1 px-4 xl:flex normal-case"
             >
               <UserCircleIcon className="h-5 w-5 text-sebna-navy" />
-              Sign In
+              {t('dashboard.signIn')}
             </Button>
             <IconButton
               variant="text"

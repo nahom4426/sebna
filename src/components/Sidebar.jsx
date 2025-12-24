@@ -3,7 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { ROLES } from '@/constants/roles';
 import { isSuperAdmin, hasAllPrivileges } from '@/utils/rbacUtils';
-
+import brandIcon from '@/assets/Icon@300x.png';
 const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -17,6 +17,13 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
       path: '/dashboard/home',
       requiredRoles: [ROLES.READ_REPORTS],
     },
+     {
+      name: 'My Shares',
+      icon: '🏠',
+      path: '/dashboard/shareholder',
+      requiredRoles: [ROLES.READ_POSTS],
+    },
+    
     {
       name: 'Posts',
       icon: '📰',
@@ -163,7 +170,9 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
       {/* Header Section */}
       <div className="flex-shrink-0 space-y-4">
         <div className="flex gap-2 justify-center items-center py-4 w-full">
-          <span className="transition-transform transform text-sebna-navy hover:scale-110 text-2xl">🏥</span>
+          <span className="transition-transform transform text-sebna-navy hover:scale-110 text-2xl">
+                  <img src={brandIcon} alt="Sebna" className="w-8 h-8 object-contain" />
+          </span>
           {!isCollapsed && (
             <span className="text-lg font-bold text-sebna-navy animate-fade-in">Sebna</span>
           )}
@@ -309,7 +318,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
         <div className="p-4 bg-gradient-to-br from-gray-50 to-white border-t border-gray-100">
           <div className="flex gap-3 items-center p-3 rounded-xl bg-sebna-navy/5">
             <div className="flex justify-center items-center w-10 h-10 rounded-full bg-sebna-navy/10">
-              <span className="text-lg">🏥</span>
+                             <img src={brandIcon} alt="Sebna" className="w-8 h-8 object-contain" />
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-xs font-semibold text-gray-700 truncate">
