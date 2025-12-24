@@ -203,10 +203,10 @@ const News = () => {
           <div className="grid grid-cols-3 items-center">
             <button
               onClick={handleBack}
-              className="group flex items-center gap-3 px-3 w-40 py-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg transition-all duration-300"
+              className="group flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 border border-slate-200/50 dark:border-slate-700/50 hover:bg-white dark:hover:bg-slate-800 hover:shadow-lg transition-all duration-300"
             >
               <ArrowLeftIcon className="w-5 h-5 text-slate-600 dark:text-slate-300 group-hover:-translate-x-1 transition-transform" />
-              <span className="font-semibold text-slate-700 dark:text-slate-200">Back to Home</span>
+              <span className="hidden sm:inline font-semibold text-slate-700 dark:text-slate-200">Back to Home</span>
             </button>
 
             <div className="flex items-center justify-center">

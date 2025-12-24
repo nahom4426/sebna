@@ -4,6 +4,7 @@ import { useAuthStore } from '@/stores/authStore';
 import { ROLES } from '@/constants/roles';
 import { isSuperAdmin, hasAllPrivileges } from '@/utils/rbacUtils';
 import brandIcon from '@/assets/Icon@300x.png';
+import brandLogo from '@/assets/logo.svg';
 const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -170,12 +171,13 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
       {/* Header Section */}
       <div className="flex-shrink-0 space-y-4">
         <div className="flex gap-2 justify-center items-center py-4 w-full">
-          <span className="transition-transform transform text-sebna-navy hover:scale-110 text-2xl">
-                  <img src={brandIcon} alt="Sebna" className="w-8 h-8 object-contain" />
+          <span className="transition-transform transform text-sebna-navy hover:scale-110">
+            <img
+              src={isCollapsed ? brandIcon : brandLogo}
+              alt="Sebna"
+              className={isCollapsed ? 'w-8 h-8 object-contain' : 'h-7 w-auto object-contain'}
+            />
           </span>
-          {!isCollapsed && (
-            <span className="text-lg font-bold text-sebna-navy animate-fade-in">Sebna</span>
-          )}
         </div>
         <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
       </div>

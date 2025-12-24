@@ -32,8 +32,78 @@
     <!-- Nepcha Analytics (nepcha.com) -->
     <!-- Nepcha is a easy-to-use web analytics. No cookies and fully compliant with GDPR, CCPA and PECR. -->
     <script defer data-site="YOUR_DOMAIN_HERE" src="https://api.nepcha.com/js/nepcha-analytics.js"></script>
+
+    <style>
+      #app-preloader {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: radial-gradient(1200px circle at 20% 20%, rgba(244, 59, 17, 0.22), transparent 55%),
+          radial-gradient(1000px circle at 80% 70%, rgba(0, 23, 75, 0.30), transparent 55%),
+          linear-gradient(135deg, #00174b 0%, #f43b11 100%);
+      }
+
+      #app-preloader .app-preloader-inner {
+        text-align: center;
+        color: rgba(255, 255, 255, 0.92);
+        font-family: Roboto, system-ui, -apple-system, Segoe UI, Arial, sans-serif;
+      }
+
+      #app-preloader .app-preloader-title {
+        font-weight: 900;
+        letter-spacing: 0.18em;
+        font-size: 44px;
+        line-height: 1;
+        margin-bottom: 14px;
+      }
+
+      #app-preloader .app-preloader-subtitle {
+        font-weight: 500;
+        font-size: 14px;
+        opacity: 0.9;
+        margin-top: 12px;
+      }
+
+      #app-preloader .app-preloader-bar {
+        width: 240px;
+        height: 8px;
+        background: rgba(255, 255, 255, 0.18);
+        border-radius: 999px;
+        overflow: hidden;
+        margin: 0 auto;
+      }
+
+      #app-preloader .app-preloader-bar::before {
+        content: "";
+        display: block;
+        height: 100%;
+        width: 50%;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.15));
+        transform: translateX(-100%);
+        animation: appPreloaderMove 1.1s ease-in-out infinite;
+      }
+
+      @keyframes appPreloaderMove {
+        0% {
+          transform: translateX(-100%);
+        }
+        100% {
+          transform: translateX(200%);
+        }
+      }
+    </style>
   </head>
   <body>
+    <div id="app-preloader" aria-label="Loading">
+      <div class="app-preloader-inner">
+        <div class="app-preloader-title">SEBNA</div>
+        <div class="app-preloader-bar"></div>
+        <div class="app-preloader-subtitle">Loading experience...</div>
+      </div>
+    </div>
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

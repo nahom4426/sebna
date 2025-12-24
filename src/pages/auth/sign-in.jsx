@@ -469,7 +469,7 @@ const SignIn = () => {
         transition={{ delay: 0.2 }}
       >
         <FiArrowLeft className="w-5 h-5 group-hover:animate-pulse" />
-        <span className="font-medium text-sm sm:text-base">Back to Home</span>
+        <span className="hidden sm:inline font-medium text-sm sm:text-base">Back to Home</span>
       </motion.button>
 
       <motion.div 
@@ -765,7 +765,7 @@ const SignIn = () => {
                 >
                   {/* Phone Input */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                    <label className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                       <FiSmartphone className="w-4 h-4" />
                       Phone Number
                     </label>

@@ -1,6 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AOS from 'aos';
 import 'aos/dist/aos.css';
 import { Button } from '@/components';
 import { useI18n } from '@/i18n/I18nContext';
@@ -59,6 +58,7 @@ const SebnaLanding = () => {
   const navigate = useNavigate();
   const { lang, setLang, t } = useI18n();
   const deviceIdRef = useRef(null);
+  const aosRef = useRef(null);
   const [currentPrice, setCurrentPrice] = useState(10000);
   const [priceChange, setPriceChange] = useState(0);
   const [priceHistory, setPriceHistory] = useState(() => Array.from({ length: 24 }, () => 10000));
@@ -71,6 +71,7 @@ const SebnaLanding = () => {
   const [newsTotalElements, setNewsTotalElements] = useState(0);
   const [newsLast, setNewsLast] = useState(false);
   const [newsLoading, setNewsLoading] = useState(false);
+  const hasLoadedNewsRef = useRef(false);
 
   const [selectedPostIndex, setSelectedPostIndex] = useState(null);
   const [selectedPost, setSelectedPost] = useState(null);
@@ -82,7 +83,6 @@ const SebnaLanding = () => {
   const [modalCommentsLoading, setModalCommentsLoading] = useState(false);
   const [newCommentText, setNewCommentText] = useState('');
   const [newCommentSubmitting, setNewCommentSubmitting] = useState(false);
-  const [showLoadingScreen, setShowLoadingScreen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -181,34 +181,77 @@ const SebnaLanding = () => {
   }, []);
 
   useEffect(() => {
-    try {
-      AOS.init({
-        duration: 800,
-        easing: 'ease-out-cubic',
-        once: false,
-        mirror: true,
-        offset: 100,
-        delay: 100,
-      });
-      AOS.refresh();
-    } catch (e) {
-      console.error('AOS init error:', e);
-    }
+    let mounted = true;
+    const initAos = async () => {
+      try {
+        const mod = await import('aos');
+        if (!mounted) return;
+        const Aos = mod?.default;
+        if (!Aos) return;
+
+        aosRef.current = Aos;
+
+        Aos.init({
+          duration: 700,
+          easing: 'ease-out-cubic',
+          once: false,
+          mirror: true,
+          offset: 80,
+          delay: 0,
+          disable: false,
+        });
+        Aos.refresh();
+      } catch (e) {
+        console.error('AOS init error:', e);
+      }
+    };
+
+    initAos();
+
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowLoadingScreen(false);
-    }, 1500);
+    const refresh = () => {
+      const Aos = aosRef.current;
+      if (!Aos) return;
+      if (typeof Aos.refreshHard === 'function') Aos.refreshHard();
+      else if (typeof Aos.refresh === 'function') Aos.refresh();
+    };
 
-    return () => clearTimeout(timer);
+    if (typeof window === 'undefined') return undefined;
+
+    // After initial render / global loader removal, make sure AOS recalculates positions.
+    const id = window.setTimeout(refresh, 400);
+    window.addEventListener('load', refresh);
+    window.addEventListener('resize', refresh);
+
+    return () => {
+      window.clearTimeout(id);
+      window.removeEventListener('load', refresh);
+      window.removeEventListener('resize', refresh);
+    };
   }, []);
+
+  useEffect(() => {
+    // When async content changes height (news cards, etc.), refresh AOS so desktop triggers correctly.
+    const Aos = aosRef.current;
+    if (!Aos) return;
+    const id = window.setTimeout(() => {
+      if (typeof Aos.refreshHard === 'function') Aos.refreshHard();
+      else if (typeof Aos.refresh === 'function') Aos.refresh();
+    }, 150);
+    return () => window.clearTimeout(id);
+  }, [landingPosts.length, newsLoading]);
 
   useEffect(() => {
     const fetchLandingPosts = async () => {
       setNewsLoading(true);
       try {
         const res = await getLandingPosts({ category: newsFilter, page: 0, limit: newsLimit });
+
         if (res?.success) {
           const data = res.data;
           const content = data?.content || data?.posts || data?.response || data || [];
@@ -228,8 +271,30 @@ const SebnaLanding = () => {
         setNewsLoading(false);
       }
     };
+
+    // Defer the very first fetch until the browser is idle to improve first paint.
+    // Subsequent filter/limit changes should fetch immediately.
+    if (!hasLoadedNewsRef.current && typeof window !== 'undefined') {
+      hasLoadedNewsRef.current = true;
+      if (typeof window.requestIdleCallback === 'function') {
+        const id = window.requestIdleCallback(() => fetchLandingPosts());
+        return () => window.cancelIdleCallback?.(id);
+      }
+      const id = window.setTimeout(() => fetchLandingPosts(), 0);
+      return () => window.clearTimeout(id);
+    }
+
     fetchLandingPosts();
   }, [newsFilter, newsLimit]);
+
+  const floatingElements = useMemo(() => {
+    return Array.from({ length: 15 }, () => ({
+      top: `${Math.random() * 100}%`,
+      left: `${Math.random() * 100}%`,
+      duration: `${3 + Math.random() * 7}s`,
+      delay: `${Math.random() * 5}s`,
+    }));
+  }, []);
 
   const handleLoadMoreNews = () => {
     if (newsLoading) return;
@@ -422,32 +487,6 @@ const SebnaLanding = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-sebna-navy/5 to-sebna-orange/5 overflow-x-hidden">
-      {/* Loading Screen */}
-      {showLoadingScreen && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-gradient-to-br from-sebna-navy via-sebna-navy to-sebna-navy">
-          <div className="relative">
-            {/* Animated orbs */}
-            <div className="absolute -inset-20">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full bg-gradient-to-r from-sebna-navy/20 via-sebna-orange/15 to-sebna-navy/20 blur-3xl animate-gradient-orb-1"></div>
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 rounded-full bg-gradient-to-r from-sebna-orange/20 via-sebna-navy/10 to-sebna-orange/20 blur-3xl animate-gradient-orb-2"></div>
-            </div>
-            
-            {/* Loading content */}
-            <div className="relative z-10 text-center text-white">
-              <div className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-white via-sebna-orange/30 to-white bg-clip-text text-transparent animate-gradient-shift">
-                SEBNA
-              </div>
-              <div className="flex items-center justify-center gap-3 mb-8">
-                <div className="w-3 h-3 rounded-full bg-white animate-pulse"></div>
-                <div className="w-3 h-3 rounded-full bg-white animate-pulse animation-delay-200"></div>
-                <div className="w-3 h-3 rounded-full bg-white animate-pulse animation-delay-400"></div>
-              </div>
-              <p className="text-lg md:text-xl text-white/90 animate-fade-in">{t('landing.loadingScreenTagline')}</p>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         {/* Gradient Orbs */}
@@ -462,15 +501,15 @@ const SebnaLanding = () => {
         }}></div>
         
         {/* Floating Elements */}
-        {[...Array(15)].map((_, i) => (
+        {floatingElements.map((cfg, i) => (
           <div
             key={i}
             className="absolute w-2 h-2 rounded-full bg-gradient-to-r from-sebna-navy/20 to-sebna-orange/20"
             style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float ${3 + Math.random() * 7}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 5}s`
+              top: cfg.top,
+              left: cfg.left,
+              animation: `float ${cfg.duration} ease-in-out infinite`,
+              animationDelay: cfg.delay,
             }}
           />
         ))}
@@ -939,6 +978,8 @@ const SebnaLanding = () => {
                 <img 
                   src="/img/3WKayx05pJw1.jpg" 
                   alt="Business Meeting" 
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-[400px] object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
@@ -947,6 +988,8 @@ const SebnaLanding = () => {
                 <img 
                   src="/img/oMF3X7wxIJ0X.jpg"
                   alt="Office Building"
+                  loading="lazy"
+                  decoding="async"
                   className="w-full h-full object-cover"
                 />
               </div>
@@ -1280,6 +1323,8 @@ const SebnaLanding = () => {
                   <img
                     src={bank.image}
                     alt={bank.name}
+                    loading="lazy"
+                    decoding="async"
                     className="max-w-full max-h-full object-contain p-2"
                   />
                 </div>
@@ -1401,6 +1446,8 @@ const SebnaLanding = () => {
                     <img
                       src={getImageSrc(post) || '/img/4u2kdUqkvMAv.jpg'}
                       alt={post.title || 'News'}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                     />
                     <div className="absolute top-4 left-4">
@@ -1482,6 +1529,7 @@ const SebnaLanding = () => {
                     <img
                       src={getImageSrc(selectedPost || landingPosts[selectedPostIndex]) || '/img/4u2kdUqkvMAv.jpg'}
                       alt={(selectedPost || landingPosts[selectedPostIndex])?.title || 'Post'}
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -1573,6 +1621,8 @@ const SebnaLanding = () => {
           <div className="text-center mb-16">
             <div 
               data-aos="fade-up"
+              data-aos-anchor-placement="top-bottom"
+              data-aos-offset="200"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
               <EnvelopeIcon className="w-4 h-4 text-sebna-navy" />
@@ -1583,6 +1633,8 @@ const SebnaLanding = () => {
             <h2 
               data-aos="fade-up"
               data-aos-delay="100"
+              data-aos-anchor-placement="top-bottom"
+              data-aos-offset="200"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
               <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.contactUs')}</span>
@@ -1590,6 +1642,8 @@ const SebnaLanding = () => {
             <p 
               data-aos="fade-up"
               data-aos-delay="200"
+              data-aos-anchor-placement="top-bottom"
+              data-aos-offset="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
             >
               {t('landing.contactDescription')}
@@ -1609,6 +1663,8 @@ const SebnaLanding = () => {
                   key={idx}
                   data-aos="fade-up"
                   data-aos-delay={300 + idx * 100}
+                  data-aos-anchor-placement="top-bottom"
+                  data-aos-offset="200"
                   className="group flex gap-4 p-6 rounded-2xl bg-gradient-to-br from-white/70 to-white/50 backdrop-blur-sm border border-white/30 shadow-lg hover:shadow-xl transition-all duration-500 hover:-translate-y-1"
                 >
                   <div className="w-14 h-14 rounded-xl bg-gradient-to-r from-sebna-navy to-sebna-orange flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-500">
@@ -1626,6 +1682,8 @@ const SebnaLanding = () => {
             <div 
               data-aos="fade-left"
               data-aos-delay="300"
+              data-aos-anchor-placement="top-bottom"
+              data-aos-offset="200"
               className="bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-xl rounded-3xl p-8 border border-white/40 shadow-2xl"
             >
               <form className="space-y-4">
