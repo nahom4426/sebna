@@ -82,13 +82,13 @@ export function DashboardNavbar() {
 
           <Menu placement="bottom-end">
             <MenuHandler>
-              <Button
+              {/* <Button
                 variant="text"
                 color="blue-gray"
                 className="hidden items-center gap-2 px-3 xl:flex normal-case"
               >
                 {currentLangLabel}
-              </Button>
+              </Button> */}
             </MenuHandler>
             <MenuList className="w-max border-0">
               <MenuItem
@@ -97,7 +97,7 @@ export function DashboardNavbar() {
               >
                 {t('admin.language.english')}
               </MenuItem>
-              <MenuItem
+              {/* <MenuItem
                 onClick={() => setLang('am')}
                 className={lang === 'am' ? 'font-semibold text-sebna-navy' : ''}
               >
@@ -108,7 +108,7 @@ export function DashboardNavbar() {
                 className={lang === 'ti' ? 'font-semibold text-sebna-navy' : ''}
               >
                 {t('admin.language.tigrinya')}
-              </MenuItem>
+              </MenuItem> */}
             </MenuList>
           </Menu>
 

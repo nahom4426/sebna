@@ -562,7 +562,7 @@ const SebnaLanding = () => {
                   >
                     EN
                   </button>
-                  <button
+                  {/* <button
                     type="button"
                     onClick={() => setLang('am')}
                     className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
@@ -581,7 +581,7 @@ const SebnaLanding = () => {
                     aria-label="Tigrinya"
                   >
                     ትግ
-                  </button>
+                  </button> */}
                 </div>
               </div>
 
@@ -629,7 +629,7 @@ const SebnaLanding = () => {
                     >
                       EN
                     </button>
-                    <button
+                    {/* <button
                       type="button"
                       onClick={() => setLang('am')}
                       className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
@@ -646,7 +646,7 @@ const SebnaLanding = () => {
                       }`}
                     >
                       ትግ
-                    </button>
+                    </button> */}
                   </div>
                 </div>
 
