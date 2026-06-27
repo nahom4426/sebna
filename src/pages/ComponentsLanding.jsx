@@ -81,14 +81,14 @@ const ComponentsLanding = () => {
           <div className="flex items-center gap-8">
             <h1 className="text-2xl font-bold text-blue-900">Sebna</h1>
             <div className="hidden md:flex gap-6">
-              <button 
+              <button
                 onClick={() => window.scrollTo(0, 0)}
                 className="text-gray-600 hover:text-blue-900 transition-colors font-medium"
               >
                 Components
               </button>
-              <a 
-                href="#" 
+              <a
+                href="#"
                 className="text-gray-600 hover:text-blue-900 transition-colors font-medium"
               >
                 Documentation
@@ -96,15 +96,15 @@ const ComponentsLanding = () => {
             </div>
           </div>
           <div className="flex gap-3">
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="sm"
               onClick={() => navigate('/auth/sign-in')}
             >
               Sign In
             </Button>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               size="sm"
               onClick={() => navigate('/dashboard/home')}
             >
@@ -391,7 +391,7 @@ const ComponentsLanding = () => {
               footer={<Button size="sm" variant="outline">View Report</Button>}
             >
               <div className="text-center py-4">
-                <p className="text-4xl font-bold text-orange-600">ETB 250M</p>
+                <p className="text-4xl font-bold text-orange-600">ETB 25M</p>
                 <p className="text-gray-600 mt-2">Total capital invested</p>
               </div>
             </Card>
@@ -506,15 +506,15 @@ const ComponentsLanding = () => {
             Use these components to create beautiful, responsive applications with ease.
           </p>
           <div className="flex flex-wrap gap-4 justify-center">
-            <Button 
-              variant="secondary" 
+            <Button
+              variant="secondary"
               size="lg"
               onClick={() => navigate('/dashboard/home')}
             >
               Go to Dashboard
             </Button>
-            <Button 
-              variant="outline" 
+            <Button
+              variant="outline"
               size="lg"
               onClick={() => navigate('/auth/sign-in')}
             >

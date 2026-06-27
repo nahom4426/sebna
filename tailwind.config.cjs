@@ -1,7 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 const withMT = require("@material-tailwind/react/utils/withMT");
 
- module.exports = withMT({
+module.exports = withMT({
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   darkMode: 'class', // Enable class-based dark mode
   theme: {
@@ -88,7 +88,7 @@ const withMT = require("@material-tailwind/react/utils/withMT");
           'to': { opacity: '1' },
         },
         ripple: {
-          '100%': { 
+          '100%': {
             width: 'var(--btnWidth)',
             height: 'var(--btnWidth)',
             opacity: '0',
@@ -109,7 +109,7 @@ const withMT = require("@material-tailwind/react/utils/withMT");
         'inner-lg': 'inset 0 2px 4px 0 rgba(0, 0, 0, 0.06)',
       },
       transitionDuration: {
-        '250': '250ms',
+        '250': '25Ms',
         '400': '400ms',
         '600': '600ms',
       },
@@ -140,7 +140,7 @@ const withMT = require("@material-tailwind/react/utils/withMT");
   },
   plugins: [
     require('@tailwindcss/forms'),
-    function({ addUtilities }) {
+    function ({ addUtilities }) {
       const newUtilities = {
         '.text-gradient': {
           background: 'linear-gradient(135deg, #00174b 0%, #f43b11 100%)',

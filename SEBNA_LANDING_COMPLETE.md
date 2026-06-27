@@ -105,7 +105,7 @@ export * from './auth';
 - Gradient background with animated blobs
 - Hero content with badge
 - "You are the epicenter" headline
-- Stats display (15,000 investors, 250M ETB, 45 projects)
+- Stats display (250 investors, 25M ETB, 45 projects)
 - Call-to-action buttons
 - Live price card with chart
 

@@ -10,9 +10,9 @@ import { getPricePerSharePublic } from '@/pages/admin/api/SebnaSettingsApi';
 import brandLogo from '@/assets/logo.svg';
 import brandIcon from '@/assets/Icon@300x.png';
 
-import { 
-  ArrowUpIcon, 
-  Bars3Icon, 
+import {
+  ArrowUpIcon,
+  Bars3Icon,
   XMarkIcon,
   ChevronRightIcon,
   ChevronLeftIcon,
@@ -47,7 +47,7 @@ import {
   UserIcon
 } from '@heroicons/react/24/outline';
 
-import { 
+import {
   HeartIcon as HeartSolidIcon,
   StarIcon as StarSolidIcon
 } from '@heroicons/react/24/solid';
@@ -173,10 +173,10 @@ const SebnaLanding = () => {
     const checkMobile = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
+
     checkMobile();
     window.addEventListener('resize', checkMobile);
-    
+
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
@@ -492,14 +492,14 @@ const SebnaLanding = () => {
         {/* Gradient Orbs */}
         <div className="absolute -top-40 -left-40 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-sebna-navy/10 via-sebna-navy/5 to-sebna-orange/10 blur-3xl animate-gradient-orb-1"></div>
         <div className="absolute -bottom-40 -right-40 w-[600px] h-[600px] rounded-full bg-gradient-to-r from-sebna-orange/10 via-sebna-navy/5 to-sebna-navy/10 blur-3xl animate-gradient-orb-2"></div>
-        
+
         {/* Grid Pattern */}
         <div className="absolute inset-0 opacity-[0.02]" style={{
           backgroundImage: `linear-gradient(to right, #00174b 1px, transparent 1px),
                            linear-gradient(to bottom, #00174b 1px, transparent 1px)`,
           backgroundSize: '50px 50px'
         }}></div>
-        
+
         {/* Floating Elements */}
         {floatingElements.map((cfg, i) => (
           <div
@@ -516,11 +516,10 @@ const SebnaLanding = () => {
       </div>
 
       {/* Navigation */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${
-        scrolled 
-          ? 'bg-white/90 backdrop-blur-xl shadow-lg shadow-sebna-navy/10 border-b border-white/20 py-3' 
-          : 'bg-transparent py-4'
-      }`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
+        ? 'bg-white/90 backdrop-blur-xl shadow-lg shadow-sebna-navy/10 border-b border-white/20 py-3'
+        : 'bg-transparent py-4'
+        }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between">
             {/* Logo */}
@@ -555,9 +554,8 @@ const SebnaLanding = () => {
                   <button
                     type="button"
                     onClick={() => setLang('en')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                      lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
-                    }`}
+                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                      }`}
                     aria-label="English"
                   >
                     EN
@@ -585,7 +583,7 @@ const SebnaLanding = () => {
                 </div>
               </div>
 
-              <button 
+              <button
                 onClick={() => navigate('/auth/sign-in')}
                 className="px-4 py-2 text-gray-700 hover:text-sebna-navy font-medium transition-colors"
               >
@@ -623,9 +621,8 @@ const SebnaLanding = () => {
                     <button
                       type="button"
                       onClick={() => setLang('en')}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                        lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                        }`}
                     >
                       EN
                     </button>
@@ -661,7 +658,7 @@ const SebnaLanding = () => {
                   </button>
                 ))}
                 <div className="border-t border-gray-200/50 pt-3 mt-3 space-y-2">
-                  <button 
+                  <button
                     onClick={() => navigate('/auth/sign-in')}
                     className="w-full px-4 py-3 text-gray-700 hover:text-sebna-navy hover:bg-sebna-navy/5 font-medium transition-all duration-300 rounded-xl text-left"
                   >
@@ -693,8 +690,8 @@ const SebnaLanding = () => {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             {/* Left Content */}
             <div className="text-center lg:text-left">
-              <div 
-                data-aos="fade-up" 
+              <div
+                data-aos="fade-up"
                 data-aos-delay="100"
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
               >
@@ -704,8 +701,8 @@ const SebnaLanding = () => {
                 </span>
               </div>
 
-              <h1 
-                data-aos="fade-up" 
+              <h1
+                data-aos="fade-up"
                 data-aos-delay="200"
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
               >
@@ -715,8 +712,8 @@ const SebnaLanding = () => {
                 </span>
               </h1>
 
-              <p 
-                data-aos="fade-up" 
+              <p
+                data-aos="fade-up"
                 data-aos-delay="300"
                 className="text-lg sm:text-xl text-gray-600 mb-8 max-w-2xl"
               >
@@ -724,14 +721,14 @@ const SebnaLanding = () => {
               </p>
 
               {/* Stats */}
-              <div 
-                data-aos="fade-up" 
+              <div
+                data-aos="fade-up"
                 data-aos-delay="400"
                 className="grid grid-cols-3 gap-6 mb-8"
               >
-                {[ 
-                  { value: '15,000', label: t('landing.statsActiveInvestors'), color: 'from-sebna-navy to-sebna-navy' },
-                  { value: '250M', label: t('landing.statsEtbInvested'), color: 'from-sebna-navy to-sebna-navy' },
+                {[
+                  { value: '250', label: t('landing.statsActiveInvestors'), color: 'from-sebna-navy to-sebna-navy' },
+                  { value: '25M', label: t('landing.statsEtbInvested'), color: 'from-sebna-navy to-sebna-navy' },
                   { value: '45', label: t('landing.statsProjectsFunded'), color: 'from-sebna-orange to-sebna-orange' },
                 ].map((stat, idx) => (
                   <div key={idx} className="text-center">
@@ -746,8 +743,8 @@ const SebnaLanding = () => {
               </div>
 
               {/* CTA Buttons */}
-              <div 
-                data-aos="fade-up" 
+              <div
+                data-aos="fade-up"
                 data-aos-delay="500"
                 className="flex flex-col sm:flex-row gap-4"
               >
@@ -772,8 +769,8 @@ const SebnaLanding = () => {
             </div>
 
             {/* Right Card */}
-            <div 
-              data-aos="fade-left" 
+            <div
+              data-aos="fade-left"
               data-aos-delay="600"
               className="relative"
             >
@@ -881,8 +878,8 @@ const SebnaLanding = () => {
 
         {/* Scroll Indicator */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2">
-          <div 
-            data-aos="fade-up" 
+          <div
+            data-aos="fade-up"
             data-aos-delay="800"
             className="flex flex-col items-center gap-2"
           >
@@ -898,7 +895,7 @@ const SebnaLanding = () => {
       <section id="about" className="py-20 md:py-32 relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center mb-16">
-            <div 
+            <div
               data-aos="fade-up"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
@@ -908,7 +905,7 @@ const SebnaLanding = () => {
               </span>
             </div>
 
-            <h2 
+            <h2
               data-aos="fade-up"
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
@@ -919,7 +916,7 @@ const SebnaLanding = () => {
               </span>
             </h2>
 
-            <p 
+            <p
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
@@ -951,7 +948,7 @@ const SebnaLanding = () => {
                   gradient: 'from-sebna-orange to-sebna-orange'
                 }
               ].map((feature, idx) => (
-                <div 
+                <div
                   key={idx}
                   data-aos="fade-up"
                   data-aos-delay={300 + idx * 100}
@@ -969,15 +966,15 @@ const SebnaLanding = () => {
             </div>
 
             {/* Image */}
-            <div 
+            <div
               data-aos="fade-left"
               data-aos-delay="400"
               className="relative"
             >
               <div className="relative rounded-3xl overflow-hidden shadow-2xl">
-                <img 
-                  src="/img/3WKayx05pJw1.jpg" 
-                  alt="Business Meeting" 
+                <img
+                  src="/img/3WKayx05pJw1.jpg"
+                  alt="Business Meeting"
                   loading="lazy"
                   decoding="async"
                   className="w-full h-[400px] object-cover transform group-hover:scale-110 transition-transform duration-700"
@@ -985,7 +982,7 @@ const SebnaLanding = () => {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
               </div>
               <div className="absolute -bottom-6 -right-6 w-48 h-36 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-                <img 
+                <img
                   src="/img/oMF3X7wxIJ0X.jpg"
                   alt="Office Building"
                   loading="lazy"
@@ -1004,7 +1001,7 @@ const SebnaLanding = () => {
         <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid md:grid-cols-2 gap-8">
             {/* Mission */}
-            <div 
+            <div
               data-aos="fade-up"
               className="group bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2"
             >
@@ -1021,7 +1018,7 @@ const SebnaLanding = () => {
             </div>
 
             {/* Vision */}
-            <div 
+            <div
               data-aos="fade-up"
               data-aos-delay="200"
               className="group bg-gradient-to-br from-white/20 to-white/10 backdrop-blur-xl rounded-3xl p-8 border border-white/20 shadow-2xl hover:shadow-3xl transition-all duration-500 hover:-translate-y-2"
@@ -1045,7 +1042,7 @@ const SebnaLanding = () => {
       <section className="py-20 md:py-32 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div 
+            <div
               data-aos="fade-up"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
@@ -1055,7 +1052,7 @@ const SebnaLanding = () => {
               </span>
             </div>
 
-            <h2 
+            <h2
               data-aos="fade-up"
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
@@ -1063,7 +1060,7 @@ const SebnaLanding = () => {
               {t('landing.valuesTitlePrefix')} <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">SEBNA</span> {t('landing.valuesTitleSuffix')}
             </h2>
 
-            <p 
+            <p
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
@@ -1088,7 +1085,7 @@ const SebnaLanding = () => {
               >
                 {/* Hover effect background */}
                 <div className={`absolute inset-0 bg-gradient-to-r ${value.gradient} opacity-0 group-hover:opacity-10 transition-opacity duration-500`}></div>
-                
+
                 <div className="relative z-10">
                   <div className={`w-14 h-14 rounded-xl bg-gradient-to-r ${value.gradient} flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-500`}>
                     <value.icon className="w-7 h-7 text-white" />
@@ -1108,7 +1105,7 @@ const SebnaLanding = () => {
       <section className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div 
+            <div
               data-aos="fade-up"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
@@ -1118,7 +1115,7 @@ const SebnaLanding = () => {
               </span>
             </div>
 
-            <h2 
+            <h2
               data-aos="fade-up"
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
@@ -1129,7 +1126,7 @@ const SebnaLanding = () => {
               </span>
             </h2>
 
-            <p 
+            <p
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
@@ -1154,7 +1151,7 @@ const SebnaLanding = () => {
                   change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
-                { icon: WalletIcon, value: 'ETB 250M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
                 { icon: UserGroupIcon, value: '15,247', label: t('landing.activeInvestors'), change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
@@ -1180,7 +1177,7 @@ const SebnaLanding = () => {
       <section id="investment" className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div 
+            <div
               data-aos="fade-up"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
@@ -1189,14 +1186,14 @@ const SebnaLanding = () => {
                 {t('landing.liveDashboard')}
               </span>
             </div>
-            <h2 
+            <h2
               data-aos="fade-up"
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
               <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.investmentPerformance')}</span>
             </h2>
-            <p 
+            <p
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
@@ -1222,7 +1219,7 @@ const SebnaLanding = () => {
                   change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
-                { icon: WalletIcon, value: 'ETB 250M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
                 { icon: UserGroupIcon, value: '15,247', label: t('landing.activeInvestors'), change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
                 { icon: BanknotesIcon, value: '16.8%', label: t('landing.averageRoi'), change: '+1.2%', gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
@@ -1249,7 +1246,7 @@ const SebnaLanding = () => {
       <section id="banking" className="py-20 md:py-32 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div 
+            <div
               data-aos="fade-up"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
@@ -1258,14 +1255,14 @@ const SebnaLanding = () => {
                 {t('landing.bankingPartners')}
               </span>
             </div>
-            <h2 
+            <h2
               data-aos="fade-up"
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
               <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.trustedFinancialPartners')}</span>
             </h2>
-            <p 
+            <p
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
@@ -1274,7 +1271,7 @@ const SebnaLanding = () => {
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
             {[
               {
                 image: '/img/W83dIgAvVmg6.jpg',
@@ -1311,6 +1308,15 @@ const SebnaLanding = () => {
                 features: ['Foreign Exchange', 'Trade Finance', 'International Transfer'],
                 gradient: 'from-sebna-navy to-sebna-orange',
                 delay: '400'
+              },
+              {
+                image: '/img/anbessa.jpg',
+                name: 'Anbessa Bank',
+                fullName: 'Anbessa Bank',
+                description: 'Reliable banking services with a focus on customer satisfaction and community development.',
+                features: ['Savings Account', 'Loans', 'Digital Banking'],
+                gradient: 'from-sebna-navy to-sebna-orange',
+                delay: '500'
               }
             ].map((bank, idx) => (
               <div
@@ -1350,7 +1356,7 @@ const SebnaLanding = () => {
       <section id="news" className="py-20 md:py-32">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div 
+            <div
               data-aos="fade-up"
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
@@ -1359,14 +1365,14 @@ const SebnaLanding = () => {
                 {t('landing.latestNews')}
               </span>
             </div>
-            <h2 
+            <h2
               data-aos="fade-up"
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
               <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.stayUpdated')}</span>
             </h2>
-            <p 
+            <p
               data-aos="fade-up"
               data-aos-delay="200"
               className="text-xl text-gray-600 max-w-3xl mx-auto"
@@ -1376,7 +1382,7 @@ const SebnaLanding = () => {
           </div>
 
           {/* Filters */}
-          <div 
+          <div
             data-aos="fade-up"
             data-aos-delay="300"
             className="flex flex-wrap gap-2 justify-center mb-12"
@@ -1389,11 +1395,10 @@ const SebnaLanding = () => {
                   setNewsFilter(filter);
                   setNewsLimit(8);
                 }}
-                className={`px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 ${
-                  newsFilter === filter
-                    ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow-lg shadow-sebna-navy/25'
-                    : 'bg-gradient-to-br from-white/60 to-white/40 text-gray-700 hover:bg-white/80'
-                }`}
+                className={`px-6 py-2.5 rounded-xl font-semibold transition-all duration-300 ${newsFilter === filter
+                  ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow-lg shadow-sebna-navy/25'
+                  : 'bg-gradient-to-br from-white/60 to-white/40 text-gray-700 hover:bg-white/80'
+                  }`}
               >
                 {t(`landing.${filter}`)} {t('landing.newsSuffix')}
               </button>
@@ -1619,7 +1624,7 @@ const SebnaLanding = () => {
       <section id="contact" className="py-20 md:py-32 bg-gradient-to-b from-gray-50 to-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <div 
+            <div
               data-aos="fade-up"
               data-aos-anchor-placement="top-bottom"
               data-aos-offset="200"
@@ -1630,7 +1635,7 @@ const SebnaLanding = () => {
                 {t('landing.getInTouch')}
               </span>
             </div>
-            <h2 
+            <h2
               data-aos="fade-up"
               data-aos-delay="100"
               data-aos-anchor-placement="top-bottom"
@@ -1639,7 +1644,7 @@ const SebnaLanding = () => {
             >
               <span className="bg-gradient-to-r from-sebna-navy to-sebna-orange bg-clip-text text-transparent">{t('landing.contactUs')}</span>
             </h2>
-            <p 
+            <p
               data-aos="fade-up"
               data-aos-delay="200"
               data-aos-anchor-placement="top-bottom"
@@ -1654,9 +1659,9 @@ const SebnaLanding = () => {
             {/* Contact Info */}
             <div className="space-y-6">
               {[
-                { icon: MapPinIcon, title: t('landing.visitOffice'), content: 'Mekelle, Tigray, Ethiopia\nNear Commercial Bank Building' },
-                { icon: PhoneIcon, title: t('landing.callUs'), content: '+251 914 858 538\n+251 911 234 567' },
-                { icon: EnvelopeIcon, title: t('landing.emailUs'), content: 'info@sebna.et\ninvest@sebna.et' },
+                { icon: MapPinIcon, title: t('landing.visitOffice'), content: 'Mekelle, Tigray, Ethiopia\nAround hawzen avenue' },
+                { icon: PhoneIcon, title: t('landing.callUs'), content: '+251 914 5858388' },
+                { icon: EnvelopeIcon, title: t('landing.emailUs'), content: 'sebnainfo@gmail.com\nwww.sebna.et' },
                 { icon: ClockIcon, title: t('landing.businessHours'), content: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 2:00 PM' },
               ].map((contact, idx) => (
                 <div
@@ -1679,7 +1684,7 @@ const SebnaLanding = () => {
             </div>
 
             {/* Contact Form */}
-            <div 
+            <div
               data-aos="fade-left"
               data-aos-delay="300"
               data-aos-anchor-placement="top-bottom"
@@ -1740,9 +1745,9 @@ const SebnaLanding = () => {
           <div className="text-center">
             <div className="flex items-center justify-center gap-3 mb-6">
               <div className=" h-10 rounded-xl bg-gradient-to-br flex items-center justify-center">
-              <img src={brandLogo} alt="Sebna" className="h-6 w-auto" />
+                <img src={brandLogo} alt="Sebna" className="h-6 w-auto" />
               </div>
-             
+
             </div>
             <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
               {t('landing.footerDescription')}
@@ -1757,9 +1762,8 @@ const SebnaLanding = () => {
       {/* Back to Top */}
       <button
         onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-        className={`fixed bottom-6 right-6 w-12 h-12 rounded-full bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow-2xl shadow-sebna-navy/25 hover:shadow-3xl hover:shadow-sebna-navy/35 transition-all duration-500 ${
-          scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
-        }`}
+        className={`fixed bottom-6 right-6 w-12 h-12 rounded-full bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow-2xl shadow-sebna-navy/25 hover:shadow-3xl hover:shadow-sebna-navy/35 transition-all duration-500 ${scrolled ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          }`}
       >
         <ArrowUpIcon className="w-5 h-5 mx-auto" />
       </button>
