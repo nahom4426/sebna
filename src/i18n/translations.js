@@ -33,7 +33,7 @@ export const translations = {
       signIn: 'Sign In',
       dashboard: 'Dashboard',
       goToDashboard: 'Go to Dashboard',
-      trustedBy: 'Trusted by 10,000+ Investors',
+      trustedBy: 'Trusted by 250+ Investors',
       heroLine1: 'You are the',
       heroHighlight: 'Epicenter',
       heroDescription:
@@ -168,7 +168,7 @@ export const translations = {
       signIn: 'ግባ',
       dashboard: 'ዳሽቦርድ',
       goToDashboard: 'ወደ ዳሽቦርድ ሂድ',
-      trustedBy: 'በ10,000+ ኢንቨስተሮች የታመነ',
+      trustedBy: 'በ250+ ኢንቨስተሮች የታመነ',
       heroLine1: 'እርስዎ ናቸው',
       heroHighlight: 'ማዕከሉ',
       heroDescription:
@@ -303,7 +303,7 @@ export const translations = {
       signIn: 'እተው',
       dashboard: 'ዳሽቦርድ',
       goToDashboard: 'ናብ ዳሽቦርድ ኪድ',
-      trustedBy: 'ብ10,000+ ኢንቨስተራት ዝተኣምነ',
+      trustedBy: 'ብ10,250+ ኢንቨስተራት ዝተኣምነ',
       heroLine1: 'ንስኻ/ንስኺ ኢኻ/ኢኺ',
       heroHighlight: 'ማእከል',
       heroDescription:

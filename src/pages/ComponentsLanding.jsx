@@ -380,7 +380,7 @@ const ComponentsLanding = () => {
               footer={<Button size="sm" variant="outline">Learn More</Button>}
             >
               <div className="text-center py-4">
-                <p className="text-4xl font-bold text-green-600">15,247</p>
+                <p className="text-4xl font-bold text-green-600">250</p>
                 <p className="text-gray-600 mt-2">Active investors on platform</p>
               </div>
             </Card>

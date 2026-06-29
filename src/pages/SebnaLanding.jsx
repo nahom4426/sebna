@@ -729,7 +729,7 @@ const SebnaLanding = () => {
                 {[
                   { value: '250', label: t('landing.statsActiveInvestors'), color: 'from-sebna-navy to-sebna-navy' },
                   { value: '25M', label: t('landing.statsEtbInvested'), color: 'from-sebna-navy to-sebna-navy' },
-                  { value: '45', label: t('landing.statsProjectsFunded'), color: 'from-sebna-orange to-sebna-orange' },
+                  { value: '2', label: t('landing.statsProjectsFunded'), color: 'from-sebna-orange to-sebna-orange' },
                 ].map((stat, idx) => (
                   <div key={idx} className="text-center">
                     <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</div>
@@ -814,9 +814,6 @@ const SebnaLanding = () => {
                     <div className="inline-flex items-baseline justify-center gap-2 mb-2">
                       <span className="text-gray-500">ETB</span>
                       <span className="text-5xl md:text-6xl font-bold text-gray-900">{Number(currentPrice || 0).toLocaleString()}</span>
-                      <span className="bg-sebna-orange/10 text-sebna-orange px-3 py-1 rounded-xl text-sm font-semibold">
-                        {priceChange >= 0 ? '+' : ''}{Number(priceChange || 0).toFixed(1)}%
-                      </span>
                     </div>
                   )}
                   <p className="text-sm text-gray-500">{t('landing.realTimeTradingData')}</p>
@@ -1148,11 +1145,10 @@ const SebnaLanding = () => {
                   icon: ChartBarIcon,
                   value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
                   label: t('landing.currentSharePrice'),
-                  change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
-                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: UserGroupIcon, value: '15,247', label: t('landing.activeInvestors'), change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '250', label: t('landing.activeInvestors'), gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
                   key={idx}
@@ -1164,8 +1160,7 @@ const SebnaLanding = () => {
                     <metric.icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</div>
-                  <div className="text-sm text-gray-500 mb-2">{metric.label}</div>
-                  <div className="text-sm text-green-600 font-semibold">{metric.change}</div>
+                  <div className="text-sm text-gray-500">{metric.label}</div>
                 </div>
               ))
             )}
@@ -1216,12 +1211,11 @@ const SebnaLanding = () => {
                   icon: ChartBarIcon,
                   value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
                   label: t('landing.currentSharePrice'),
-                  change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
-                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: UserGroupIcon, value: '15,247', label: t('landing.activeInvestors'), change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: BanknotesIcon, value: '16.8%', label: t('landing.averageRoi'), change: '+1.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '250', label: t('landing.activeInvestors'), gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: BanknotesIcon, value: '16.8%', label: t('landing.averageRoi'), gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
                   key={idx}
@@ -1233,8 +1227,7 @@ const SebnaLanding = () => {
                     <metric.icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</div>
-                  <div className="text-sm text-gray-500 mb-2">{metric.label}</div>
-                  <div className="text-sm text-green-600 font-semibold">{metric.change}</div>
+                  <div className="text-sm text-gray-500">{metric.label}</div>
                 </div>
               ))
             )}
@@ -1659,7 +1652,7 @@ const SebnaLanding = () => {
             {/* Contact Info */}
             <div className="space-y-6">
               {[
-                { icon: MapPinIcon, title: t('landing.visitOffice'), content: 'Mekelle, Tigray, Ethiopia\nAround hawzen avenue' },
+                { icon: MapPinIcon, title: t('landing.visitOffice'), content: 'Mekelle, Tigray, Ethiopia\nAround Hawzen Avenue' },
                 { icon: PhoneIcon, title: t('landing.callUs'), content: '+251 914 5858388' },
                 { icon: EnvelopeIcon, title: t('landing.emailUs'), content: 'sebnainfo@gmail.com\nwww.sebna.et' },
                 { icon: ClockIcon, title: t('landing.businessHours'), content: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 2:00 PM' },
