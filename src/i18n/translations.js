@@ -85,7 +85,6 @@ export const translations = {
         'Explore our diverse portfolio of investment opportunities across key sectors in Tigray.',
       currentSharePrice: 'Current Share Price',
       totalInvestment: 'Total Investment',
-      averageRoi: 'Average ROI',
       liveDashboard: 'Live Dashboard',
       investmentPerformance: 'Investment Performance',
       performanceDescription:

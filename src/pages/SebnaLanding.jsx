@@ -980,7 +980,7 @@ const SebnaLanding = () => {
               </div>
               <div className="absolute -bottom-6 -right-6 w-48 h-36 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
                 <img
-                  src="/img/oMF3X7wxIJ0X.jpg"
+                  src="/img/42fr15EGxcLv.jpg"
                   alt="Office Building"
                   loading="lazy"
                   decoding="async"
@@ -1197,10 +1197,10 @@ const SebnaLanding = () => {
             </p>
           </div>
 
-          {/* Metrics Grid */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+          {/* Metrics Grid - Now 3 columns */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
             {priceLoading ? (
-              [...Array(4)].map((_, idx) => (
+              [...Array(3)].map((_, idx) => (
                 <div key={idx} data-aos="fade-up" data-aos-delay={300 + idx * 100}>
                   <MetricSkeleton />
                 </div>
@@ -1215,7 +1215,6 @@ const SebnaLanding = () => {
                 },
                 { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), gradient: 'from-sebna-navy to-sebna-orange' },
                 { icon: UserGroupIcon, value: '250', label: t('landing.activeInvestors'), gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: BanknotesIcon, value: '16.8%', label: t('landing.averageRoi'), gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
                   key={idx}
