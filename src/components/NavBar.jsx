@@ -2,12 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuthStore } from '@/stores/authStore';
 import { useI18n } from '@/i18n/I18nContext';
+import { useTheme } from '@/context/ThemeContext';
 import defaultProfile from '@/assets/img/profile.png';
 
 const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { lang, setLang, t } = useI18n();
+  const { isDark, toggleTheme } = useTheme();
   const auth = useAuthStore((state) => state.auth);
   const logout = useAuthStore((state) => state.logout);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -65,8 +67,8 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
   return (
     <div
-      className={`sticky top-0 z-30 flex items-center justify-between h-16 px-3 md:px-6 rounded-xl transition-all duration-300 backdrop-blur-xl bg-white/95 ${
-        isScrolled ? 'shadow-xl scale-[1.002] border border-transparent' : 'shadow-md border border-gray-100'
+      className={`sticky top-0 z-30 flex items-center justify-between h-16 px-3 md:px-6 rounded-xl transition-all duration-300 backdrop-blur-xl dark:bg-gray-900/95 bg-white/95 ${
+        isScrolled ? 'shadow-xl scale-[1.002] border border-transparent dark:border-gray-700/50' : 'shadow-md border border-gray-100 dark:border-gray-800'
       }`}
     >
       {/* Left Section */}
@@ -96,7 +98,7 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
             className="p-2 rounded-lg transition-colors duration-200 hover:bg-primary/10 group hover:scale-105"
             aria-label="Go back"
           >
-            <svg className="w-5 h-5 text-gray-600 transition-colors duration-200 group-hover:text-sebna-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5 text-gray-600 dark:text-gray-300 transition-colors duration-200 group-hover:text-sebna-navy" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </button>
@@ -104,11 +106,11 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
         {/* Breadcrumbs and Title */}
         <div className="flex flex-col flex-1 min-w-0">
-          <h1 className="text-base font-semibold text-gray-800 truncate md:text-lg animate-slide-in-left">
+          <h1 className="text-base font-semibold text-gray-800 dark:text-gray-100 truncate md:text-lg animate-slide-in-left">
             {currentPage}
           </h1>
           {breadcrumbsList.length > 1 && !isMobile && (
-            <p className="flex gap-1 items-center text-xs text-gray-500 truncate animate-fade-in">
+            <p className="flex gap-1 items-center text-xs text-gray-500 dark:text-gray-400 truncate animate-fade-in">
               {breadcrumbsList.map((crumb, index) => (
                 <span key={index}>
                   {index > 0 && <span>/</span>}
@@ -134,6 +136,46 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
       {/* Right Section */}
       <div className="flex gap-2 items-center md:gap-4">
+        {/* Dark Mode Toggle */}
+        <button
+          type="button"
+          onClick={toggleTheme}
+          id="theme-toggle-btn"
+          aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+          className="relative p-2 rounded-xl transition-all duration-300 group hover:scale-105 active:scale-95
+                     bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800
+                     border border-gray-200/60 dark:border-gray-600/60
+                     shadow-sm hover:shadow-md"
+        >
+          <div className="relative w-5 h-5">
+            {/* Sun icon */}
+            <svg
+              className={`absolute inset-0 w-5 h-5 text-amber-500 transition-all duration-500 ${
+                isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-50'
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <circle cx="12" cy="12" r="5" strokeWidth="2" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+            </svg>
+            {/* Moon icon */}
+            <svg
+              className={`absolute inset-0 w-5 h-5 text-sebna-navy transition-all duration-500 ${
+                isDark ? 'opacity-0 -rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'
+              }`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+            </svg>
+          </div>
+        </button>
+
         <button
           type="button"
           onClick={() => navigate('/admin/messages')}
@@ -164,9 +206,9 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
         <div ref={languageMenuRef} className="relative">
             <button
               onClick={() => setShowLanguageMenu(!showLanguageMenu)}
-              className="flex gap-2 items-center px-2 py-2 rounded-lg transition-all duration-200 md:px-3 hover:bg-gray-100 group hover:scale-105"
+              className="flex gap-2 items-center px-2 py-2 rounded-lg transition-all duration-200 md:px-3 hover:bg-gray-100 dark:hover:bg-gray-700 group hover:scale-105"
             >
-              <span className="text-xs font-medium text-gray-700 md:text-sm group-hover:text-sebna-navy">{currentLangLabel}</span>
+              <span className="text-xs font-medium text-gray-700 dark:text-gray-200 md:text-sm group-hover:text-sebna-navy">{currentLangLabel}</span>
               <svg
                 className={`w-4 h-4 text-gray-500 transition-transform group-hover:text-sebna-navy ${showLanguageMenu ? 'rotate-180' : ''}`}
                 fill="none"
@@ -177,14 +219,14 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
               </svg>
             </button>
             {showLanguageMenu && (
-              <div className="absolute right-0 mt-2 w-40 rounded-lg border border-gray-100 shadow-lg backdrop-blur-sm bg-white/95 animate-dropdown z-50">
+              <div className="absolute right-0 mt-2 w-40 rounded-lg border border-gray-100 dark:border-gray-700 shadow-lg backdrop-blur-sm bg-white/95 dark:bg-gray-800/95 animate-dropdown z-50">
                 <button
                   onClick={() => {
                     setLang('en');
                     setShowLanguageMenu(false);
                   }}
-                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 text-sm ${
-                    lang === 'en' ? 'text-sebna-navy font-semibold' : 'text-gray-700'
+                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 text-sm ${
+                    lang === 'en' ? 'text-sebna-navy font-semibold' : 'text-gray-700 dark:text-gray-200'
                   }`}
                 >
                   {t('admin.language.english')}
@@ -194,8 +236,8 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
                     setLang('am');
                     setShowLanguageMenu(false);
                   }}
-                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 text-sm ${
-                    lang === 'am' ? 'text-sebna-navy font-semibold' : 'text-gray-700'
+                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 text-sm ${
+                    lang === 'am' ? 'text-sebna-navy font-semibold' : 'text-gray-700 dark:text-gray-200'
                   }`}
                 >
                   {t('admin.language.amharic')}
@@ -205,8 +247,8 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
                     setLang('ti');
                     setShowLanguageMenu(false);
                   }}
-                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 text-sm ${
-                    lang === 'ti' ? 'text-sebna-navy font-semibold' : 'text-gray-700'
+                  className={`w-full text-left p-2 rounded-md transition-colors hover:bg-gray-50 dark:hover:bg-gray-700 text-sm ${
+                    lang === 'ti' ? 'text-sebna-navy font-semibold' : 'text-gray-700 dark:text-gray-200'
                   }`}
                 >
                   {t('admin.language.tigrinya')}
@@ -253,12 +295,12 @@ const NavBar = ({ toggleMobileMenu, isMobile, breadcrumbs = {} }) => {
 
           {/* User Dropdown Menu */}
           {showUserMenu && (
-            <div className="absolute right-0 z-50 flex flex-col gap-1 p-2 mt-2 w-48 rounded-xl border border-gray-100 shadow-xl backdrop-blur-sm md:w-56 bg-white/95 animate-dropdown">
-              <div className="px-3 py-2 border-b border-gray-100">
-                <p className="text-sm font-medium text-gray-800">
+            <div className="absolute right-0 z-50 flex flex-col gap-1 p-2 mt-2 w-48 rounded-xl border border-gray-100 dark:border-gray-700 shadow-xl backdrop-blur-sm md:w-56 bg-white/95 dark:bg-gray-800/95 animate-dropdown">
+              <div className="px-3 py-2 border-b border-gray-100 dark:border-gray-700">
+                <p className="text-sm font-medium text-gray-800 dark:text-gray-100">
                   {auth?.user?.firstName} {auth?.user?.fatherName}
                 </p>
-                <p className="text-xs text-gray-500">{auth?.user?.email}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{auth?.user?.email}</p>
               </div>
 
               <button

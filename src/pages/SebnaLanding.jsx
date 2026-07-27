@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import 'aos/dist/aos.css';
 import { Button } from '@/components';
 import { useI18n } from '@/i18n/I18nContext';
+import { useTheme } from '@/context/ThemeContext';
 import { getLandingPosts, getPublicPostById } from '@/pages/admin/posts/api/PostsApi';
 import { checkIfPublicUserLiked, togglePublicLike } from '@/pages/admin/posts/api/LikesApi';
 import { getPublicPostComments, createPublicComment } from '@/pages/admin/comments/api/CommentsApi';
@@ -57,6 +58,7 @@ const NAV_ITEMS = ['home', 'about', 'services', 'investment', 'banking', 'news',
 const SebnaLanding = () => {
   const navigate = useNavigate();
   const { lang, setLang, t } = useI18n();
+  const { isDark, toggleTheme } = useTheme();
   const deviceIdRef = useRef(null);
   const aosRef = useRef(null);
   const [currentPrice, setCurrentPrice] = useState(10000);
@@ -486,7 +488,7 @@ const SebnaLanding = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-sebna-navy/5 to-sebna-orange/5 overflow-x-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-sebna-navy/5 to-sebna-orange/5 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 overflow-x-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
         {/* Gradient Orbs */}
@@ -517,7 +519,7 @@ const SebnaLanding = () => {
 
       {/* Navigation */}
       <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${scrolled
-        ? 'bg-white/90 backdrop-blur-xl shadow-lg shadow-sebna-navy/10 border-b border-white/20 py-3'
+        ? 'bg-white/90 dark:bg-gray-900/90 backdrop-blur-xl shadow-lg shadow-sebna-navy/10 border-b border-white/20 dark:border-gray-700/20 py-3'
         : 'bg-transparent py-4'
         }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -539,7 +541,7 @@ const SebnaLanding = () => {
                 <button
                   key={item}
                   onClick={() => scrollToSection(item)}
-                  className="px-4 py-2 text-gray-700 hover:text-sebna-navy font-medium transition-all duration-300 rounded-lg hover:bg-white/50 hover:shadow-sm capitalize text-sm"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-200 hover:text-sebna-navy font-medium transition-all duration-300 rounded-lg hover:bg-white/50 dark:hover:bg-gray-800/50 hover:shadow-sm capitalize text-sm"
                 >
                   {t(`nav.${item}`)}
                 </button>
@@ -550,42 +552,57 @@ const SebnaLanding = () => {
             <div className="hidden md:flex items-center gap-3">
               {/* Language Selector */}
               <div className="relative">
-                <div className="flex items-center gap-1 bg-white/60 backdrop-blur-sm border border-white/30 rounded-xl p-1 shadow-sm">
+                <div className="flex items-center gap-1 bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm border border-white/30 dark:border-gray-600/30 rounded-xl p-1 shadow-sm">
                   <button
                     type="button"
                     onClick={() => setLang('en')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 dark:text-gray-200 hover:bg-white/70 dark:hover:bg-gray-700'
                       }`}
                     aria-label="English"
                   >
                     EN
                   </button>
-                  {/* <button
-                    type="button"
-                    onClick={() => setLang('am')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                      lang === 'am' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
-                    }`}
-                    aria-label="Amharic"
-                  >
-                    አማ
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setLang('ti')}
-                    className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                      lang === 'ti' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
-                    }`}
-                    aria-label="Tigrinya"
-                  >
-                    ትግ
-                  </button> */}
                 </div>
               </div>
 
+              {/* Dark Mode Toggle */}
+              <button
+                type="button"
+                onClick={toggleTheme}
+                id="landing-theme-toggle"
+                aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                className="relative p-2.5 rounded-xl transition-all duration-300 hover:scale-110 active:scale-95
+                           bg-white/60 dark:bg-gray-800/60 backdrop-blur-sm
+                           border border-white/30 dark:border-gray-600/30 shadow-sm hover:shadow-md"
+              >
+                <div className="relative w-5 h-5">
+                  {/* Sun icon */}
+                  <svg
+                    className={`absolute inset-0 w-5 h-5 text-amber-500 transition-all duration-500 ${
+                      isDark ? 'opacity-100 rotate-0 scale-100' : 'opacity-0 rotate-90 scale-50'
+                    }`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <circle cx="12" cy="12" r="5" strokeWidth="2" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                      d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                  </svg>
+                  {/* Moon icon */}
+                  <svg
+                    className={`absolute inset-0 w-5 h-5 text-sebna-navy dark:text-white transition-all duration-500 ${
+                      isDark ? 'opacity-0 -rotate-90 scale-50' : 'opacity-100 rotate-0 scale-100'
+                    }`}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                      d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                  </svg>
+                </div>
+              </button>
+
               <button
                 onClick={() => navigate('/auth/sign-in')}
-                className="px-4 py-2 text-gray-700 hover:text-sebna-navy font-medium transition-colors"
+                className="px-4 py-2 text-gray-700 dark:text-gray-200 hover:text-sebna-navy font-medium transition-colors"
               >
                 {t('landing.signIn')}
               </button>
@@ -612,38 +629,50 @@ const SebnaLanding = () => {
 
           {/* Mobile Menu */}
           {mobileMenuOpen && (
-            <div className="md:hidden absolute top-full left-4 right-4 mt-2 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-sebna-navy/15 border border-white/30 animate-slide-in-down overflow-hidden">
+            <div className="md:hidden absolute top-full left-4 right-4 mt-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-sebna-navy/15 border border-white/30 dark:border-gray-700/30 animate-slide-in-down overflow-hidden">
               <div className="p-4 space-y-1">
-                {/* Mobile Language Selector */}
-                <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gradient-to-br from-white/70 to-white/40 border border-white/30">
-                  <div className="text-sm font-semibold text-gray-800">{t('common.language')}</div>
-                  <div className="flex items-center gap-1">
+                {/* Mobile Language + Theme Selector */}
+                <div className="flex items-center justify-between gap-3 px-4 py-3 rounded-xl bg-gradient-to-br from-white/70 to-white/40 dark:from-gray-800/70 dark:to-gray-800/40 border border-white/30 dark:border-gray-700/30">
+                  <div className="text-sm font-semibold text-gray-800 dark:text-gray-100">{t('common.language')}</div>
+                  <div className="flex items-center gap-2">
                     <button
                       type="button"
                       onClick={() => setLang('en')}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
+                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${lang === 'en' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 dark:text-gray-200 hover:bg-white/70 dark:hover:bg-gray-700'
                         }`}
                     >
                       EN
                     </button>
-                    {/* <button
-                      type="button"
-                      onClick={() => setLang('am')}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                        lang === 'am' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
-                      }`}
-                    >
-                      አማ
-                    </button>
+                    {/* Dark mode toggle in mobile */}
                     <button
                       type="button"
-                      onClick={() => setLang('ti')}
-                      className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-all ${
-                        lang === 'ti' ? 'bg-gradient-to-r from-sebna-navy to-sebna-orange text-white shadow' : 'text-gray-700 hover:bg-white/70'
-                      }`}
+                      onClick={toggleTheme}
+                      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+                      className="p-2 rounded-lg transition-all duration-300 hover:scale-110
+                                 bg-white/60 dark:bg-gray-700/60 border border-white/30 dark:border-gray-600/30"
                     >
-                      ትግ
-                    </button> */}
+                      <div className="relative w-4 h-4">
+                        <svg
+                          className={`absolute inset-0 w-4 h-4 text-amber-500 transition-all duration-500 ${
+                            isDark ? 'opacity-100' : 'opacity-0'
+                          }`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <circle cx="12" cy="12" r="5" strokeWidth="2" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42" />
+                        </svg>
+                        <svg
+                          className={`absolute inset-0 w-4 h-4 text-sebna-navy dark:text-white transition-all duration-500 ${
+                            isDark ? 'opacity-0' : 'opacity-100'
+                          }`}
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2"
+                            d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z" />
+                        </svg>
+                      </div>
+                    </button>
                   </div>
                 </div>
 
@@ -651,16 +680,16 @@ const SebnaLanding = () => {
                   <button
                     key={item}
                     onClick={() => scrollToSection(item)}
-                    className="w-full px-4 py-3 text-gray-700 hover:text-sebna-navy hover:bg-sebna-navy/5 font-medium transition-all duration-300 rounded-xl capitalize text-left flex items-center gap-3"
+                    className="w-full px-4 py-3 text-gray-700 dark:text-gray-200 hover:text-sebna-navy hover:bg-sebna-navy/5 dark:hover:bg-sebna-navy/10 font-medium transition-all duration-300 rounded-xl capitalize text-left flex items-center gap-3"
                   >
                     <ChevronRightIcon className="w-4 h-4" />
                     {t(`nav.${item}`)}
                   </button>
                 ))}
-                <div className="border-t border-gray-200/50 pt-3 mt-3 space-y-2">
+                <div className="border-t border-gray-200/50 dark:border-gray-700/50 pt-3 mt-3 space-y-2">
                   <button
                     onClick={() => navigate('/auth/sign-in')}
-                    className="w-full px-4 py-3 text-gray-700 hover:text-sebna-navy hover:bg-sebna-navy/5 font-medium transition-all duration-300 rounded-xl text-left"
+                    className="w-full px-4 py-3 text-gray-700 dark:text-gray-200 hover:text-sebna-navy hover:bg-sebna-navy/5 dark:hover:bg-sebna-navy/10 font-medium transition-all duration-300 rounded-xl text-left"
                   >
                     {t('landing.signIn')}
                   </button>
@@ -729,7 +758,7 @@ const SebnaLanding = () => {
                 {[
                   { value: '250', label: t('landing.statsActiveInvestors'), color: 'from-sebna-navy to-sebna-navy' },
                   { value: '25M', label: t('landing.statsEtbInvested'), color: 'from-sebna-navy to-sebna-navy' },
-                  { value: '2', label: t('landing.statsProjectsFunded'), color: 'from-sebna-orange to-sebna-orange' },
+                  { value: '45', label: t('landing.statsProjectsFunded'), color: 'from-sebna-orange to-sebna-orange' },
                 ].map((stat, idx) => (
                   <div key={idx} className="text-center">
                     <div className="text-2xl sm:text-3xl font-bold text-gray-900">{stat.value}</div>
@@ -814,6 +843,9 @@ const SebnaLanding = () => {
                     <div className="inline-flex items-baseline justify-center gap-2 mb-2">
                       <span className="text-gray-500">ETB</span>
                       <span className="text-5xl md:text-6xl font-bold text-gray-900">{Number(currentPrice || 0).toLocaleString()}</span>
+                      <span className="bg-sebna-orange/10 text-sebna-orange px-3 py-1 rounded-xl text-sm font-semibold">
+                        {priceChange >= 0 ? '+' : ''}{Number(priceChange || 0).toFixed(1)}%
+                      </span>
                     </div>
                   )}
                   <p className="text-sm text-gray-500">{t('landing.realTimeTradingData')}</p>
@@ -974,18 +1006,9 @@ const SebnaLanding = () => {
                   alt="Business Meeting"
                   loading="lazy"
                   decoding="async"
-                  className="w-full h-[400px] object-cover transform group-hover:scale-110 transition-transform duration-700"
+                  className="w-full h-[400px] object-cover transform hover:scale-105 transition-transform duration-700"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
-              </div>
-              <div className="absolute -bottom-6 -right-6 w-48 h-36 rounded-2xl overflow-hidden shadow-2xl border-4 border-white">
-                <img
-                  src="/img/42fr15EGxcLv.jpg"
-                  alt="Office Building"
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover"
-                />
               </div>
             </div>
           </div>
@@ -1145,10 +1168,11 @@ const SebnaLanding = () => {
                   icon: ChartBarIcon,
                   value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
                   label: t('landing.currentSharePrice'),
+                  change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
-                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: UserGroupIcon, value: '250', label: t('landing.activeInvestors'), gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '250', label: t('landing.activeInvestors'), change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
                   key={idx}
@@ -1160,7 +1184,8 @@ const SebnaLanding = () => {
                     <metric.icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</div>
-                  <div className="text-sm text-gray-500">{metric.label}</div>
+                  <div className="text-sm text-gray-500 mb-2">{metric.label}</div>
+                  <div className="text-sm text-green-600 font-semibold">{metric.change}</div>
                 </div>
               ))
             )}
@@ -1197,10 +1222,10 @@ const SebnaLanding = () => {
             </p>
           </div>
 
-          {/* Metrics Grid - Now 3 columns */}
-          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+          {/* Metrics Grid */}
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
             {priceLoading ? (
-              [...Array(3)].map((_, idx) => (
+              [...Array(4)].map((_, idx) => (
                 <div key={idx} data-aos="fade-up" data-aos-delay={300 + idx * 100}>
                   <MetricSkeleton />
                 </div>
@@ -1211,10 +1236,12 @@ const SebnaLanding = () => {
                   icon: ChartBarIcon,
                   value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
                   label: t('landing.currentSharePrice'),
+                  change: `${priceChange >= 0 ? '+' : ''}${Number(priceChange || 0).toFixed(1)}%`,
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
-                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: UserGroupIcon, value: '250', label: t('landing.activeInvestors'), gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), change: '+15.2%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '250', label: t('landing.activeInvestors'), change: '+8.3%', gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: BanknotesIcon, value: '16.8%', label: t('landing.averageRoi'), change: '+1.2%', gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
                   key={idx}
@@ -1226,7 +1253,8 @@ const SebnaLanding = () => {
                     <metric.icon className="w-6 h-6 text-white" />
                   </div>
                   <div className="text-2xl font-bold text-gray-900 mb-1">{metric.value}</div>
-                  <div className="text-sm text-gray-500">{metric.label}</div>
+                  <div className="text-sm text-gray-500 mb-2">{metric.label}</div>
+                  <div className="text-sm text-green-600 font-semibold">{metric.change}</div>
                 </div>
               ))
             )}
@@ -1651,7 +1679,7 @@ const SebnaLanding = () => {
             {/* Contact Info */}
             <div className="space-y-6">
               {[
-                { icon: MapPinIcon, title: t('landing.visitOffice'), content: 'Mekelle, Tigray, Ethiopia\nAround Hawzen Avenue' },
+                { icon: MapPinIcon, title: t('landing.visitOffice'), content: 'Mekelle, Tigray, Ethiopia\nAround hawzen avenue' },
                 { icon: PhoneIcon, title: t('landing.callUs'), content: '+251 914 5858388' },
                 { icon: EnvelopeIcon, title: t('landing.emailUs'), content: 'sebnainfo@gmail.com\nwww.sebna.et' },
                 { icon: ClockIcon, title: t('landing.businessHours'), content: 'Monday - Friday: 8:00 AM - 6:00 PM\nSaturday: 9:00 AM - 2:00 PM' },

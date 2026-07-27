@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  /* Smooth theme transitions on key elements */
+  html {
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  /* Dark mode color scheme */
+  html.dark {
+    color-scheme: dark;
+  }
+
+  /* Dark background for body */
+  .dark body {
+    background-color: rgb(3 7 18);
+    color: rgb(243 244 246);
+  }
+
+  /* Smooth color transitions for theme switch - only on color properties */
+  .dark *,
+  .dark *::before,
+  .dark *::after {
+    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+  }
+}

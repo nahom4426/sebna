@@ -70,7 +70,7 @@ const MainLayout = () => {
   };
 
   return (
-    <div className="flex h-screen w-full bg-gradient-to-br from-gray-50 via-sebna-navy/5 to-sebna-orange/5 relative overflow-hidden">
+    <div className="flex h-screen w-full bg-gradient-to-br from-gray-50 via-sebna-navy/5 to-sebna-orange/5 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950 relative overflow-hidden">
       {/* Animated Background Elements */}
       <div className="fixed inset-0 pointer-events-none">
         {/* Gradient Orbs */}
@@ -165,8 +165,9 @@ const MainLayout = () => {
             : 'translateX(0)'
         }}
       >
-        <div className="h-full rounded-2xl bg-gradient-to-b from-white/90 via-white/80 to-white/70 
-                      backdrop-blur-2xl border border-white/40 shadow-2xl shadow-sebna-navy/10 
+        <div className="h-full rounded-2xl bg-gradient-to-b from-white/90 via-white/80 to-white/70
+                      dark:from-gray-900/95 dark:via-gray-900/90 dark:to-gray-900/85
+                      backdrop-blur-2xl border border-white/40 dark:border-gray-700/40 shadow-2xl shadow-sebna-navy/10 
                       overflow-hidden">
           <Sidebar
             isCollapsed={isCollapsed}
@@ -190,7 +191,8 @@ const MainLayout = () => {
 
         {/* NavBar with Glass Effect */}
         <div className="relative z-50 overflow-visible rounded-2xl bg-gradient-to-r from-white/80 via-white/70 to-white/60 
-                      backdrop-blur-2xl border border-white/40 shadow-xl shadow-sebna-navy/10 
+                      dark:from-gray-900/90 dark:via-gray-900/85 dark:to-gray-900/80
+                      backdrop-blur-2xl border border-white/40 dark:border-gray-700/40 shadow-xl shadow-sebna-navy/10 
                       transition-all duration-300 hover:shadow-2xl hover:shadow-sebna-navy/20">
           <NavBar
             toggleMobileMenu={toggleMobileMenu}
@@ -202,7 +204,8 @@ const MainLayout = () => {
         {/* Content Area with Glass Effect */}
         <div className="main-content-area show-scrollbar flex-1 overflow-auto rounded-2xl 
                        bg-gradient-to-br from-white/70 via-white/60 to-white/50 
-                       backdrop-blur-2xl border border-white/40 
+                       dark:from-gray-900/80 dark:via-gray-900/70 dark:to-gray-900/60
+                       backdrop-blur-2xl border border-white/40 dark:border-gray-700/40
                        shadow-xl shadow-sebna-navy/10 
                        transition-all duration-500 hover:shadow-2xl hover:shadow-sebna-navy/20 
                        p-3 md:p-6 min-w-0 relative group">
@@ -229,17 +232,17 @@ const MainLayout = () => {
 
       {/* Bottom Status Bar */}
       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-20 px-4 py-2 
-                    bg-gradient-to-r from-white/80 to-white/60 backdrop-blur-2xl 
-                    border border-white/40 rounded-full shadow-lg shadow-sebna-navy/10 
-                    text-sm text-gray-600 flex items-center gap-3">
+                    bg-gradient-to-r from-white/80 to-white/60 dark:from-gray-800/90 dark:to-gray-800/70 backdrop-blur-2xl 
+                    border border-white/40 dark:border-gray-700/40 rounded-full shadow-lg shadow-sebna-navy/10 
+                    text-sm text-gray-600 dark:text-gray-300 flex items-center gap-3">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 rounded-full bg-sebna-orange animate-pulse"></div>
           <span className="font-medium">System Status: </span>
-          <span className="text-sebna-navy font-semibold">Online</span>
+          <span className="text-sebna-navy dark:text-sebna-orange font-semibold">Online</span>
         </div>
-        <div className="w-px h-4 bg-gray-300/50"></div>
+        <div className="w-px h-4 bg-gray-300/50 dark:bg-gray-600/50"></div>
         <div className="hidden sm:block">
-          <span className="text-gray-500">Last updated: </span>
+          <span className="text-gray-500 dark:text-gray-400">Last updated: </span>
           <span className="font-medium">{new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
         </div>
       </div>

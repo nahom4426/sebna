@@ -153,16 +153,16 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
   const userData = auth?.user || {};
 
   return (
-    <div className="flex relative flex-col space-y-4 h-full rounded-2xl border border-gray-100 shadow-xl backdrop-blur-lg transition-all duration-300 bg-white/95">
+    <div className="flex relative flex-col space-y-4 h-full rounded-2xl border border-gray-100 dark:border-gray-700/50 shadow-xl backdrop-blur-lg transition-all duration-300 bg-white/95 dark:bg-gray-900/95">
       {/* Collapse Button */}
       {!isMobile && (
         <button
           onClick={() => toggleSidebar(!isCollapsed)}
-          className={`flex absolute -right-3 top-10 z-10 justify-center items-center bg-white rounded-full border border-gray-200 shadow-sm transition-all duration-300 cursor-pointer size-6 hover:bg-gray-50 hover:shadow-md ${
+          className={`flex absolute -right-3 top-10 z-10 justify-center items-center bg-white dark:bg-gray-800 rounded-full border border-gray-200 dark:border-gray-600 shadow-sm transition-all duration-300 cursor-pointer size-6 hover:bg-gray-50 dark:hover:bg-gray-700 hover:shadow-md ${
             isCollapsed ? 'rotate-180' : ''
           }`}
         >
-          <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-4 h-4 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -179,16 +179,16 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
             />
           </span>
         </div>
-        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent"></div>
+        <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-gray-600 to-transparent"></div>
       </div>
 
       {/* Close button for mobile */}
       {isMobile && (
         <button
           onClick={() => toggleSidebar()}
-          className="absolute top-4 right-4 z-20 p-2 rounded-lg transition-colors hover:bg-white/50"
+          className="absolute top-4 right-4 z-20 p-2 rounded-lg transition-colors hover:bg-white/50 dark:hover:bg-gray-700/50"
         >
-          <svg className="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-5 h-5 text-gray-600 dark:text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
           </svg>
         </button>
@@ -196,7 +196,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
 
       {/* Navigation Menu */}
       <div
-        className={`overflow-y-auto h-full scrollbar-hide text-gray-700 ${
+        className={`overflow-y-auto h-full scrollbar-hide text-gray-700 dark:text-gray-200 ${
           isCollapsed ? 'items-center' : 'px-4'
         }`}
       >
@@ -210,8 +210,8 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                     onClick={() => toggleMenu(item.name)}
                     className={`flex justify-between items-center w-full h-12 rounded-xl transition-all duration-200 group ${
                       expandedMenus.includes(item.name) && !isCollapsed
-                        ? 'bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 shadow-sm'
-                        : 'hover:bg-gray-50'
+                        ? 'bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 dark:from-sebna-navy/20 dark:to-sebna-orange/20 shadow-sm'
+                        : 'hover:bg-gray-50 dark:hover:bg-gray-800'
                     }`}
                   >
                     <span className="flex gap-4 items-center ml-3">
@@ -219,7 +219,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                         {item.icon}
                       </span>
                       {!isCollapsed && (
-                        <span className="text-sm font-semibold text-gray-700 transition-colors md:whitespace-nowrap group-hover:text-sebna-navy">
+                        <span className="text-sm font-semibold text-gray-700 dark:text-gray-200 transition-colors md:whitespace-nowrap group-hover:text-sebna-navy">
                           {item.name}
                         </span>
                       )}
@@ -255,7 +255,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                           className={`flex pl-3 h-10 rounded-lg transition-all duration-200 group w-full ${
                             isActive(child.path)
                               ? 'bg-sebna-navy text-white shadow-md'
-                              : 'hover:bg-sebna-navy/10 text-gray-600'
+                              : 'hover:bg-sebna-navy/10 dark:hover:bg-sebna-navy/20 text-gray-600 dark:text-gray-300'
                           }`}
                         >
                           <span className="flex gap-3 items-center">
@@ -289,7 +289,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                   className={`flex h-12 rounded-xl transition-all duration-200 group w-full ${
                     isActive(item.path)
                       ? 'bg-sebna-navy text-white shadow-md'
-                      : 'hover:bg-gray-50 hover:shadow-sm'
+                      : 'hover:bg-gray-50 dark:hover:bg-gray-800 hover:shadow-sm'
                   } ${isCollapsed ? 'justify-center' : 'pl-3'}`}
                 >
                   <span className="flex gap-3 items-center">
@@ -301,7 +301,7 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
                         className={`text-sm font-semibold transition-all duration-200 ${
                           isActive(item.path)
                             ? 'text-white'
-                            : 'text-gray-700 group-hover:text-sebna-navy'
+                            : 'text-gray-700 dark:text-gray-200 group-hover:text-sebna-navy'
                         }`}
                       >
                         {item.name}
@@ -317,16 +317,16 @@ const Sidebar = ({ isCollapsed, isMobile, isMobileOpen, toggleSidebar }) => {
 
       {/* Footer Section */}
       {(!isCollapsed || isMobile) && (
-        <div className="p-4 bg-gradient-to-br from-gray-50 to-white border-t border-gray-100">
-          <div className="flex gap-3 items-center p-3 rounded-xl bg-sebna-navy/5">
-            <div className="flex justify-center items-center w-10 h-10 rounded-full bg-sebna-navy/10">
+        <div className="p-4 bg-gradient-to-br from-gray-50 to-white dark:from-gray-800/50 dark:to-gray-900/50 border-t border-gray-100 dark:border-gray-700/50">
+          <div className="flex gap-3 items-center p-3 rounded-xl bg-sebna-navy/5 dark:bg-sebna-navy/10">
+            <div className="flex justify-center items-center w-10 h-10 rounded-full bg-sebna-navy/10 dark:bg-sebna-navy/20">
                              <img src={brandIcon} alt="Sebna" className="w-8 h-8 object-contain" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-gray-700 truncate">
+              <p className="text-xs font-semibold text-gray-700 dark:text-gray-200 truncate">
                 {userData.firstName || 'User'}
               </p>
-              <p className="text-xs text-gray-500 truncate">{userData.roleName || 'Role'}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{userData.roleName || 'Role'}</p>
             </div>
           </div>
         </div>
