@@ -721,7 +721,7 @@ const SebnaLanding = () => {
                 className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
               >
                 <StarIcon className="w-4 h-4 text-sebna-orange" />
-                <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+                <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                   {t('landing.trustedBy')}
                 </span>
               </div>
@@ -732,7 +732,7 @@ const SebnaLanding = () => {
                 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-6 leading-tight"
               >
                 <span className="block text-gray-900 dark:text-white">{t('landing.heroLine1')}</span>
-                <span className="block bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent animate-gradient-shift">
+                <span className="block bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent animate-gradient-shift">
                   {t('landing.heroHighlight')}
                 </span>
               </h1>
@@ -925,7 +925,7 @@ const SebnaLanding = () => {
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
               <ShieldCheckIcon className="w-4 h-4 text-sebna-navy" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.aboutSebna')}
               </span>
             </div>
@@ -936,7 +936,7 @@ const SebnaLanding = () => {
               className="text-4xl md:text-5xl font-bold mb-6"
             >
               <span className="block text-gray-900 dark:text-white">{t('landing.aboutTitleLine1')}</span>
-              <span className="bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.aboutTitleHighlight')}
               </span>
             </h2>
@@ -1063,7 +1063,7 @@ const SebnaLanding = () => {
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
               <StarIcon className="w-4 h-4 text-sebna-orange" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.ourValues')}
               </span>
             </div>
@@ -1073,7 +1073,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              {t('landing.valuesTitlePrefix')} <span className="bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">SEBNA</span> {t('landing.valuesTitleSuffix')}
+              {t('landing.valuesTitlePrefix')} <span className="bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">SEBNA</span> {t('landing.valuesTitleSuffix')}
             </h2>
 
             <p
@@ -1126,7 +1126,7 @@ const SebnaLanding = () => {
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
               <ChartBarIcon className="w-4 h-4 text-sebna-navy" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.ourServices')}
               </span>
             </div>
@@ -1137,7 +1137,7 @@ const SebnaLanding = () => {
               className="text-4xl md:text-5xl font-bold mb-6"
             >
               {t('landing.investmentOpportunities').split(' ')[0]}{' '}
-              <span className="bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.investmentOpportunities').split(' ').slice(1).join(' ') || t('landing.investmentOpportunities')}
               </span>
             </h2>
@@ -1198,7 +1198,7 @@ const SebnaLanding = () => {
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
               <ChartBarIcon className="w-4 h-4 text-sebna-navy" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.liveDashboard')}
               </span>
             </div>
@@ -1207,7 +1207,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              <span className="bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">{t('landing.investmentPerformance')}</span>
+              <span className="bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">{t('landing.investmentPerformance')}</span>
             </h2>
             <p
               data-aos="fade-up"
@@ -1267,7 +1267,7 @@ const SebnaLanding = () => {
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
               <BanknotesIcon className="w-4 h-4 text-sebna-navy" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.bankingPartners')}
               </span>
             </div>
@@ -1276,7 +1276,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              <span className="bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">{t('landing.trustedFinancialPartners')}</span>
+              <span className="bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">{t('landing.trustedFinancialPartners')}</span>
             </h2>
             <p
               data-aos="fade-up"
@@ -1378,7 +1378,7 @@ const SebnaLanding = () => {
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
               <GlobeAltIcon className="w-4 h-4 text-sebna-navy" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.latestNews')}
               </span>
             </div>
@@ -1387,7 +1387,7 @@ const SebnaLanding = () => {
               data-aos-delay="100"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              <span className="bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">{t('landing.stayUpdated')}</span>
+              <span className="bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">{t('landing.stayUpdated')}</span>
             </h2>
             <p
               data-aos="fade-up"
@@ -1648,7 +1648,7 @@ const SebnaLanding = () => {
               className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
             >
               <EnvelopeIcon className="w-4 h-4 text-sebna-navy" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">
+              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
                 {t('landing.getInTouch')}
               </span>
             </div>
@@ -1659,7 +1659,7 @@ const SebnaLanding = () => {
               data-aos-offset="200"
               className="text-4xl md:text-5xl font-bold mb-6"
             >
-              <span className="bg-gradient-to-r from-sebna-navy dark:from-amber-100 dark:via-amber-200 to-sebna-orange dark:to-amber-500 bg-clip-text text-transparent">{t('landing.contactUs')}</span>
+              <span className="bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">{t('landing.contactUs')}</span>
             </h2>
             <p
               data-aos="fade-up"
