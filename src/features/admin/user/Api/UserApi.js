@@ -2,7 +2,7 @@ import ApiService from "@/service/ApiService";
 import { getQueryFormObject } from "@/utils/utils.js";
 
 // Create a new API service instance with the specific base URL
-const api = new ApiService(import.meta.env.v_API_URI);
+const api = new ApiService(import.meta.env.VITE_API_URI);
 const path = "/users";
 
 export function CreateUser(data) {
