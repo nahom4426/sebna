@@ -33,7 +33,7 @@ export const translations = {
       signIn: 'Sign In',
       dashboard: 'Dashboard',
       goToDashboard: 'Go to Dashboard',
-      trustedBy: 'Trusted by 250+ Investors',
+      trustedBy: 'Trusted by 2 Investors',
       heroLine1: 'You are the',
       heroHighlight: 'Epicenter',
       heroDescription:
@@ -85,7 +85,6 @@ export const translations = {
         'Explore our diverse portfolio of investment opportunities across key sectors in Tigray.',
       currentSharePrice: 'Current Share Price',
       totalInvestment: 'Total Investment',
-      averageRoi: 'Average ROI',
       liveDashboard: 'Live Dashboard',
       investmentPerformance: 'Investment Performance',
       performanceDescription:
@@ -168,7 +167,7 @@ export const translations = {
       signIn: 'ግባ',
       dashboard: 'ዳሽቦርድ',
       goToDashboard: 'ወደ ዳሽቦርድ ሂድ',
-      trustedBy: 'በ250+ ኢንቨስተሮች የታመነ',
+      trustedBy: 'በ2 ኢንቨስተሮች የታመነ',
       heroLine1: 'እርስዎ ናቸው',
       heroHighlight: 'ማዕከሉ',
       heroDescription:
@@ -303,7 +302,7 @@ export const translations = {
       signIn: 'እተው',
       dashboard: 'ዳሽቦርድ',
       goToDashboard: 'ናብ ዳሽቦርድ ኪድ',
-      trustedBy: 'ብ10,250+ ኢንቨስተራት ዝተኣምነ',
+      trustedBy: 'ብ2 ኢንቨስተራት ዝተኣምነ',
       heroLine1: 'ንስኻ/ንስኺ ኢኻ/ኢኺ',
       heroHighlight: 'ማእከል',
       heroDescription:
