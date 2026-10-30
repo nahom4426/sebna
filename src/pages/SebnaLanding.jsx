@@ -138,6 +138,10 @@ const SebnaLanding = () => {
       return;
     }
 
+    if (sectionId === 'services') {
+      sectionId = 'investment';
+    }
+
     try {
       const el = document.getElementById(sectionId);
       if (!el) return;
@@ -1110,76 +1114,6 @@ const SebnaLanding = () => {
                 </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Services Section */}
-      <section className="py-20 md:py-32">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <div
-              data-aos="fade-up"
-              className="inline-flex items-center gap-2 bg-gradient-to-r from-sebna-navy/10 to-sebna-orange/10 backdrop-blur-sm border border-white/20 px-4 py-2 rounded-full mb-6"
-            >
-              <ChartBarIcon className="w-4 h-4 text-sebna-navy" />
-              <span className="text-sm font-semibold bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
-                {t('landing.ourServices')}
-              </span>
-            </div>
-
-            <h2
-              data-aos="fade-up"
-              data-aos-delay="100"
-              className="text-4xl md:text-5xl font-bold mb-6"
-            >
-              {t('landing.investmentOpportunities').split(' ')[0]}{' '}
-              <span className="bg-gradient-to-r from-sebna-navy dark:from-white to-sebna-orange bg-clip-text text-transparent">
-                {t('landing.investmentOpportunities').split(' ').slice(1).join(' ') || t('landing.investmentOpportunities')}
-              </span>
-            </h2>
-
-            <p
-              data-aos="fade-up"
-              data-aos-delay="200"
-              className="text-xl text-gray-600 dark:text-gray-300 max-w-3xl mx-auto"
-            >
-              {t('landing.servicesDescription')}
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {priceLoading ? (
-              [...Array(3)].map((_, idx) => (
-                <div key={idx} data-aos="fade-up" data-aos-delay={300 + idx * 100}>
-                  <MetricSkeleton />
-                </div>
-              ))
-            ) : (
-              [
-                {
-                  icon: ChartBarIcon,
-                  value: `ETB ${Number(currentPrice || 0).toLocaleString()}`,
-                  label: t('landing.currentSharePrice'),
-                  gradient: 'from-sebna-navy to-sebna-orange'
-                },
-                { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: UserGroupIcon, value: '2', label: t('landing.activeInvestors'), gradient: 'from-sebna-navy to-sebna-orange' },
-              ].map((metric, idx) => (
-                <div
-                  key={idx}
-                  data-aos="fade-up"
-                  data-aos-delay={300 + idx * 100}
-                  className="group bg-gradient-to-br from-white/80 to-white/60 dark:from-gray-800/80 dark:to-gray-800/60 backdrop-blur-sm rounded-2xl p-6 border border-white/40 dark:border-gray-700/40 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-1"
-                >
-                  <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${metric.gradient} flex items-center justify-center mb-4`}>
-                    <metric.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="text-2xl font-bold text-gray-900 dark:text-white mb-1">{metric.value}</div>
-                  <div className="text-sm text-gray-500 dark:text-gray-400">{metric.label}</div>
-                </div>
-              ))
-            )}
           </div>
         </div>
       </section>
