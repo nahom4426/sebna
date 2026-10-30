@@ -33,7 +33,7 @@ export const translations = {
       signIn: 'Sign In',
       dashboard: 'Dashboard',
       goToDashboard: 'Go to Dashboard',
-      trustedBy: 'Trusted by 2 Investors',
+      trustedBy: 'Trusted by 250+ Investors',
       heroLine1: 'You are the',
       heroHighlight: 'Epicenter',
       heroDescription:
