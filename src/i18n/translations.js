@@ -167,7 +167,7 @@ export const translations = {
       signIn: 'ግባ',
       dashboard: 'ዳሽቦርድ',
       goToDashboard: 'ወደ ዳሽቦርድ ሂድ',
-      trustedBy: 'በ2 ኢንቨስተሮች የታመነ',
+      trustedBy: 'በ250+ ኢንቨስተሮች የታመነ',
       heroLine1: 'እርስዎ ናቸው',
       heroHighlight: 'ማዕከሉ',
       heroDescription:
@@ -302,7 +302,7 @@ export const translations = {
       signIn: 'እተው',
       dashboard: 'ዳሽቦርድ',
       goToDashboard: 'ናብ ዳሽቦርድ ኪድ',
-      trustedBy: 'ብ2 ኢንቨስተራት ዝተኣምነ',
+      trustedBy: 'ብ250+ ኢንቨስተራት ዝተኣምነ',
       heroLine1: 'ንስኻ/ንስኺ ኢኻ/ኢኺ',
       heroHighlight: 'ማእከል',
       heroDescription:

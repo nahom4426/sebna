@@ -756,7 +756,7 @@ const SebnaLanding = () => {
                 className="grid grid-cols-3 gap-6 mb-8"
               >
                 {[
-                  { value: '2', label: t('landing.statsActiveInvestors'), color: 'from-sebna-navy to-sebna-navy' },
+                  { value: '250+', label: t('landing.statsActiveInvestors'), color: 'from-sebna-navy to-sebna-navy' },
                   { value: '25M', label: t('landing.statsEtbInvested'), color: 'from-sebna-navy to-sebna-navy' },
                   { value: '2', label: t('landing.statsProjectsFunded'), color: 'from-sebna-orange to-sebna-orange' },
                 ].map((stat, idx) => (
@@ -1164,7 +1164,7 @@ const SebnaLanding = () => {
                   gradient: 'from-sebna-navy to-sebna-orange'
                 },
                 { icon: WalletIcon, value: 'ETB 25M', label: t('landing.totalInvestment'), gradient: 'from-sebna-navy to-sebna-orange' },
-                { icon: UserGroupIcon, value: '2', label: t('landing.activeInvestors'), gradient: 'from-sebna-navy to-sebna-orange' },
+                { icon: UserGroupIcon, value: '250+', label: t('landing.activeInvestors'), gradient: 'from-sebna-navy to-sebna-orange' },
               ].map((metric, idx) => (
                 <div
                   key={idx}
