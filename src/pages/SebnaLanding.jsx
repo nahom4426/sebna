@@ -8,6 +8,8 @@ import { getLandingPosts, getPublicPostById } from '@/pages/admin/posts/api/Post
 import { checkIfPublicUserLiked, togglePublicLike } from '@/pages/admin/posts/api/LikesApi';
 import { getPublicPostComments, createPublicComment } from '@/pages/admin/comments/api/CommentsApi';
 import { getPricePerSharePublic } from '@/pages/admin/api/SebnaSettingsApi';
+import { sendContactMessage } from '@/pages/admin/api/ContactApi';
+import { toasted } from '@/utils/toast';
 import brandLogo from '@/assets/logo.svg';
 import brandIcon from '@/assets/Icon@300x.png';
 
@@ -63,6 +65,24 @@ const SebnaLanding = () => {
   const aosRef = useRef(null);
   const [currentPrice, setCurrentPrice] = useState(10000);
   const [priceChange, setPriceChange] = useState(0);
+  const emptyContactForm = { firstName: '', lastName: '', email: '', phone: '', subject: '', message: '' };
+  const [contactForm, setContactForm] = useState(emptyContactForm);
+  const [contactSending, setContactSending] = useState(false);
+
+  const updateContactField = (field) => (e) => setContactForm((prev) => ({ ...prev, [field]: e.target.value }));
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
+    if (contactSending) return;
+    setContactSending(true);
+    const res = await sendContactMessage(contactForm);
+    setContactSending(false);
+    // Errors are already shown as a toast by the response handler
+    if (res?.success) {
+      toasted(true, '', res.data?.message || 'Message sent');
+      setContactForm(emptyContactForm);
+    }
+  };
   const [priceHistory, setPriceHistory] = useState(() => Array.from({ length: 24 }, () => 10000));
   const [priceLoading, setPriceLoading] = useState(true);
 
@@ -1634,42 +1654,68 @@ const SebnaLanding = () => {
               data-aos-offset="200"
               className="bg-gradient-to-br from-white/80 to-white/60 backdrop-blur-xl rounded-3xl p-8 border border-white/40 shadow-2xl"
             >
-              <form className="space-y-4">
+              <form className="space-y-4" onSubmit={handleContactSubmit}>
                 <div className="grid sm:grid-cols-2 gap-4">
                   <input
                     type="text"
+                    required
+                    maxLength={100}
+                    value={contactForm.firstName}
+                    onChange={updateContactField('firstName')}
                     placeholder={t('landing.firstName')}
                     className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                   />
                   <input
                     type="text"
+                    maxLength={100}
+                    value={contactForm.lastName}
+                    onChange={updateContactField('lastName')}
                     placeholder={t('landing.lastName')}
                     className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                   />
                 </div>
                 <input
                   type="email"
+                  required
+                  maxLength={200}
+                  value={contactForm.email}
+                  onChange={updateContactField('email')}
                   placeholder={t('landing.emailAddress')}
                   className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                 />
                 <input
                   type="tel"
+                  maxLength={30}
+                  value={contactForm.phone}
+                  onChange={updateContactField('phone')}
                   placeholder={t('landing.phoneNumber')}
                   className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
                 />
-                <select className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300">
-                  <option>{t('landing.selectSubject')}</option>
-                  <option>{t('landing.investmentInquiry')}</option>
-                  <option>{t('landing.partnership')}</option>
-                  <option>{t('landing.customerSupport')}</option>
-                  <option>{t('landing.other')}</option>
+                <select
+                  value={contactForm.subject}
+                  onChange={updateContactField('subject')}
+                  className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300"
+                >
+                  <option value="">{t('landing.selectSubject')}</option>
+                  <option value="Investment Inquiry">{t('landing.investmentInquiry')}</option>
+                  <option value="Partnership">{t('landing.partnership')}</option>
+                  <option value="Customer Support">{t('landing.customerSupport')}</option>
+                  <option value="Other">{t('landing.other')}</option>
                 </select>
                 <textarea
+                  required
+                  maxLength={5000}
+                  value={contactForm.message}
+                  onChange={updateContactField('message')}
                   placeholder={t('landing.message')}
                   rows="4"
                   className="w-full px-4 py-3 rounded-xl bg-white/50 border border-white/40 focus:border-sebna-navy focus:ring-2 focus:ring-sebna-navy/20 outline-none transition-all duration-300 resize-none"
                 ></textarea>
-                <button className="group w-full px-8 py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-semibold rounded-xl shadow-lg shadow-sebna-navy/25 hover:shadow-xl hover:shadow-sebna-navy/35 transition-all duration-500 overflow-hidden">
+                <button
+                  type="submit"
+                  disabled={contactSending}
+                  className="group w-full px-8 py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-semibold rounded-xl shadow-lg shadow-sebna-navy/25 hover:shadow-xl hover:shadow-sebna-navy/35 transition-all duration-500 overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
+                >
                   <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy to-sebna-orange opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <span className="relative flex items-center justify-center gap-3">
                     <PaperAirplaneIcon className="w-5 h-5" />
