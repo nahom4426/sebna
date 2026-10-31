@@ -1714,7 +1714,7 @@ const SebnaLanding = () => {
                 <button
                   type="submit"
                   disabled={contactSending}
-                  className="group w-full px-8 py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-semibold rounded-xl shadow-lg shadow-sebna-navy/25 hover:shadow-xl hover:shadow-sebna-navy/35 transition-all duration-500 overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="group relative w-full px-8 py-3 bg-gradient-to-r from-sebna-navy to-sebna-orange text-white font-semibold rounded-xl shadow-lg shadow-sebna-navy/25 hover:shadow-xl hover:shadow-sebna-navy/35 transition-all duration-500 overflow-hidden disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <div className="absolute inset-0 bg-gradient-to-r from-sebna-navy to-sebna-orange opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                   <span className="relative flex items-center justify-center gap-3">
